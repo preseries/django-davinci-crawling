@@ -86,7 +86,7 @@ setup(
     ],
     dependency_links=[
         "https://github.com/preseries/django-cassandra-engine/tarball/"
-        "1.5.4.preseries-1#egg=django-cassandra-engine-1.5.4.preseries-1",
+        "1.5.4-preseries-1#egg=django-cassandra-engine-1.5.4.preseries-1",
         "https://github.com/preseries/django-caravaggio-rest-api/tarball/"
         "0.1.1#egg=django-caravaggio-rest-api-0.1.1"
     ],
