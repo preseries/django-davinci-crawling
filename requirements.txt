@@ -1,0 +1,13 @@
+spitslurp>=0.4
+python-dateutil>=2
+requests>=2.19
+untangle>=1.1
+selenium>=3
+beautifulsoup4>=4
+xmljson>=0.1
+
+google-api-python-client>=1.7
+google-cloud-storage>=1.10
+
+https://github.com/preseries/django-cassandra-engine/tarball/1.5.4-preseries-1#egg=django-cassandra-engine-1.5.4-preseries-1
+https://github.com/preseries/django-caravaggio-rest-api/tarball/0.1.1#egg=django-caravaggio-rest-api-0.1.1
