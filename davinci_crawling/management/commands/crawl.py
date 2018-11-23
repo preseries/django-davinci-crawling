@@ -87,8 +87,8 @@ class Command(BaseCommand):
         try:
             crawler_params = crawler.crawl_params(**options)
 
-            _logger.info("Crawler params ({0}): {1}".
-                         format(len(crawler_params), crawler_params))
+            _logger.info("Starting crawling with {0} params.".
+                         format(len(crawler_params)))
 
             func_params = []
             for crawler_param in crawler_params:
@@ -101,12 +101,14 @@ class Command(BaseCommand):
             call_results = pool.starmap(crawl, func_params)
 
             # Merge all the responses into one only list
-            results += list(
-                itertools.chain.from_iterable(call_results))
+            if call_results:
+                results += list(
+                    itertools.chain.from_iterable(call_results))
 
-            _logger.info("Crawler results ({0}): {1}".
-                         format(len(crawler_params), crawler_params))
+                # _logger.info("Crawler results ({0}): {1}".
+                #             format(len(crawler_params), crawler_params))
 
+            _logger.info("Crawler successfully finished!")
         except TimeoutError:
             _logger.error("Timeout error")
         finally:

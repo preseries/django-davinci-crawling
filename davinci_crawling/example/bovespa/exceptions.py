@@ -18,7 +18,7 @@ ERRORS = {
 class BovespaError(Exception):
     """
     <?xml version="1.0" encoding="ISO-8859-1" ?>
-    <ERROS DataSolicitada="19/02/2016 00:01" TipoDocumento="ITR" 
+    <ERROS DataSolicitada="19/02/2016 00:01" TipoDocumento="ITR"
             DataConsulta="23/07/2018 15:30">
         <NUMERO_DO_ERRO>22016</NUMERO_DO_ERRO>
         <DESCRICAO_DO_ERRO>Nenhum registro localizado.</DESCRICAO_DO_ERRO>
@@ -54,7 +54,7 @@ class BovespaError(Exception):
 class DownloadError(Exception):
     """
     This exception signals when a download wasn't successful
-    
+
     It contains the reference to the related Doc
     """
 
