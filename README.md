@@ -20,49 +20,27 @@ Technologies:
 - Swagger view of the API documentation 
 - Google App Engine Flexible (Custom) support
 - PGBouncer Connection Pool supported in the Docker image
+    
 
+## How create a new Crawler project
 
-brew install gdal
+```
+$ conda create -n myproject pip python=3.7
+$ conda activate myproject
 
-Sierra MAC OSX
-    sudo chown -R $(whoami) $(brew --prefix)/*
-    sudo install -d -o $(whoami) -g admin /usr/local/Frameworks
-    brew install gdal
+$ pip install django>=2
+
+$ django-admin.py startproject \
+  --template=https://github.com/preseries/davinci-crawling-template-project/archive/master.zip \
+  --name=Dockerfile \
+  --extension=py,md,env,sh,template,yamltemplate \
+  myproject
+```
+
+We can now follow the instructions explained in the README.md file inside the new created project in order to install and execute the new crawler code.
     
     
-## RESTful Searches
-
-
-Available operations:
-
-```
-    'content': u'%s',
-    'contains': u'*%s*',
-    'endswith': u'*%s',
-    'startswith': u'%s*',
-    'exact': u'%s',
-    'gt': u'{%s TO *}',
-    'gte': u'[%s TO *]',
-    'lt': u'{* TO %s}',
-    'lte': u'[* TO %s]',
-    'fuzzy': u'%s~',		
-    'in': u'("%s"... OR ... "%s")'
-    'range': u'[%s TO %s]'
-```    
-
-Boosting term:
-
-```
-boost=alpha_2,5
-```
-
-Geo Spatial searches:
-
-```
-km=10&from=-123.25022,44.59641
-```
-
-## Tests
+## Testing
 
 
 ### Requirements
@@ -75,11 +53,11 @@ We will get an error message if the postgres user with username django does
   to be sure that the `apian` user has rights to do so.
  
  ```
- $ docker run -it --rm --link apian-db:postgres postgres:9.6 psql -h postgres -U postgresPassword for user postgres: 
+ $ docker run -it --rm --link davinci_crawling-db:postgres postgres:9.6 psql -h postgres -U postgresPassword for user postgres: 
 psql (9.6.1)
 Type "help" for help.
 
-postgres=# ALTER USER apian CREATEDB;
+postgres=# ALTER USER davinci_crawling CREATEDB;
 ALTER ROLE
  ```
    
@@ -88,7 +66,7 @@ ALTER ROLE
 To run the tests we only need to run the following instruction:
 
 ```
-$ python manage.py test --testrunner=caravaggio_api.testrunner.TestRunner
+$ python manage.py test --testrunner=davinci_crawling.testrunner.TestRunner
 ```
 
 The output will be something like:
@@ -97,9 +75,9 @@ The output will be something like:
 Creating test database for alias 'default'...
 Creating test database for alias 'cassandra'...
 Creating keyspace test_apian [CONNECTION cassandra] ..
-Syncing company.models.BalanceSheet
-Syncing company.models.Company
-Syncing company.models.EntityMetrics
+Syncing davinci_crawling.example.models.BovespaCompany
+Syncing davinci_crawling.example.models.BovespaCompanyFile
+Syncing davinci_crawling.example.models.BovespaAccount
 System check identified no issues (0 silenced).
 E
 ======================================================================
@@ -125,3 +103,10 @@ Avoid the destruction of the database after the tests have finished and the inde
 ```
 $ python manage.py test --testrunner=caravaggio_api.testrunner.TestRunner --keepdb --keep-indexes
 ```
+
+brew install gdal
+
+Sierra MAC OSX
+    sudo chown -R $(whoami) $(brew --prefix)/*
+    sudo install -d -o $(whoami) -g admin /usr/local/Frameworks
+    brew install gdal
