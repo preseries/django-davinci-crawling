@@ -12,7 +12,7 @@ try:
 except ImportError:
     from cassandra.cqlengine import columns, ValidationError
 
-from caravaggio_rest_api.dse_models import BaseEntity, CustomDjangoCassandraModel
+from caravaggio_rest_api.dse.models import CustomDjangoCassandraModel
 from caravaggio_rest_api.utils import default
 
 
