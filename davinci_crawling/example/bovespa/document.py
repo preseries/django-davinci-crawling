@@ -32,7 +32,7 @@ SHARES_NUMBER_ACCOUNTS = [
     ("1.89.06", "QuantidadeTotalAcaoTesouraria")
 ]
 
-_logger = logging.getLogger("{}.document".
+_logger = logging.getLogger("davinci_crawler_{}.document".
                             format(BOVESPA_CRAWLER))
 
 
@@ -118,7 +118,7 @@ def get_financial_info_accounts(available_files, company_file):
             "financial_info_type": FINANCIAL_INFO_TYPES[
                 int(acc_version["CodigoTipoInformacaoFinanceira"]["$"]) - 1],
             "number": str(account_info["PlanoConta"]["NumeroConta"]["$"]),
-            "name": account_info["DescricaoConta1"]["$"],
+            "name": str(account_info["DescricaoConta1"]["$"]),
         }
 
         if account["balance_type"] ==  DFP_BALANCE_DMPL:

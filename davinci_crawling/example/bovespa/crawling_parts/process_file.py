@@ -13,8 +13,9 @@ try:
 except ImportError:
     from cassandra.cqlengine.query import LWTException
 
-_logger = logging.getLogger("{}.crawling_part.process_file".
-                            format(BOVESPA_CRAWLER))
+_logger = logging.getLogger(
+    "davinci_crawler_{}.crawling_part.process_file".
+        format(BOVESPA_CRAWLER))
 
 
 def process_file(

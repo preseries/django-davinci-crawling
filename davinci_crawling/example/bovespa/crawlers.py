@@ -11,7 +11,8 @@ from dateutil.parser import parse as date_parse
 from solrq import Q, Range, ANY
 from caravaggio_rest_api.query import CaravaggioSearchQuerySet
 
-from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
+from davinci_crawling.example.bovespa import \
+    BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.crawling_parts.process_file import \
     process_file
 from .models import BovespaCompanyFile, FILE_STATUS_NOT_PROCESSED
@@ -28,7 +29,7 @@ LAST_EXECUTION_DATE_CTL_FIELD = "last_execution_date"
 LAST_UPDATE_COMPANIES_LISTING_CTL_FIELD = "last_update_companies_listing"
 LAST_UPDATE_COMPANIES_FILES_CTL_FIELD = "last_update_companies_files"
 
-_logger = logging.getLogger(BOVESPA_CRAWLER)
+_logger = logging.getLogger("davinci_crawler_{}".format(BOVESPA_CRAWLER))
 
 
 def get_from_date(options, checkpoint_data):
@@ -87,11 +88,17 @@ def process_listed_companies(options, checkpoint_data, current_execution_date):
             phantomjs_path, workers_num=workers_num)
 
 
-def get_not_processed_files():
+def get_not_processed_files(options):
     files = []
 
     filter = ~Q(file_url=Range(ANY, ANY)) | \
              Q(status=FILE_STATUS_NOT_PROCESSED)
+
+    if options.get("include_companies", None):
+       filter = Q(ccvm=" ".join(options.get("include_companies", []))) & \
+                (filter)
+
+    print(str(filter))
 
     _logger.debug("Loading from database the files to be crawled...")
     paginator = CaravaggioSearchPaginator(
@@ -122,7 +129,7 @@ def process_companies_files(
 
     # We do not want to crawl the companies listing
     if no_update:
-        return get_not_processed_files()
+        return get_not_processed_files(options)
 
     update_elapsetime = \
         options.get("companies_files_update_elapsetime", None)
@@ -154,7 +161,7 @@ def process_companies_files(
 
     # Let's find all the company files without file_url (not downloaded
     # and processed yet) or not processed (status)
-    return get_not_processed_files()
+    return get_not_processed_files(options)
 
 
 class BovespaCrawler(Crawler):

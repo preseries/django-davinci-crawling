@@ -5,8 +5,7 @@ import logging
 from davinci_crawling.io import get_base_dir, mkdirs, get_local_base_dir
 from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 
-_logger = logging.getLogger("{}.io".
-                            format(BOVESPA_CRAWLER))
+_logger = logging.getLogger("davinci_crawler_{}.io".format(BOVESPA_CRAWLER))
 
 
 def _doc_base_path(options, company_file):

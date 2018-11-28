@@ -3,7 +3,6 @@
 
 import logging
 import re
-import itertools
 import traceback
 
 from multiprocessing.pool import Pool
@@ -53,8 +52,7 @@ DOWNLOAD_URL = "http://www.rad.cvm.gov.br/enetconsulta/" \
                "frmDownloadDocumento.aspx?CodigoInstituicao=1&" \
                "NumeroSequencialDocumento={protocol}"
 
-
-_logger = logging.getLogger("{}.crawling_part.company_files".
+_logger = logging.getLogger("davinci_crawler_{}.crawling_part.company_files".
                             format(BOVESPA_CRAWLER))
 
 

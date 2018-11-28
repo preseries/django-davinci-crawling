@@ -34,8 +34,9 @@ COMPANIES_LISTING_URL = "http://cvmweb.cvm.gov.br/SWB/Sistemas/SCW/CPublica/" \
 COMPANY_LETTERS_CTL = "ctl/listed_companies_letters.ctl"
 COMPANIES_CTL = "ctl/listed_companies_companies.ctl"
 
-_logger = logging.getLogger("{}.crawling_part.listed_companies".
-                            format(BOVESPA_CRAWLER))
+_logger = logging.getLogger(
+    "davinci_crawler_{}.crawling_part.listed_companies".
+        format(BOVESPA_CRAWLER))
 
 
 @Throttle(minutes=1, rate=50, max_tokens=50)

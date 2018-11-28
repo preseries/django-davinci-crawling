@@ -24,8 +24,9 @@ RE_FILE_BY_ITR = r"^.*\.ITR"
 RE_FILE_BY_DFP = r"^.*\.DFP"
 RE_FILE_BY_XML = r"^.*\.XML"
 
-_logger = logging.getLogger("{}.crawling_part.download_file".
-                            format(BOVESPA_CRAWLER))
+_logger = logging.getLogger(
+    "davinci_crawler_{}.crawling_part.download_file".
+        format(BOVESPA_CRAWLER))
 
 
 def extract_files_to_process(options, company_file):

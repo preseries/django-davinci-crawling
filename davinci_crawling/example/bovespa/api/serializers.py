@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta
 from dateutil.parser import parse as parse_date
 
-from caravaggio_rest_api.serializers import \
+from caravaggio_rest_api.drf_haystack.serializers import \
     BaseCachedSerializerMixin, CustomHaystackSerializer
 from drf_haystack.serializers import HaystackFacetSerializer
 
@@ -10,7 +10,7 @@ from rest_framework import fields, serializers
 
 from rest_framework_cache.registry import cache_registry
 
-from caravaggio_rest_api import serializers as dse_serializers
+from caravaggio_rest_api.drf_haystack import serializers as dse_serializers
 
 from davinci_crawling.example.bovespa.models import \
     BovespaCompany, BovespaCompanyFile, BovespaAccount

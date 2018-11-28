@@ -3,7 +3,8 @@
 
 import logging
 from datetime import datetime
-from caravaggio_rest_api.dse_models import CustomDjangoCassandraModel
+from caravaggio_rest_api.dse.models import CustomDjangoCassandraModel
+from caravaggio_rest_api.dse.columns import Decimal
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
@@ -29,7 +30,7 @@ FILE_STATUS_NOT_PROCESSED = "not_processed"
 FILE_STATUS_PROCESSED = "processed"
 FILE_STATUSES = [FILE_STATUS_NOT_PROCESSED, FILE_STATUS_PROCESSED]
 
-_logger = logging.getLogger("{}.models".
+_logger = logging.getLogger("davinci_crawler_{}.models".
                             format(BOVESPA_CRAWLER))
 
 
@@ -277,7 +278,7 @@ class BovespaAccount(CustomDjangoCassandraModel):
     name = columns.Text(max_length=200, required=True)
 
     # The value of the account
-    value = columns.Decimal(required=True)
+    value = Decimal(required=True, max_digits=20, decimal_places=2)
 
     # The comments. Used for "DFP_BALANCE_DMPL" accounts, explaining the
     # meaning of the account: Shareholder's Equity, Accrued Profit/Loss, etc.

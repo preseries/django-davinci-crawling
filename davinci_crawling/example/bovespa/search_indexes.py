@@ -11,7 +11,7 @@ from caravaggio_rest_api.indexes import BaseSearchIndex
 from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from .models import BovespaCompany, BovespaCompanyFile, BovespaAccount
 
-_logger = logging.getLogger("{}.search_indexes".
+_logger = logging.getLogger("davinci_crawler_{}.search_indexes".
                             format(BOVESPA_CRAWLER))
 
 

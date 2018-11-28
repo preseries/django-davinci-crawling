@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2018-2019 PreSeries Tech, SL
 
+import logging
+
+from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.time import mk_datetime
+
+_logger = logging.getLogger("davinci_crawler_{}".format(BOVESPA_CRAWLER))
 
 ERRORS = {
     "22014": "Invalid date",
