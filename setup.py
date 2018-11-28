@@ -62,7 +62,7 @@ setup(
         'google-api-python-client>=1.7',
         'google-cloud-storage>=1.10',
         'django-cassandra-engine==1.5.4.preseries-1',
-        'django-caravaggio-rest-api==0.1.1'],
+        'django-caravaggio-rest-api==0.1.2'],
     python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
     zip_safe=False,
     classifiers=[
@@ -88,7 +88,7 @@ setup(
         "https://github.com/preseries/django-cassandra-engine/tarball/"
         "1.5.4-preseries-1#egg=django-cassandra-engine-1.5.4.preseries-1",
         "https://github.com/preseries/django-caravaggio-rest-api/tarball/"
-        "0.1.1#egg=django-caravaggio-rest-api-0.1.1"
+        "0.1.2#egg=django-caravaggio-rest-api-0.1.2"
     ],
 )
 
