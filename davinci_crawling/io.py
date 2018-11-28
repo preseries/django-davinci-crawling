@@ -89,7 +89,7 @@ def upload_gs_file(options, source_file, dest_file):
 
     dest_file = get_gs_path(dest_file)
 
-    _logger.debug(("Upload file [%s] into [gc://%s/%s]" %
+    _logger.debug(("Upload file [%s] into [gs://%s/%s]" %
           (source_file, bucket.name, dest_file)))
 
     blob = bucket.blob(dest_file)
@@ -294,7 +294,7 @@ def exists(options, dest_file):
         bucket = storage_client.get_bucket(bucket_name)
 
         dest_file = get_gs_path(dest_file)
-        _logger.debug(("Checking existence of file [%s] into [gc://%s]" %
+        _logger.debug(("Checking existence of file [%s] into [gs://%s]" %
                        (dest_file, bucket.name)))
 
         blob = bucket.blob(dest_file)
@@ -335,7 +335,7 @@ def copy_file(options, source_file, dest_file):
         source_backend, source_file = get_backend_and_path(options, source_file)
         if source_backend == "gs":
             source_file = download_gs_file(
-                options, source_file,
+                options, "gs://{}".format(source_file),
                 "fs://{0}/{1}".format(temp_path, "test.zip"))
             try:
                 source_file = re.match(FILE_PATH_RE, source_file)[1]
