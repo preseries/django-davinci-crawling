@@ -9,7 +9,6 @@ from multiprocessing.pool import Pool
 
 from urllib.parse import urlencode
 
-from caravaggio_rest_api.query import CaravaggioSearchQuerySet
 from dateutil.parser import parse as date_parse
 
 from bs4 import BeautifulSoup

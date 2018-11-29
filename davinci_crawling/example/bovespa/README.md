@@ -328,6 +328,161 @@ And the result will be something like: (it shows 10 of the 36 accounts available
   ]
 }
 ```
+
+### Obtain all the accounts that follows a pattern (RegEx search)
+
+We will use the `/bovespa/company-account/search` endpoint to solve this request.
+
+To do these kind of queries we will need the `regex` operator. The case sensitive or insensitive will depends on the field definition in the index, if we are applying a `<filter class="solr.LowercaseFilterFactory" />`.
+
+Arguments:
+
+- Query: `ccvm=15300`
+- Restrictions: 
+    - `period=2018-06-30T00:00:00Z`, 
+    - `financial_info_type=INSTANT`, 
+    - and `number__iregex=1.01.(.*).01(.*)`
+- Sort results: `order_by=number`
+
+After [obtain our user Token](https://github.com/preseries/django-caravaggio-rest-api/blob/master/docs/local_environment.md#run-application-with-development-server), we can execute the following instruction:
+
+```
+$ curl -H 'Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b' \
+    -X GET "http://localhost:8001/bovespa/company-account/search/?period=2018-06-30T00:00:00Z&ccvm=15300&balance_type=ASSETS&financial_info_type=INSTANT&number__iregex=1.01.(.*).01(.*)&order_by=number"
+```
+
+And the result will be something like: (it shows 10 of the 36 accounts available for the period)
+
+```json5
+{
+  "total": 12,
+  "page": 10,
+  "next": "http://localhost:8001/bovespa/company-account/search/?balance_type=ASSETS&ccvm=15300&financial_info_type=INSTANT&number__iregex=1.01.%28.%2A%29.01%28.%2A%29&order_by=number&page=2&period=2018-06-30T00%3A00%3A00Z",
+  "previous": null,
+  "results": [
+    {
+      "ccvm": "15300",
+      "period": "2018-06-30",
+      "number": "1.01.02.01",
+      "financial_info_type": "INSTANT",
+      "balance_type": "ASSETS",
+      "name": "Aplicações Financeiras Avaliadas a Valor Justo através do Resultado",
+      "value": 0.0,
+      "created_at": "2018-11-26T22:57:30.754000",
+      "updated_at": "2018-11-26T22:57:30.754000",
+      "score": 12.044513
+    },
+    {
+      "ccvm": "15300",
+      "period": "2018-06-30",
+      "number": "1.01.02.01.01",
+      "financial_info_type": "INSTANT",
+      "balance_type": "ASSETS",
+      "name": "Títulos para Negociação",
+      "value": 0.0,
+      "created_at": "2018-11-26T22:57:30.758000",
+      "updated_at": "2018-11-26T22:57:30.758000",
+      "score": 12.044513
+    },
+    {
+      "ccvm": "15300",
+      "period": "2018-06-30",
+      "number": "1.01.02.01.02",
+      "financial_info_type": "INSTANT",
+      "balance_type": "ASSETS",
+      "name": "Títulos Designados a Valor Justo",
+      "value": 0.0,
+      "created_at": "2018-11-26T22:57:30.762000",
+      "updated_at": "2018-11-26T22:57:30.762000",
+      "score": 12.044513
+    },
+    {
+      "ccvm": "15300",
+      "period": "2018-06-30",
+      "number": "1.01.02.01.03",
+      "financial_info_type": "INSTANT",
+      "balance_type": "ASSETS",
+      "name": "Caixa restrito",
+      "value": 0.0,
+      "created_at": "2018-11-26T22:57:30.778000",
+      "updated_at": "2018-11-26T22:57:30.779000",
+      "score": 12.044513
+    },
+    {
+      "ccvm": "15300",
+      "period": "2018-06-30",
+      "number": "1.01.02.02.01",
+      "financial_info_type": "INSTANT",
+      "balance_type": "ASSETS",
+      "name": "Títulos Mantidos até o Vencimento",
+      "value": 0.0,
+      "created_at": "2018-11-26T22:57:30.797000",
+      "updated_at": "2018-11-26T22:57:30.797000",
+      "score": 12.044513
+    },
+    {
+      "ccvm": "15300",
+      "period": "2018-06-30",
+      "number": "1.01.03.01",
+      "financial_info_type": "INSTANT",
+      "balance_type": "ASSETS",
+      "name": "Clientes",
+      "value": 194127.0,
+      "created_at": "2018-11-26T22:57:30.811000",
+      "updated_at": "2018-11-26T22:57:30.812000",
+      "score": 12.044513
+    },
+    {
+      "ccvm": "15300",
+      "period": "2018-06-30",
+      "number": "1.01.03.02.01",
+      "financial_info_type": "INSTANT",
+      "balance_type": "ASSETS",
+      "name": "Adiantamentos a fornecedores",
+      "value": 0.0,
+      "created_at": "2018-11-26T22:57:30.822000",
+      "updated_at": "2018-11-26T22:57:30.822000",
+      "score": 12.044513
+    },
+    {
+      "ccvm": "15300",
+      "period": "2018-06-30",
+      "number": "1.01.06.01",
+      "financial_info_type": "INSTANT",
+      "balance_type": "ASSETS",
+      "name": "Tributos Correntes a Recuperar",
+      "value": 101872.0,
+      "created_at": "2018-11-26T22:57:30.847000",
+      "updated_at": "2018-11-26T22:57:30.848000",
+      "score": 12.044513
+    },
+    {
+      "ccvm": "15300",
+      "period": "2018-06-30",
+      "number": "1.01.06.01.01",
+      "financial_info_type": "INSTANT",
+      "balance_type": "ASSETS",
+      "name": "Imposto de renda e contribuição social a recuperar",
+      "value": 21123.0,
+      "created_at": "2018-11-26T22:57:30.853000",
+      "updated_at": "2018-11-26T22:57:30.853000",
+      "score": 12.044513
+    },
+    {
+      "ccvm": "15300",
+      "period": "2018-06-30",
+      "number": "1.01.06.01.02",
+      "financial_info_type": "INSTANT",
+      "balance_type": "ASSETS",
+      "name": "Outros tributos a recuperar",
+      "value": 80749.0,
+      "created_at": "2018-11-26T22:57:30.858000",
+      "updated_at": "2018-11-26T22:57:30.858000",
+      "score": 12.044513
+    }
+  ]
+}
+```
  
 ### Obtain all the new accounts keyed into the system after a specific date
 

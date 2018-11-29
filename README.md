@@ -101,7 +101,7 @@ Destroying test database for alias 'cassandra'...
 Avoid the destruction of the database after the tests have finished and the indexes synchronization:
 
 ```
-$ python manage.py test --testrunner=caravaggio_api.testrunner.TestRunner --keepdb --keep-indexes
+$ python manage.py test --testrunner=caravaggio_rest_api.testrunner.TestRunner --keepdb --keep-indexes
 ```
 
 brew install gdal

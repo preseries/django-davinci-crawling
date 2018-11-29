@@ -3,13 +3,14 @@
 
 import logging
 
-from caravaggio_rest_api.solr import CaravaggioSearchPaginator
+from caravaggio_rest_api.haystack.backends.utils import \
+    CaravaggioSearchPaginator
 from datetime import datetime
 
 from dateutil.parser import parse as date_parse
 
 from solrq import Q, Range, ANY
-from caravaggio_rest_api.query import CaravaggioSearchQuerySet
+from caravaggio_rest_api.haystack.query import CaravaggioSearchQuerySet
 
 from davinci_crawling.example.bovespa import \
     BOVESPA_CRAWLER

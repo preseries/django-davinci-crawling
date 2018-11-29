@@ -8,7 +8,8 @@ from datetime import datetime, date
 
 from solrq import Q
 from caravaggio_rest_api.utils import quarter
-from caravaggio_rest_api.solr import CaravaggioSearchPaginator
+from caravaggio_rest_api.haystack.backends.utils import \
+    CaravaggioSearchPaginator
 
 from django.core.management import BaseCommand
 
