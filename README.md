@@ -103,10 +103,3 @@ Avoid the destruction of the database after the tests have finished and the inde
 ```
 $ python manage.py test --testrunner=caravaggio_rest_api.testrunner.TestRunner --keepdb --keep-indexes
 ```
-
-brew install gdal
-
-Sierra MAC OSX
-    sudo chown -R $(whoami) $(brew --prefix)/*
-    sudo install -d -o $(whoami) -g admin /usr/local/Frameworks
-    brew install gdal
