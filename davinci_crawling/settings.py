@@ -351,7 +351,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS':
         ('drf_haystack.filters.HaystackFilter',
          'drf_haystack.filters.HaystackBoostFilter',
-         'caravaggio_rest_api.drf_haystack.filters.HaystackOrderingFilter',),
+         'drf_haystack.filters.HaystackOrderingFilter',),
 
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 
