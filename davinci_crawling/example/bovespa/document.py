@@ -69,7 +69,8 @@ def get_cap_composition_accounts(available_files, company_file):
     money_scale, quant_scale = get_scales(available_files, company_file)
 
     data = convert_xml_into_json(
-        available_files[FILE_CAPITAL_COMPOSITION.
+        available_files[
+            FILE_CAPITAL_COMPOSITION.
             format(doc_type=company_file.doc_type.lower())])
 
     accounts = []
@@ -105,7 +106,8 @@ def get_financial_info_accounts(available_files, company_file):
     money_scale, quant_scale = get_scales(available_files, company_file)
 
     data = convert_xml_into_json(
-        available_files[FILE_FINANCIAL_INFO.
+        available_files[
+            FILE_FINANCIAL_INFO.
             format(doc_type=company_file.doc_type.lower())])
 
     for account_info in data["ArrayOfInfoFinaDFin"]["InfoFinaDFin"]:
@@ -121,7 +123,7 @@ def get_financial_info_accounts(available_files, company_file):
             "name": str(account_info["DescricaoConta1"]["$"]),
         }
 
-        if account["balance_type"] ==  DFP_BALANCE_DMPL:
+        if account["balance_type"] == DFP_BALANCE_DMPL:
             period = account_info[
                 "PeriodoDemonstracaoFinanceira"][
                 "NumeroIdentificacaoPeriodo"]["$"]
@@ -213,7 +215,5 @@ def load_account_details(options, available_files, company_file):
 
     accounts = get_cap_composition_accounts(available_files, company_file)
     accounts.extend(get_financial_info_accounts(available_files, company_file))
-
-
 
     return accounts

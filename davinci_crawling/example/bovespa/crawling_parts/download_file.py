@@ -26,7 +26,7 @@ RE_FILE_BY_XML = r"^.*\.XML"
 
 _logger = logging.getLogger(
     "davinci_crawler_{}.crawling_part.download_file".
-        format(BOVESPA_CRAWLER))
+    format(BOVESPA_CRAWLER))
 
 
 def extract_files_to_process(options, company_file):

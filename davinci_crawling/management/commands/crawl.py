@@ -97,16 +97,16 @@ class Command(BaseCommand):
             _logger.info(
                 "Starting a Pool of %d processes" % workers_num)
 
-            #crawl(*func_params[0])
-            call_results = pool.starmap(crawl, func_params)
+            # crawl(*func_params[0])
+            # call_results = pool.starmap(crawl, func_params)
+            pool.starmap(crawl, func_params)
 
             # Merge all the responses into one only list
-            if call_results:
-                results += list(
-                    itertools.chain.from_iterable(call_results))
-
-                # _logger.info("Crawler results ({0}): {1}".
-                #             format(len(crawler_params), crawler_params))
+            # if call_results:
+            #    results += list(
+            #        itertools.chain.from_iterable(call_results))
+            #    _logger.info("Crawler results ({0}): {1}".
+            #             format(len(results), results))
 
             _logger.info("Crawler successfully finished!")
         except TimeoutError:

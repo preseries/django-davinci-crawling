@@ -109,7 +109,7 @@ def fetch_page(url, timeout):
 
 def parse_json(s):
     """
-    Parse the given json string into a python dictionary 
+    Parse the given json string into a python dictionary
     """
     return json.loads(s) if s else None
 
@@ -152,7 +152,8 @@ def fetch_tenaciously(fetcher, url, n, s,
                            "Max %d attempts remaining." %
                            (status_code, url, n))
             # logger.warning("Headers: %s" % page.response.headers)
-            return __maybe_retry(fetcher, url, n, s, data, page, error_callback)
+            return __maybe_retry(
+                fetcher, url, n, s, data, page, error_callback)
     except Exception as ex:
         logger.exception("Exception thrown for %s:%s."
                          " Max %d attempts remaining" %
@@ -180,8 +181,8 @@ def __content_error(status):
 
 def fetch_file(url, options):
     with tempfile.TemporaryDirectory() as temp_path:
-
-        logger.info("Download from [%s] and store into [%s]" % (url, temp_path))
+        logger.info(
+            "Download from [%s] and store into [%s]" % (url, temp_path))
         try:
             response = requests.get(
                 url, stream=True, timeout=(1800, 1800), verify=False)

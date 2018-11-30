@@ -24,7 +24,7 @@ from davinci_crawling.time import mk_datetime
 
 _logger = logging.getLogger(
     "davinci_crawler_{}.commands.gen_finstat".
-        format(BOVESPA_CRAWLER))
+    format(BOVESPA_CRAWLER))
 
 MONTHS_PER_QUARTER = [3, 6, 9, 12]
 
@@ -66,7 +66,6 @@ def get_quarter_date(period, accumulated=False):
         return periods
 
 
-
 def get_q4_prev_period(period, accumulated=False):
     """
     Returns the previous period (quarter) given a date. If the period is part
@@ -98,7 +97,7 @@ def get_prev_quarter_date(period):
     year = period.year if period_quarter > 1 else period.year - 1
     month = month_per_quarter[previous_quarter - 1]
 
-    return date(year, month, calendar.monthrange(year,month)[1])
+    return date(year, month, calendar.monthrange(year, month)[1])
 
 
 def get_same_quarter_prev_period(period, accumulated=False):
@@ -154,7 +153,7 @@ PERIODS_BY_BALANCE_TYPE = (
       # Other periods to compare with
       (("End Prev. Exercise", get_q4_prev_period, False),),
       # Percentages - Comparisons. 1 = current period, 2 first of other periods
-      (("Evolution", (1,2)),))),
+      (("Evolution", (1, 2)),))),
     (DFP_BALANCE_BPP,
      ("Passive",
       # Other periods to compare with
@@ -242,11 +241,12 @@ def load_accounts(ccvm, period):
         while paginator.has_next():
             _logger.debug(
                 "{0}/{1} accounts loaded from database...".
-                    format(paginator.get_loaded_docs(),
-                           paginator.get_hits()))
+                format(paginator.get_loaded_docs(),
+                       paginator.get_hits()))
             paginator.next()
             for d in paginator.get_results():
-                balance_type_accounts = period_data.setdefault(d.balance_type, {})
+                balance_type_accounts = \
+                    period_data.setdefault(d.balance_type, {})
                 financial_type_accounts = balance_type_accounts.\
                     setdefault(d.financial_info_type, {})
 
@@ -281,9 +281,11 @@ def add_basic_indicators(
             row + 0, 0, "{} Indicators".format(indicators_type), format_title)
 
         worksheet.write(row + 1, 0, "Market Cap", format_header)
-        worksheet.write(row + 1, 1,
-                        '=VLOOKUP("3.99.99.22",\'Income (DRE)\'!A1:C10000,3,0)*VLOOKUP("3.99.99.30",\'Income (DRE)\'!A1:C10000,3,0)'.format(
-                            acc_type), format_money)
+        worksheet.write(
+            row + 1, 1,
+            '=VLOOKUP("3.99.99.22",\'Income (DRE)\'!A1:C10000,3,0)*'
+            'VLOOKUP("3.99.99.30",\'Income (DRE)\'!A1:C10000,3,0)'.
+            format(acc_type), format_money)
 
         worksheet.write(row + 4, 0, "Operational efficiency", format_header)
         worksheet.write(row + 4, 1, "Current Quarter", format_header)
@@ -292,77 +294,228 @@ def add_basic_indicators(
         worksheet.write(row + 4, 4, "Accum. Prev. Year", format_header)
 
         worksheet.write(row + 5, 0, "Gross Margin")
-        worksheet.write(row + 5, 1, '=VLOOKUP("3.03{0}",\'Income (DRE)\'!A1:C10000,3,0)/VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,3,0)'.format(acc_type), format_percent)
-        worksheet.write(row + 5, 2, '=VLOOKUP("3.03{0}",\'Income (DRE)\'!A1:F10000,4,0)/VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,4,0)'.format(acc_type), format_percent)
-        worksheet.write(row + 5, 3, '=VLOOKUP("3.03{0}",\'Income (DRE)\'!A1:F10000,5,0)/VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,5,0)'.format(acc_type), format_percent)
-        worksheet.write(row + 5, 4, '=VLOOKUP("3.03{0}",\'Income (DRE)\'!A1:F10000,6,0)/VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,6,0)'.format(acc_type), format_percent)
+        worksheet.write(
+            row + 5, 1,
+            '=VLOOKUP("3.03{0}",\'Income (DRE)\'!A1:C10000,3,0)/'
+            'VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,3,0)'.
+            format(acc_type), format_percent)
+        worksheet.write(
+            row + 5, 2,
+            '=VLOOKUP("3.03{0}",\'Income (DRE)\'!A1:F10000,4,0)/'
+            'VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,4,0)'.
+            format(acc_type), format_percent)
+        worksheet.write(
+            row + 5, 3,
+            '=VLOOKUP("3.03{0}",\'Income (DRE)\'!A1:F10000,5,0)/'
+            'VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,5,0)'.
+            format(acc_type), format_percent)
+        worksheet.write(
+            row + 5, 4,
+            '=VLOOKUP("3.03{0}",\'Income (DRE)\'!A1:F10000,6,0)/'
+            'VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,6,0)'.
+            format(acc_type), format_percent)
 
         worksheet.write(row + 6, 0, "EBIT Margin")
-        worksheet.write(row + 6, 1, '=VLOOKUP("3.05{0}",\'Income (DRE)\'!A1:C10000,3,0)/VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:C10000,3,0)'.format(acc_type), format_percent)
-        worksheet.write(row + 6, 2, '=VLOOKUP("3.05{0}",\'Income (DRE)\'!A1:F10000,4,0)/VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,4,0)'.format(acc_type), format_percent)
-        worksheet.write(row + 6, 3, '=VLOOKUP("3.05{0}",\'Income (DRE)\'!A1:F10000,5,0)/VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,5,0)'.format(acc_type), format_percent)
-        worksheet.write(row + 6, 4, '=VLOOKUP("3.05{0}",\'Income (DRE)\'!A1:F10000,6,0)/VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,6,0)'.format(acc_type), format_percent)
+        worksheet.write(
+            row + 6, 1,
+            '=VLOOKUP("3.05{0}",\'Income (DRE)\'!A1:C10000,3,0)/'
+            'VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:C10000,3,0)'.
+            format(acc_type), format_percent)
+        worksheet.write(
+            row + 6, 2,
+            '=VLOOKUP("3.05{0}",\'Income (DRE)\'!A1:F10000,4,0)/'
+            'VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,4,0)'.
+            format(acc_type), format_percent)
+        worksheet.write(
+            row + 6, 3,
+            '=VLOOKUP("3.05{0}",\'Income (DRE)\'!A1:F10000,5,0)/'
+            'VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,5,0)'.
+            format(acc_type), format_percent)
+        worksheet.write(
+            row + 6, 4,
+            '=VLOOKUP("3.05{0}",\'Income (DRE)\'!A1:F10000,6,0)/'
+            'VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,6,0)'.
+            format(acc_type), format_percent)
 
         worksheet.write(row + 7, 0, "Net Margin")
-        worksheet.write(row + 7, 1, '=VLOOKUP("3.11{0}",\'Income (DRE)\'!A1:C10000,3,0)/VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:C10000,3,0)'.format(acc_type), format_percent)
-        worksheet.write(row + 7, 2, '=VLOOKUP("3.11{0}",\'Income (DRE)\'!A1:F10000,4,0)/VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,4,0)'.format(acc_type), format_percent)
-        worksheet.write(row + 7, 3, '=VLOOKUP("3.11{0}",\'Income (DRE)\'!A1:F10000,5,0)/VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,5,0)'.format(acc_type), format_percent)
-        worksheet.write(row + 7, 4, '=VLOOKUP("3.11{0}",\'Income (DRE)\'!A1:F10000,6,0)/VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,6,0)'.format(acc_type), format_percent)
+        worksheet.write(
+            row + 7, 1,
+            '=VLOOKUP("3.11{0}",\'Income (DRE)\'!A1:C10000,3,0)/'
+            'VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:C10000,3,0)'.
+            format(acc_type), format_percent)
+        worksheet.write(
+            row + 7, 2,
+            '=VLOOKUP("3.11{0}",\'Income (DRE)\'!A1:F10000,4,0)/'
+            'VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,4,0)'.
+            format(acc_type), format_percent)
+        worksheet.write(
+            row + 7, 3,
+            '=VLOOKUP("3.11{0}",\'Income (DRE)\'!A1:F10000,5,0)/'
+            'VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,5,0)'.
+            format(acc_type), format_percent)
+        worksheet.write(
+            row + 7, 4,
+            '=VLOOKUP("3.11{0}",\'Income (DRE)\'!A1:F10000,6,0)/'
+            'VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:F10000,6,0)'.
+            format(acc_type), format_percent)
 
         worksheet.write(row + 8, 0, "ROE")
-        worksheet.write(row + 8, 1, '=VLOOKUP("3.11{0}",\'Income (DRE)\'!A1:D10000,4,0)/B2'.format(acc_type), format_percent)
+        worksheet.write(
+            row + 8, 1,
+            '=VLOOKUP("3.11{0}",\'Income (DRE)\'!A1:D10000,4,0)/B2'.
+            format(acc_type), format_percent)
 
         worksheet.write(row + 9, 0, "Annualized ROE")
-        worksheet.write(row + 9, 1, '=4*VLOOKUP("3.11{0}",\'Income (DRE)\'!A1:C10000,3,0)/VLOOKUP("2.03{0}",\'Passive\'!A1:C10000,3,0)'.format(acc_type), format_percent)
+        worksheet.write(
+            row + 9, 1,
+            '=4*VLOOKUP("3.11{0}",\'Income (DRE)\'!A1:C10000,3,0)/'
+            'VLOOKUP("2.03{0}",\'Passive\'!A1:C10000,3,0)'.
+            format(acc_type), format_percent)
 
         worksheet.write(row + 10, 0, "Annualized EBIT/Assets")
-        worksheet.write(row + 10, 1, '=4*VLOOKUP("3.05{0}",\'Income (DRE)\'!A1:C10000,3,0)/VLOOKUP("1{0}",\'Active\'!A1:C10000,3,0)'.format(acc_type), format_percent)
+        worksheet.write(
+            row + 10, 1,
+            '=4*VLOOKUP("3.05{0}",\'Income (DRE)\'!A1:C10000,3,0)/'
+            'VLOOKUP("1{0}",\'Active\'!A1:C10000,3,0)'.
+            format(acc_type), format_percent)
 
         worksheet.write(row + 11, 0, "Annualized RL/Assets")
-        worksheet.write(row + 11, 1, '=4*VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:C10000,3,0)/VLOOKUP("1{0}",\'Active\'!A1:C10000,3,0)'.format(acc_type), format_percent)
+        worksheet.write(
+            row + 11, 1,
+            '=4*VLOOKUP("3.01{0}",\'Income (DRE)\'!A1:C10000,3,0)/'
+            'VLOOKUP("1{0}",\'Active\'!A1:C10000,3,0)'.
+            format(acc_type), format_percent)
 
         worksheet.write(row + 13, 0, "Price indicators", format_header)
 
         worksheet.write(row + 14, 0, "Price Earnings Ratio (PER)")
-        worksheet.write(row + 14, 1, '=(VLOOKUP("3.99.99.22",\'Income (DRE)\'!A1:C10000,3,0)*VLOOKUP("3.99.99.30",\'Income (DRE)\'!A1:C10000,3,0))/(4*VLOOKUP("3.11{0}",\'Income (DRE)\'!A1:C10000,3,0))'.format(acc_type), format_stock_price)
+        worksheet.write(
+            row + 14, 1,
+            '=(VLOOKUP("3.99.99.22",\'Income (DRE)\'!A1:C10000,3,0)*'
+            'VLOOKUP("3.99.99.30",\'Income (DRE)\'!A1:C10000,3,0))/'
+            '(4*VLOOKUP("3.11{0}",\'Income (DRE)\'!A1:C10000,3,0))'.
+            format(acc_type), format_stock_price)
 
         worksheet.write(row + 15, 0, "Price per Book Value (P/BV)")
-        worksheet.write(row + 15, 1, '=(VLOOKUP("3.99.99.22",\'Income (DRE)\'!A1:C10000,3,0)*VLOOKUP("3.99.99.30",\'Income (DRE)\'!A1:C10000,3,0))/VLOOKUP("2.03{0}",\'Passive\'!A1:C10000,3,0)'.format(acc_type), format_stock_price)
+        worksheet.write(
+            row + 15, 1,
+            '=(VLOOKUP("3.99.99.22",\'Income (DRE)\'!A1:C10000,3,0)*'
+            'VLOOKUP("3.99.99.30",\'Income (DRE)\'!A1:C10000,3,0))/'
+            'VLOOKUP("2.03{0}",\'Passive\'!A1:C10000,3,0)'.
+            format(acc_type), format_stock_price)
 
         worksheet.write(row + 16, 0, "Enterprise Value per EBIT (EV/EBIT)")
-        worksheet.write(row + 16, 1, '=(VLOOKUP("3.99.99.22",\'Income (DRE)\'!A1:C10000,3,0)*VLOOKUP("3.99.99.30",\'Income (DRE)\'!A1:C10000,3,0))/(4*VLOOKUP("3.05{0}",\'Income (DRE)\'!A1:C10000,3,0))'.format(acc_type), format_stock_price)
+        worksheet.write(
+            row + 16, 1,
+            '=(VLOOKUP("3.99.99.22",\'Income (DRE)\'!A1:C10000,3,0)*'
+            'VLOOKUP("3.99.99.30",\'Income (DRE)\'!A1:C10000,3,0))/'
+            '(4*VLOOKUP("3.05{0}",\'Income (DRE)\'!A1:C10000,3,0))'.
+            format(acc_type), format_stock_price)
 
         worksheet.write(row + 18, 0, "Debt indicators", format_header)
         worksheet.write(row + 18, 1, "Current Quarter", format_header)
         worksheet.write(row + 18, 2, "End Prev. Exercise", format_header)
 
         worksheet.write(row + 19, 0, "Loans / Equity (L/E ratio)")
-        worksheet.write(row + 19, 1, '=(IFERROR(VLOOKUP("2.01.04{0}",\'Passive\'!A1:C10000,3,0), 0.0)+IFERROR(VLOOKUP("2.02.01{0}",\'Passive\'!A1:C10000,3,0), 0.0))/VLOOKUP("2.03{0}",\'Passive\'!A1:C10000,3,0)'.format(acc_type), format_percent)
-        worksheet.write(row + 19, 2, '=(IFERROR(VLOOKUP("2.01.04{0}",\'Passive\'!A1:D10000,4,0), 0.0)+IFERROR(VLOOKUP("2.02.01{0}",\'Passive\'!A1:D10000,4,0), 0.0))/VLOOKUP("2.03{0}",\'Passive\'!A1:D10000,4,0)'.format(acc_type), format_percent)
+        worksheet.write(
+            row + 19, 1,
+            '=(IFERROR(VLOOKUP("2.01.04{0}",\'Passive\'!A1:C10000,3,0), 0.0)+'
+            'IFERROR(VLOOKUP("2.02.01{0}",\'Passive\'!A1:C10000,3,0), 0.0))/'
+            'VLOOKUP("2.03{0}",\'Passive\'!A1:C10000,3,0)'.
+            format(acc_type), format_percent)
+        worksheet.write(
+            row + 19, 2,
+            '=(IFERROR(VLOOKUP("2.01.04{0}",\'Passive\'!A1:D10000,4,0), 0.0)+'
+            'IFERROR(VLOOKUP("2.02.01{0}",\'Passive\'!A1:D10000,4,0), 0.0))/'
+            'VLOOKUP("2.03{0}",\'Passive\'!A1:D10000,4,0)'.
+            format(acc_type), format_percent)
 
         worksheet.write(row + 20, 0, "Total Debt / Equity (D/E)")
-        worksheet.write(row + 20, 1, '=(VLOOKUP("2.01{0}",\'Passive\'!A1:C10000,3,0)+VLOOKUP("2.02{0}",\'Passive\'!A1:C10000,3,0))/VLOOKUP("2.03{0}",\'Passive\'!A1:C10000,3,0)'.format(acc_type), format_percent)
-        worksheet.write(row + 20, 2, '=(VLOOKUP("2.01{0}",\'Passive\'!A1:D10000,4,0)+VLOOKUP("2.02{0}",\'Passive\'!A1:D10000,4,0))/VLOOKUP("2.03{0}",\'Passive\'!A1:D10000,4,0)'.format(acc_type), format_percent)
+        worksheet.write(
+            row + 20, 1,
+            '=(VLOOKUP("2.01{0}",\'Passive\'!A1:C10000,3,0)+'
+            'VLOOKUP("2.02{0}",\'Passive\'!A1:C10000,3,0))/'
+            'VLOOKUP("2.03{0}",\'Passive\'!A1:C10000,3,0)'.
+            format(acc_type), format_percent)
+        worksheet.write(
+            row + 20, 2,
+            '=(VLOOKUP("2.01{0}",\'Passive\'!A1:D10000,4,0)+'
+            'VLOOKUP("2.02{0}",\'Passive\'!A1:D10000,4,0))/'
+            'VLOOKUP("2.03{0}",\'Passive\'!A1:D10000,4,0)'.
+            format(acc_type), format_percent)
 
         worksheet.write(row + 21, 0, "Long Term Debt / Equity (LTD/E)")
-        worksheet.write(row + 21, 1, '=VLOOKUP("2.02{0}",\'Passive\'!A1:C10000,3,0)/VLOOKUP("2.03{0}",\'Passive\'!A1:C10000,3,0)'.format(acc_type), format_percent)
-        worksheet.write(row + 21, 2, '=VLOOKUP("2.02{0}",\'Passive\'!A1:D10000,4,0)/VLOOKUP("2.03{0}",\'Passive\'!A1:D10000,4,0)'.format(acc_type), format_percent)
+        worksheet.write(
+            row + 21, 1,
+            '=VLOOKUP("2.02{0}",\'Passive\'!A1:C10000,3,0)/'
+            'VLOOKUP("2.03{0}",\'Passive\'!A1:C10000,3,0)'.
+            format(acc_type), format_percent)
+        worksheet.write(
+            row + 21, 2,
+            '=VLOOKUP("2.02{0}",\'Passive\'!A1:D10000,4,0)/'
+            'VLOOKUP("2.03{0}",\'Passive\'!A1:D10000,4,0)'.
+            format(acc_type), format_percent)
 
-        worksheet.write(row + 22, 0, "Current Liabilities / Total Debt (Financial Indebtedness)")
-        worksheet.write(row + 22, 1, '=IFERROR(VLOOKUP("2.01{0}",\'Passive\'!A1:C10000,3,0), 0.0)/(IFERROR(VLOOKUP("2.01{0}",\'Passive\'!A1:C10000,3,0), 0.0)+IFERROR(VLOOKUP("2.02{0}",\'Passive\'!A1:C10000,3,0), 0.0))'.format(acc_type), format_percent)
-        worksheet.write(row + 22, 2, '=IFERROR(VLOOKUP("2.01{0}",\'Passive\'!A1:D10000,4,0), 0.0)/(IFERROR(VLOOKUP("2.01{0}",\'Passive\'!A1:D10000,4,0), 0.0)+IFERROR(VLOOKUP("2.02{0}",\'Passive\'!A1:D10000,4,0), 0.0))'.format(acc_type), format_percent)
+        worksheet.write(
+            row + 22, 0,
+            "Current Liabilities / Total Debt (Financial Indebtedness)")
+        worksheet.write(
+            row + 22, 1,
+            '=IFERROR(VLOOKUP("2.01{0}",\'Passive\'!A1:C10000,3,0), 0.0)/'
+            '(IFERROR(VLOOKUP("2.01{0}",\'Passive\'!A1:C10000,3,0), 0.0)+'
+            'IFERROR(VLOOKUP("2.02{0}",\'Passive\'!A1:C10000,3,0), 0.0))'.
+            format(acc_type), format_percent)
+        worksheet.write(
+            row + 22, 2,
+            '=IFERROR(VLOOKUP("2.01{0}",\'Passive\'!A1:D10000,4,0), 0.0)/'
+            '(IFERROR(VLOOKUP("2.01{0}",\'Passive\'!A1:D10000,4,0), 0.0)+'
+            'IFERROR(VLOOKUP("2.02{0}",\'Passive\'!A1:D10000,4,0), 0.0))'.
+            format(acc_type), format_percent)
 
         worksheet.write(row + 23, 0, "Long Term Debt / Total Debt")
-        worksheet.write(row + 23, 1, '=IFERROR(VLOOKUP("2.02{0}",\'Passive\'!A1:C10000,3,0), 0.0)/(IFERROR(VLOOKUP("2.01{0}",\'Passive\'!A1:C10000,3,0), 0.0)+IFERROR(VLOOKUP("2.02{0}",\'Passive\'!A1:C10000,3,0), 0.0))'.format(acc_type), format_percent)
-        worksheet.write(row + 23, 2, '=IFERROR(VLOOKUP("2.02{0}",\'Passive\'!A1:D10000,4,0), 0.0)/(IFERROR(VLOOKUP("2.01{0}",\'Passive\'!A1:D10000,4,0), 0.0)+IFERROR(VLOOKUP("2.02{0}",\'Passive\'!A1:D10000,4,0), 0.0))'.format(acc_type), format_percent)
+        worksheet.write(
+            row + 23, 1,
+            '=IFERROR(VLOOKUP("2.02{0}",\'Passive\'!A1:C10000,3,0), 0.0)/'
+            '(IFERROR(VLOOKUP("2.01{0}",\'Passive\'!A1:C10000,3,0), 0.0)+'
+            'IFERROR(VLOOKUP("2.02{0}",\'Passive\'!A1:C10000,3,0), 0.0))'.
+            format(acc_type), format_percent)
+        worksheet.write(
+            row + 23, 2,
+            '=IFERROR(VLOOKUP("2.02{0}",\'Passive\'!A1:D10000,4,0), 0.0)/'
+            '(IFERROR(VLOOKUP("2.01{0}",\'Passive\'!A1:D10000,4,0), 0.0)+'
+            'IFERROR(VLOOKUP("2.02{0}",\'Passive\'!A1:D10000,4,0), 0.0))'.
+            format(acc_type), format_percent)
 
         worksheet.write(row + 24, 0, "Quick Ratio")
-        worksheet.write(row + 24, 1, '=(IFERROR(VLOOKUP("1.01.01{0}",\'Active\'!A1:C10000,3,0), 0.0)+IFERROR(VLOOKUP("1.01.02{0}",\'Active\'!A1:C10000,3,0), 0.0)+IFERROR(VLOOKUP("1.01.03{0}",\'Active\'!A1:C10000,3,0), 0.0))/VLOOKUP("2.01{0}",\'Passive\'!A1:C10000,3,0)'.format(acc_type), format_stock_price)
-        worksheet.write(row + 24, 2, '=(IFERROR(VLOOKUP("1.01.01{0}",\'Active\'!A1:D10000,4,0), 0.0)+IFERROR(VLOOKUP("1.01.02{0}",\'Active\'!A1:D10000,4,0), 0.0)+IFERROR(VLOOKUP("1.01.03{0}",\'Active\'!A1:D10000,4,0), 0.0))/VLOOKUP("2.01{0}",\'Passive\'!A1:D10000,4,0)'.format(acc_type), format_stock_price)
+        worksheet.write(
+            row + 24, 1,
+            '=(IFERROR(VLOOKUP("1.01.01{0}",\'Active\'!A1:C10000,3,0), 0.0)+'
+            'IFERROR(VLOOKUP("1.01.02{0}",\'Active\'!A1:C10000,3,0), 0.0)+'
+            'IFERROR(VLOOKUP("1.01.03{0}",\'Active\'!A1:C10000,3,0), 0.0))/'
+            'VLOOKUP("2.01{0}",\'Passive\'!A1:C10000,3,0)'.
+            format(acc_type), format_stock_price)
+        worksheet.write(
+            row + 24, 2,
+            '=(IFERROR(VLOOKUP("1.01.01{0}",\'Active\'!A1:D10000,4,0), 0.0)+'
+            'IFERROR(VLOOKUP("1.01.02{0}",\'Active\'!A1:D10000,4,0), 0.0)+'
+            'IFERROR(VLOOKUP("1.01.03{0}",\'Active\'!A1:D10000,4,0), 0.0))/'
+            'VLOOKUP("2.01{0}",\'Passive\'!A1:D10000,4,0)'.
+            format(acc_type), format_stock_price)
 
-        # worksheet.write(row + 25, 0, "Accum. Interest / Gross Debt End Exercise")
-        # worksheet.write(row + 25, 1, '=VLOOKUP("7.08.03.01{0}",\'Added value (DVA)\'!A1:C10000,3,0)/(IFERROR(VLOOKUP("2.01.04{0}",\'Passive\'!A1:D10000,4,0), 0.0)+IFERROR(VLOOKUP("2.02.01{0}",\'Passive\'!A1:D10000,4,0), 0.0))'.format(acc_type), format_percent)
-        # worksheet.write(row + 25, 2, '=VLOOKUP("7.08.03.01{0}",\'Added value (DVA)\'!A1:D10000,4,0)/(IFERROR(VLOOKUP("2.01.04{0}",\'Passive\'!A1:D10000,4,0), 0.0)+IFERROR(VLOOKUP("2.02.01{0}",\'Passive\'!A1:D10000,4,0), 0.0))'.format(acc_type), format_percent)
+        # worksheet.write(
+        #   row + 25, 0, "Accum. Interest / Gross Debt End Exercise")
+        # worksheet.write(
+        #   row + 25, 1,
+        #   '=VLOOKUP("7.08.03.01{0}",\'Added value (DVA)\'!A1:C10000,3,0)/
+        #   (IFERROR(VLOOKUP("2.01.04{0}",\'Passive\'!A1:D10000,4,0), 0.0)+
+        #   IFERROR(VLOOKUP("2.02.01{0}",\'Passive\'!A1:D10000,4,0), 0.0))'.
+        #   format(acc_type), format_percent)
+        # worksheet.write(
+        #   row + 25, 2,
+        #   '=VLOOKUP("7.08.03.01{0}",\'Added value (DVA)\'!A1:D10000,4,0)/
+        #   (IFERROR(VLOOKUP("2.01.04{0}",\'Passive\'!A1:D10000,4,0), 0.0)+
+        #   IFERROR(VLOOKUP("2.02.01{0}",\'Passive\'!A1:D10000,4,0), 0.0))'.
+        #   format(acc_type), format_percent)
 
         row += 26
 
@@ -421,7 +574,7 @@ def export_data(ccvm, current_period):
 
             accounts = {}
             accounts.update(
-                {acc_number:current_instant_data[acc_number]["name"]
+                {acc_number: current_instant_data[acc_number]["name"]
                  for acc_number in current_instant_data.keys()})
 
             # Add periods accounts
@@ -436,12 +589,12 @@ def export_data(ccvm, current_period):
 
                     _logger.debug(
                         "Processing {0} for other period {1} - {2:%Y-%m-%d}".
-                      format(balance_type, period_name, other_period_date))
+                        format(balance_type, period_name, other_period_date))
 
                     data = other_period_data[balance_type][info_type]
 
                     accounts.update(
-                        {acc_number:data[acc_number]["name"]
+                        {acc_number: data[acc_number]["name"]
                          for acc_number in data.keys()})
 
             subsection_tittle = "Individual" \
@@ -491,11 +644,11 @@ def export_data(ccvm, current_period):
 
                     other_period_values.append(value)
 
-                    #other_period_date = period_func(current_period)
-                    #other_period_data = \
+                    # other_period_date = period_func(current_period)
+                    # other_period_data = \
                     #    load_accounts(ccvm, other_period_date)
-                    #data = other_period_data[balance_type][info_type]
-                    #other_period_values.append(
+                    # data = other_period_data[balance_type][info_type]
+                    # other_period_values.append(
                     #    data[acc_number]["value"]
                     #    if acc_number in data else 0.0)
 
@@ -625,14 +778,14 @@ class Command(BaseCommand):
             current_period = get_closest_fiscal_date(ccvm, fiscal_date)
             _logger.debug(
                 "Loading period data: {:%Y-%m-%d}".
-                    format(current_period))
-            #current_period_data = load_accounts(ccvm, current_period)
+                format(current_period))
+            # current_period_data = load_accounts(ccvm, current_period)
 
-            #q4_prev_period = get_q4_prev_period(current_period)
-            #_logger.debug(
+            # q4_prev_period = get_q4_prev_period(current_period)
+            # _logger.debug(
             #    "Loading prev Q4 period data: {:%Y-%m-%d}".
             #        format(q4_prev_period))
-            #q4_prev_period_data = load_accounts(ccvm, q4_prev_period)
+            # q4_prev_period_data = load_accounts(ccvm, q4_prev_period)
 
             export_data(ccvm, current_period)
 

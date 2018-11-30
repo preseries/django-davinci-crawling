@@ -81,7 +81,7 @@ def extract_ENET_files_from_page(
     try:
         num_of_docs = int(re.search(RE_TOTAL_FILES, str(bs))[1])
         _logger.debug("Total files {0}".format(num_of_docs))
-    except:
+    except Exception as ex:
         _logger.warning("There is no files information in the companies "
                         "files page for [{ccvm} - {doc_type}] ".
                         format(ccvm=ccvm, doc_type=doc_type))
@@ -92,7 +92,6 @@ def extract_ENET_files_from_page(
         last_file_in_page = int(
             re.search(RE_LAST_FILE_IN_PAGE, str(bs))[2])
         _logger.debug("Last file in page: {0}".format(last_file_in_page))
-
 
         # Obtain the table elements that contains information about the
         # financial statements of the company we are interested in
@@ -107,7 +106,7 @@ def extract_ENET_files_from_page(
         for table in all_tables:
             link_tag = table.find('a', href=re.compile(RE_DOWNLOAD_FILE))
             if link_tag:
-                fiscal_date = re.search(RE_FISCAL_DATE,str(table))[1]
+                fiscal_date = re.search(RE_FISCAL_DATE, str(table))[1]
                 fiscal_date = date_parse(fiscal_date)
 
                 delivery_date = re.search(RE_DELIVERY_DATE, str(table))[1]
@@ -152,11 +151,11 @@ def extract_ENET_files_from_page(
                         "The company file [{ccvm} - '{name}' - {doc_type} - "
                         "{fiscal_date:%Y-%m-%d} - {version}]"
                         " cannot be created. The file already exists.".
-                            format(ccvm=ccvm,
-                                   name=company_name,
-                                   doc_type=doc_type,
-                                   fiscal_date=fiscal_date,
-                                   version=version))
+                        format(ccvm=ccvm,
+                               name=company_name,
+                               doc_type=doc_type,
+                               fiscal_date=fiscal_date,
+                               version=version))
                     pass
 
                 files.append(company_file_data)
@@ -220,7 +219,7 @@ def obtain_company_files(
             _logger.warning(
                 "There is no documents page for company {ccvm} "
                 "and {doc_type}. Showing 'Error de Aplicacao'".
-                    format(ccvm=ccvm, doc_type=doc_type))
+                format(ccvm=ccvm, doc_type=doc_type))
             return files
 
         # Once the page is ready, we can select the doc_type from the list
@@ -240,7 +239,7 @@ def obtain_company_files(
             _logger.warning(
                 "There is no documents page for company {ccvm} "
                 "and {doc_type}. Showing 'Error de Aplicacao'".
-                    format(ccvm=ccvm, doc_type=doc_type))
+                format(ccvm=ccvm, doc_type=doc_type))
             return files
 
         bs = BeautifulSoup(driver.page_source, "html.parser")
@@ -279,16 +278,15 @@ def crawl_companies_files(
     try:
         # Obtain the ccvm codes of all the listed companies
         ccvm_codes = [r.ccvm for r in
-                      BovespaCompany.objects.
-                          only(["ccvm"]).all()]
+                      BovespaCompany.objects.only(["ccvm"]).all()]
 
         ccvm_codes = sorted(ccvm_codes)
 
         _logger.debug(
             "Processing the files of {0} companies from {1}".
-                format(len(ccvm_codes),
-                       "{0:%Y-%m-%d}".format(from_date)
-                       if from_date else "THE BEGINNING"))
+            format(len(ccvm_codes),
+                   "{0:%Y-%m-%d}".format(from_date)
+                   if from_date else "THE BEGINNING"))
 
         func_params = []
         for ccvm_code in ccvm_codes:
@@ -299,7 +297,8 @@ def crawl_companies_files(
                 func_params.append([
                     ccvm_code, phantomjs_path, doc_type, from_date])
 
-        call_results = pool.starmap(obtain_company_files, func_params)
+        # call_results = pool.starmap(obtain_company_files, func_params)
+        pool.starmap(obtain_company_files, func_params)
 
         # Merge all the responses into one only list
         # companies_files += list(

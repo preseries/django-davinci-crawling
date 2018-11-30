@@ -21,7 +21,7 @@ class Crawler(metaclass=ABCMeta):
             raise RuntimeError(
                 "The crawler {} must specify "
                 "class Meta attribute '__crawler_name__'".
-                    format(self.__class__))
+                format(self.__class__))
 
         self.__prepare_parser()
 
@@ -42,10 +42,9 @@ class Crawler(metaclass=ABCMeta):
             prog='%s' % getattr(self, "__crawler_name__"),
             description="Crawler settings",
             formatter_class=DjangoHelpFormatter,
-            missing_args_message=
-            getattr(self, 'missing_args_message', None),
-            called_from_command_line=
-            getattr(self, '_called_from_command_line', None),
+            missing_args_message=getattr(self, 'missing_args_message', None),
+            called_from_command_line=getattr(
+                self, '_called_from_command_line', None),
         )
         self._parser.add_argument(
             '--version',

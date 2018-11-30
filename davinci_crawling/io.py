@@ -90,7 +90,7 @@ def upload_gs_file(options, source_file, dest_file):
     dest_file = get_gs_path(dest_file)
 
     _logger.debug(("Upload file [%s] into [gs://%s/%s]" %
-          (source_file, bucket.name, dest_file)))
+                   (source_file, bucket.name, dest_file)))
 
     blob = bucket.blob(dest_file)
     blob.upload_from_filename(source_file)
@@ -126,7 +126,7 @@ def download_gs_file(options, source_file, dest_file):
 
     try:
         file_path = re.match(FILE_PATH_RE, dest_file)[1]
-    except:
+    except Exception as ex:
         file_path = dest_file
 
     blob.download_to_filename(file_path)
@@ -304,7 +304,7 @@ def exists(options, dest_file):
 def delete_all(options, path):
     try:
         backend = get_backend(path)
-    except:
+    except Exception as ex:
         _logger.exception("Unable to determine the backend"
                           " of the folder. Using FS by default.")
         backend = "fs"
@@ -332,7 +332,8 @@ def copy_file(options, source_file, dest_file):
     with tempfile.TemporaryDirectory() as temp_path:
         # If the backend if FS in source_file we have the reference to the
         # local FS file
-        source_backend, source_file = get_backend_and_path(options, source_file)
+        source_backend, source_file = \
+            get_backend_and_path(options, source_file)
         if source_backend == "gs":
             source_file = download_gs_file(
                 options, "gs://{}".format(source_file),

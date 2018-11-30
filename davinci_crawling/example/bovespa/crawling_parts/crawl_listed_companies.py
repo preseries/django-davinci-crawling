@@ -36,7 +36,7 @@ COMPANIES_CTL = "ctl/listed_companies_companies.ctl"
 
 _logger = logging.getLogger(
     "davinci_crawler_{}.crawling_part.listed_companies".
-        format(BOVESPA_CRAWLER))
+    format(BOVESPA_CRAWLER))
 
 
 @Throttle(minutes=1, rate=50, max_tokens=50)
@@ -66,7 +66,7 @@ def update_listed_companies(letter, phantomjs_path):
         try:
             WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.ID, 'dlCiasCdCVM')))
-        except:
+        except Exception as ex:
             WebDriverWait(driver, 10).until(
                 EC.text_to_be_present_in_element(
                     (By.ID, 'lblMsg'),

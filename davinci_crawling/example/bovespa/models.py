@@ -72,7 +72,7 @@ class BovespaCompany(CustomDjangoCassandraModel):
         if self.situation not in SITUATIONS:
             raise ValidationError(
                 "Invalid situation [{0}]. Valid situations are: {1}.".
-                    format(self.situation, SITUATIONS))
+                format(self.situation, SITUATIONS))
 
 
 class BovespaCompanyFile(CustomDjangoCassandraModel):

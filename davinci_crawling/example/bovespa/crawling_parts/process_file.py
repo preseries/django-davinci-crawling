@@ -15,7 +15,7 @@ except ImportError:
 
 _logger = logging.getLogger(
     "davinci_crawler_{}.crawling_part.process_file".
-        format(BOVESPA_CRAWLER))
+    format(BOVESPA_CRAWLER))
 
 
 def process_file(

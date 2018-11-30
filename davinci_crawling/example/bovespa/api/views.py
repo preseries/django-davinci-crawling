@@ -93,7 +93,8 @@ class BovespaCompanyFileViewSet(CustomModelViewSet):
         "created_at", "updated_at")
 
 
-class BovespaCompanyFileSearchViewSet(mixins.FacetMixin, CustomHaystackViewSet):
+class BovespaCompanyFileSearchViewSet(
+        mixins.FacetMixin, CustomHaystackViewSet):
 
     filter_backends = [
         HaystackFilter, HaystackBoostFilter,

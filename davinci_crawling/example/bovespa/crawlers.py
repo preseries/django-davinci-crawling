@@ -80,9 +80,9 @@ def process_listed_companies(options, checkpoint_data, current_execution_date):
         LAST_UPDATE_COMPANIES_LISTING_CTL_FIELD, None)
 
     do_crawl = True if last_update is None or \
-                       update_elapsetime is None or \
-                       (last_update - current_execution_date).days > \
-                       update_elapsetime else False
+        update_elapsetime is None or \
+        (last_update - current_execution_date).days > \
+        update_elapsetime else False
 
     if do_crawl:
         crawl_listed_companies(
@@ -92,14 +92,11 @@ def process_listed_companies(options, checkpoint_data, current_execution_date):
 def get_not_processed_files(options):
     files = []
 
-    filter = ~Q(file_url=Range(ANY, ANY)) | \
-             Q(status=FILE_STATUS_NOT_PROCESSED)
+    filter = ~Q(file_url=Range(ANY, ANY)) | Q(status=FILE_STATUS_NOT_PROCESSED)
 
     if options.get("include_companies", None):
-       filter = Q(ccvm=" ".join(options.get("include_companies", []))) & \
-                (filter)
-
-    print(str(filter))
+        filter = Q(ccvm=" ".join(
+            options.get("include_companies", []))) & (filter)
 
     _logger.debug("Loading from database the files to be crawled...")
     paginator = CaravaggioSearchPaginator(
@@ -111,12 +108,12 @@ def get_not_processed_files(options):
     while paginator.has_next():
         _logger.debug(
             "{0}/{1} files loaded from database...".
-                format(paginator.get_loaded_docs(), paginator.get_hits()))
+            format(paginator.get_loaded_docs(), paginator.get_hits()))
         paginator.next()
         files.extend([(d.ccvm, d.doc_type, d.fiscal_date, d.version)
                       for d in paginator.get_results()])
 
-    #return [file for file in
+    # return [file for file in
     #        CaravaggioSearchQuerySet().models(BovespaCompanyFile).
     #            raw_search(str(filter)).
     #            values_list("ccvm", "doc_type", "fiscal_date", "version")]
@@ -139,9 +136,9 @@ def process_companies_files(
         LAST_UPDATE_COMPANIES_FILES_CTL_FIELD, None)
 
     do_crawl = True if last_update is None or \
-                       update_elapsetime is None or \
-                       (last_update - current_execution_date).days > \
-                       update_elapsetime else False
+        update_elapsetime is None or \
+        (last_update - current_execution_date).days > \
+        update_elapsetime else False
 
     if do_crawl:
         # PhantomJS folder
@@ -277,10 +274,7 @@ class BovespaCrawler(Crawler):
     def crawl(self, crawling_params, options):
         _logger.info(
             "Processing company file [{}]".
-                format(crawling_params))
-
-        print("Processing company file [{}]".
-                format(crawling_params))
+            format(crawling_params))
 
         # Download the files from the source and save them into the local and
         # permanent storage for further processing.

@@ -18,8 +18,8 @@ from davinci_crawling.example.bovespa.search_indexes import \
     BovespaCompanyIndex, BovespaCompanyFileIndex, BovespaAccountIndex
 
 
-class BovespaCompanySerializerV1(dse_serializers.CassandraModelSerializer,
-                          BaseCachedSerializerMixin):
+class BovespaCompanySerializerV1(
+        dse_serializers.CassandraModelSerializer, BaseCachedSerializerMixin):
     """
     Represents a Business Object API View with support for JSON, list, and map
     fields.
@@ -34,8 +34,8 @@ class BovespaCompanySerializerV1(dse_serializers.CassandraModelSerializer,
         read_only_fields = ("created_at", "updated_at")
 
 
-class BovespaCompanySearchSerializerV1(CustomHaystackSerializer,
-                                BaseCachedSerializerMixin):
+class BovespaCompanySearchSerializerV1(
+        CustomHaystackSerializer, BaseCachedSerializerMixin):
     """
     A Fast Searcher (Solr) version of the original Business Object API View
     """
@@ -77,7 +77,7 @@ class BovespaCompanyFacetSerializerV1(HaystackFacetSerializer):
             "company_type": {},
             "situation": {},
             "created_at": {
-                "start_date": datetime.now() - timedelta(days=5* 365),
+                "start_date": datetime.now() - timedelta(days=5 * 365),
                 "end_date": datetime.now(),
                 "gap_by": "month",
                 "gap_amount": 1
@@ -108,8 +108,8 @@ cache_registry.register(BovespaCompanySerializerV1)
 cache_registry.register(BovespaCompanySearchSerializerV1)
 
 
-class BovespaCompanyFileSerializerV1(dse_serializers.CassandraModelSerializer,
-                          BaseCachedSerializerMixin):
+class BovespaCompanyFileSerializerV1(
+        dse_serializers.CassandraModelSerializer, BaseCachedSerializerMixin):
     """
     Represents a Business Object API View with support for JSON, list, and map
     fields.
@@ -128,8 +128,8 @@ class BovespaCompanyFileSerializerV1(dse_serializers.CassandraModelSerializer,
         read_only_fields = ("created_at", "updated_at")
 
 
-class BovespaCompanyFileSearchSerializerV1(CustomHaystackSerializer,
-                                BaseCachedSerializerMixin):
+class BovespaCompanyFileSearchSerializerV1(
+        CustomHaystackSerializer, BaseCachedSerializerMixin):
     """
     A Fast Searcher (Solr) version of the original Business Object API View
     """
@@ -226,8 +226,8 @@ cache_registry.register(BovespaCompanyFileSerializerV1)
 cache_registry.register(BovespaCompanyFileSearchSerializerV1)
 
 
-class BovespaAccountSerializerV1(dse_serializers.CassandraModelSerializer,
-                          BaseCachedSerializerMixin):
+class BovespaAccountSerializerV1(
+        dse_serializers.CassandraModelSerializer, BaseCachedSerializerMixin):
     """
     Represents a Business Object API View with support for JSON, list, and map
     fields.
@@ -241,9 +241,8 @@ class BovespaAccountSerializerV1(dse_serializers.CassandraModelSerializer,
         read_only_fields = ("created_at", "updated_at")
 
 
-
-class BovespaAccountSearchSerializerV1(CustomHaystackSerializer,
-                                BaseCachedSerializerMixin):
+class BovespaAccountSearchSerializerV1(
+        CustomHaystackSerializer, BaseCachedSerializerMixin):
     """
     A Fast Searcher (Solr) version of the original Business Object API View
     """
