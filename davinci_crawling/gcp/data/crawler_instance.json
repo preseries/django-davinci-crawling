@@ -1,0 +1,16 @@
+{
+  "image": {
+    // "project": "debian-cloud",
+    // "family": "debian-9"
+    // Container-Optimized OS
+    // https://cloud.google.com/compute/docs/images?hl=es-419#os-compute-support
+    "project": "cos-cloud",
+    "family": "cos-stable"
+  },
+
+  "project": "dotted-ranger-212213",
+  "zone": "europe-west2-a",
+  "machine_type": "n1-standard-1",
+  "bucket": "preseries_crawler_myproject5"
+
+}

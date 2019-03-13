@@ -14,7 +14,6 @@ try:
 except ImportError:
     from cassandra import ConsistencyLevel
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -64,8 +63,12 @@ INSTALLED_APPS = [
     'rest_framework_cache',
     'rest_framework_swagger',
     'haystack',
+    'django_apscheduler',
+
     'caravaggio_rest_api',
+
     'davinci_crawling',
+    'davinci_crawling.scheduler',
     'davinci_crawling.example.bovespa'
 ]
 
@@ -155,6 +158,11 @@ LOGGING = {
             'handlers': ['console', 'mail_admins'],
             'level': 'DEBUG',
             'propagate': True,
+        },
+        'davinci_crawling.scheduler': {
+            'handlers': ['console', 'mail_admins'],
+            'level': 'DEBUG',
+            'propagate': False,
         },
         'davinci_crawler_bovespa': {
             'handlers': ['console', 'mail_admins'],
@@ -505,3 +513,37 @@ SWAGGER_SETTINGS = {
         'patch'
     ],
 }
+
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"  # Default
+
+PROJECT_DOCKER_IMAGE = os.getenv(
+    "PROJECT_DOCKER_IMAGE",
+    "eu.gcr.io/dotted-ranger-212213/my-project:v0-0-1")
+
+DAVINCI_CRAWLERS = {
+#    "bovespa": {
+#        "deployment": {
+#            # Google Cloud Platform
+#            "cloud": "gcp",
+#            "project": "dotted-ranger-212213",  # Sandbox
+#            "zone": "europe-west2-a",
+#
+#            # A list of available machine types can be found here:
+#            # https://cloud.google.com/compute/docs/machine-types
+#            "machine-type": "n1-standard-1",
+#
+#            # Container - Optimized OS
+#            # https://cloud.google.com/compute/docs/images?
+#            #   hl=es-419#os-compute-support
+#            "image": {
+#                "project": "cos-cloud",
+#                "family": "cos-stable"
+#            }
+#        },
+#        "arguments": {
+#            "cache-dir": "gs://vanggogh2_harvest"
+#        },
+#        "cron": "*/5 * * * *"
+#    }
+}
+
