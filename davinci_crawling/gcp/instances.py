@@ -102,7 +102,7 @@ class GCPComputeService(object):
                 os.path.dirname(__file__), 'startup-script.sh'), 'r').read()
 
         paramaters = [
-            "{} {}".format(key, val) for key, val in crawler_params.items]
+            "{} {}".format(key, val) for key, val in crawler_params.items()]
 
         items = [{
                 # Startup script is automatically executed by the
