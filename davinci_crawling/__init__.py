@@ -9,8 +9,6 @@ r"""
 """
 
 __title__ = 'Django DaVinci Crawling Framework'
-#__version__ = '0.1.3'
-# Development branch
 __version__ = 'auto-deploy-crawlers'
 __author__ = 'Javier Alperte'
 __license__ = 'MIT'
