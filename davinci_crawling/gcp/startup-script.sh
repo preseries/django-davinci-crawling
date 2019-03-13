@@ -16,21 +16,21 @@ function get_parameter() {
 
 CRAWLER_IMAGE=$(get_parameter "crawler-image" "")
 CRAWLER_NAME=$(get_parameter "crawler-name" "")
-WORKERS_NUM=$(get_parameter "workers-num" "5")
-VERBOSE_LEVEL=$(get_parameter "verbose-level" "0")
-CACHE_DIR=$(get_parameter "cache-dir" "gs://davinci_cache")
-LOCAL_DIR=$(get_parameter "cache-dir" "fs:///data/harvest/local")
+WORKERS_NUM=$(get_parameter "--workers-num" "5")
+VERBOSE_LEVEL=$(get_parameter "--verbose-level" "0")
+CACHE_DIR=$(get_parameter "--cache-dir" "gs://davinci_cache")
+LOCAL_DIR=$(get_parameter "--local-dir" "fs:///data/harvest/local")
 
 # [START startup_script]
 apt-get update
 
 PARAMETERS=$(curl http://metadata/computeMetadata/v1/instance/attributes/parameters -H "Metadata-Flavor: Google")
 
-if [ -z "$WORKERS_NUM" ]
-then
-      WORKERS_NUM=5
-      exit 2
-fi
+#if [ -z "$WORKERS_NUM" ]
+#then
+#      WORKERS_NUM=5
+#      exit 2
+#fi
 
 echo "Crawler Startup" > details.txt
 echo "Crawler image: $CRAWLER_IMAGE" > details.txt
@@ -40,8 +40,6 @@ echo "Verbose: "$VERBOSE_LEVEL" >> details.txt
 echo "Cache dir: $CACHE_DIR" >> details.txt
 echo "Local dir: $LOCAL_DIR" >> details.txt
 echo "Custom parameters: $PARAMETERS" >> details.txt
-
-echo $PARAMETERS >> details.txt
 
 # Create the Google Cloud Storage bucket if it does not exists.
 gsutil mb $CACHE_DIR

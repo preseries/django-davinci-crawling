@@ -5,10 +5,14 @@
 # any circumstances be used, copied, or distributed.
 import os
 import time
+import json
+import logging
 import googleapiclient.discovery
 from jsonpath import jsonpath
 
 from davinci_crawling.crawler import get_configuration
+
+_logger = logging.getLogger("davinci_crawling.gcp")
 
 DEFAULT_CONFIG = {
     "project": None,
@@ -46,6 +50,11 @@ class GCPComputeService(object):
             self,
             crawler_image,
             crawler_name,
+            current_date,
+            verbosity,
+            workers_num,
+            cache_dir,
+            local_dir,
             crawler_params):
         """
         This function is responsible for the start (commissioning) of an
@@ -59,6 +68,16 @@ class GCPComputeService(object):
                 we start it
         :return: the result of the operation
         """
+
+        if _logger.isEnabledFor("DEBUG"):
+            _logger.debug("Commission GCP instance with following detail")
+            _logger.debug("\tCrawler image: {}".format(crawler_image))
+            _logger.debug("\tCrawler name: {}".format(crawler_name))
+            _logger.debug("\tCurrent date: {}".format(current_date))
+            _logger.debug("\tVerbosity: {}".format(verbosity))
+            _logger.debug("\tWorkers num: {}".format(workers_num))
+            _logger.debug("\tCache dir: {}".format(cache_dir))
+            _logger.debug("\tLocal dir: {}".format(local_dir))
 
         project = self._get_config_param(crawler_name, "deployment.project")[0]
         zone = self._get_config_param(crawler_name, "deployment.zone")[0]
@@ -82,8 +101,8 @@ class GCPComputeService(object):
             os.path.join(
                 os.path.dirname(__file__), 'startup-script.sh'), 'r').read()
 
-        paramaters = [param["key"] for param in crawler_params]
-        paramaters.append("test-param")
+        paramaters = [
+            "{} {}".format(key, val) for key, val in crawler_params.items]
 
         items = [{
                 # Startup script is automatically executed by the
@@ -97,14 +116,26 @@ class GCPComputeService(object):
                 'key': 'crawler-name',
                 'value': crawler_name
             }, {
-                'key': 'parameters',
-                'value': ",".join(paramaters)
+                'key': '--current-date',
+                'value': current_date
             }, {
-                'key': "test-param",
-                'value': "test-value"
+                'key': '--verbosity',
+                'value': verbosity
+            }, {
+                'key': '--workers-num',
+                'value': workers_num
+            }, {
+                'key': '--cache-dir',
+                'value': cache_dir
+            }, {
+                'key': '--local-dir',
+                'value': local_dir
+            }, {
+                'key': 'parameters',
+                'value': " ".join(paramaters)
             }]
 
-        items.extend(crawler_params)
+        _logger.debug("Metadata Items: {}".format(json.dumps(items, indent=4)))
 
         config = {
             'name': crawler_name,
@@ -145,6 +176,9 @@ class GCPComputeService(object):
                 'items': items
             }
         }
+
+        _logger.debug("Entire instance config details: {}".
+                      format(json.dumps(config, indent=4)))
 
         return self.compute.instances().insert(
             project=project,
