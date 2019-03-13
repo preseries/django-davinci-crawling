@@ -164,6 +164,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
+        'davinci_crawling.gcp': {
+            'handlers': ['console', 'debug_log', 'mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
         'davinci_crawler_bovespa': {
             'handlers': ['console', 'mail_admins'],
             'level': 'DEBUG',

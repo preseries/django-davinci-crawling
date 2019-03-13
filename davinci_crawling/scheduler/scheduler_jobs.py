@@ -40,18 +40,22 @@ def crawling_job(crawler_name):
         if base_key in params:
             del params[base_key]
 
-    compute_service = GCPComputeService.get()
-    instance = compute_service.commission_instance(
-        settings.PROJECT_DOCKER_IMAGE,
-        crawler_name,
-        current_date,
-        verbosity,
-        workers_num,
-        cache_dir,
-        local_dir,
-        params)
+    try:
+        compute_service = GCPComputeService.get()
+        instance = compute_service.commission_instance(
+            settings.PROJECT_DOCKER_IMAGE,
+            crawler_name,
+            current_date,
+            verbosity,
+            workers_num,
+            cache_dir,
+            local_dir,
+            params)
 
-    compute_service.wait_for_operation(crawler_name)
+        compute_service.wait_for_operation(crawler_name)
 
-    _logger.debug("Crawling job for {} executed. Instance: {}.".
-                  format(crawler_name, instance))
+        _logger.debug("Crawling job for {} executed. Instance: {}.".
+                      format(crawler_name, instance))
+    except Exception as ex:
+        _logger.error("Unable to execute the crawler {}".format(crawler_name))
+        raise ex
