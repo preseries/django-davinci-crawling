@@ -57,5 +57,6 @@ def crawling_job(crawler_name):
         _logger.debug("Crawling job for {} executed. Instance: {}.".
                       format(crawler_name, instance))
     except Exception as ex:
-        _logger.error("Unable to execute the crawler {}".format(crawler_name))
+        _logger.error(
+            "Unable to execute the crawler {}".format(crawler_name), ex)
         raise ex
