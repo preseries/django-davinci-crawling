@@ -69,7 +69,7 @@ class GCPComputeService(object):
         :return: the result of the operation
         """
 
-        if _logger.isEnabledFor("DEBUG"):
+        if _logger.isEnabledFor(logging.DEBUG):
             _logger.debug("Commission GCP instance with following detail")
             _logger.debug("\tCrawler image: {}".format(crawler_image))
             _logger.debug("\tCrawler name: {}".format(crawler_name))
