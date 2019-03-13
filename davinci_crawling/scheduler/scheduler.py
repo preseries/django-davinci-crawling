@@ -72,12 +72,12 @@ class Scheduler:
             self.scheduler = BackgroundScheduler()
 
         executors = {
-            'default': {'type': 'threadpool', 'max_workers': 20},
-            'processpool': ProcessPoolExecutor(max_workers=5)
+            'default': {'type': 'threadpool', 'max_workers': 3},
+            'processpool': ProcessPoolExecutor(max_workers=3)
         }
         job_defaults = {
             'coalesce': False,
-            'max_instances': 3
+            'max_instances': 2
         }
 
         job_stores = {
@@ -94,25 +94,26 @@ class Scheduler:
             # Add configured jobs to scheduler
             if hasattr(settings,"DAVINCI_CRAWLERS"):
                 for name, conf in settings.DAVINCI_CRAWLERS.items():
-                    if "cron" in conf:
-                        _logger.info(
-                            "Registering the Crawling Job for: {}".
-                                format(name))
-                        cron = conf["cron"].split()
-                        trigger = CronTrigger(month=cron[3], day=cron[2],
-                                              day_of_week=cron[4],
-                                              hour=cron[1],
-                                              minute=cron[0])
-                        self.scheduler.add_job(
-                            crawling_job,
-                            trigger=trigger,
-                            id=name,
-                            name=name,
-                            args=[name])
-                    else:
-                        _logger.info(
-                            "The Crawler {} do not have schedule details.".
-                                format(name))
+                    if not self.scheduler.get_job(name):
+                        if "cron" in conf:
+                            _logger.info(
+                                "Registering the Crawling Job for: {}".
+                                    format(name))
+                            cron = conf["cron"].split()
+                            trigger = CronTrigger(month=cron[3], day=cron[2],
+                                                  day_of_week=cron[4],
+                                                  hour=cron[1],
+                                                  minute=cron[0])
+                            self.scheduler.add_job(
+                                crawling_job,
+                                trigger=trigger,
+                                id=name,
+                                name=name,
+                                args=[name])
+                        else:
+                            _logger.info(
+                                "The Crawler {} do not have schedule details.".
+                                    format(name))
 
                 if settings.DEBUG:
                     self.scheduler.print_jobs()
