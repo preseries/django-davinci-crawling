@@ -525,6 +525,47 @@ PROJECT_DOCKER_IMAGE = os.getenv(
     "PROJECT_DOCKER_IMAGE",
     "eu.gcr.io/dotted-ranger-212213/my-project:v0-0-1")
 
+DAVINCI_CRAWLERS_ENV_PARAMS = [
+    "DSE_SUPPORT",
+
+    "CASSANDRA_DB_HOST",
+    "CASSANDRA_DB_NAME",
+    "CASSANDRA_DB_PASSWORD",
+    "CASSANDRA_DB_REPLICATION",
+    "CASSANDRA_DB_STRATEGY",
+    "CASSANDRA_DB_USER",
+
+    "DB_HOST",
+    "DB_NAME",
+    "DB_PASSWORD",
+    "DB_PORT",
+    "DB_USER",
+    "DB_USER",
+
+    "HAYSTACK_ACTIVE",
+    "HAYSTACK_ADMIN_URL",
+    "HAYSTACK_KEYSPACE",
+    "HAYSTACK_URL",
+
+    "REDIS_HOST_PRIMARY",
+    "REDIS_PASS_PRIMARY",
+    "REDIS_PORT_PRIMARY",
+
+    "SECRET_KEY",
+    "SECURE_SSL_HOST",
+    "SECURE_SSL_REDIRECT",
+
+    "STATIC_URL",
+    "THROTTLE_ENABLED",
+
+    "EMAIL_HOST_PASSWORD",
+    "EMAIL_HOST_USER",
+
+    "GAE_SERVICE",
+
+    "GOOGLE_ANALYTICS_ID"
+]
+
 DAVINCI_CRAWLERS = {
 #    "bovespa": {
 #        "deployment": {
