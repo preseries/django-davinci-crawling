@@ -55,7 +55,8 @@ class GCPComputeService(object):
             workers_num,
             cache_dir,
             local_dir,
-            crawler_params):
+            crawler_params,
+            environment_vars):
         """
         This function is responsible for the start (commissioning) of an
         instance in GCP and run a crawler.
@@ -78,6 +79,8 @@ class GCPComputeService(object):
             _logger.debug("\tWorkers num: {}".format(workers_num))
             _logger.debug("\tCache dir: {}".format(cache_dir))
             _logger.debug("\tLocal dir: {}".format(local_dir))
+            _logger.debug("\tCrawler params: {}".format(crawler_params))
+            _logger.debug("\tEnvironment vars: {}".format(environment_vars))
 
         project = self._get_config_param(crawler_name, "deployment.project")[0]
         zone = self._get_config_param(crawler_name, "deployment.zone")[0]
@@ -103,6 +106,9 @@ class GCPComputeService(object):
 
         paramaters = [
             "{} {}".format(key, val) for key, val in crawler_params.items()]
+
+        variables = [
+            "{} {}".format(key, val) for key, val in environment_vars.items()]
 
         items = [{
                 # Startup script is automatically executed by the
@@ -133,6 +139,9 @@ class GCPComputeService(object):
             }, {
                 'key': 'parameters',
                 'value': " ".join(paramaters)
+            }, {
+                'key': 'environment-vars',
+                'value': " ".join(variables)
             }]
 
         _logger.debug("Metadata Items: {}".format(json.dumps(items, indent=4)))

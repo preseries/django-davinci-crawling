@@ -26,6 +26,9 @@ apt-get update
 
 PARAMETERS=$(curl http://metadata/computeMetadata/v1/instance/attributes/parameters -H "Metadata-Flavor: Google")
 
+ENV_VARS=$(curl http://metadata/computeMetadata/v1/instance/attributes/environment-variables -H "Metadata-Flavor: Google")
+
+
 #if [ -z "$WORKERS_NUM" ]
 #then
 #      WORKERS_NUM=5
@@ -36,10 +39,11 @@ echo "Crawler Startup" > details.txt
 echo "Crawler image: $CRAWLER_IMAGE" > details.txt
 echo "Crawler name: $CRAWLER_NAME" >> details.txt
 echo "Workers num: $WORKERS_NUM" >> details.txt
-echo "Verbose: "$VERBOSE_LEVEL" >> details.txt
+echo "Verbose: $VERBOSE_LEVEL" >> details.txt
 echo "Cache dir: $CACHE_DIR" >> details.txt
 echo "Local dir: $LOCAL_DIR" >> details.txt
 echo "Custom parameters: $PARAMETERS" >> details.txt
+echo "Environment variales: $ENV_VARS" >> details.txt
 
 # Create the Google Cloud Storage bucket if it does not exists.
 gsutil mb $CACHE_DIR
@@ -55,10 +59,10 @@ gsutil mb $CACHE_DIR
 
 { # try
     echo "docker run -d --entrypoint docker-crawl-entrypoint.sh --name $CRAWLER_NAME $CRAWLER_IMAGE -v $VERBOSE_LEVEL --workers-num $WORKERS_NUM --phantomjs-path /usr/local/bin/phantomjs --cache-dir "$CACHE_DIR" --local-dir "$LOCAL_DIR" $PARAMETERS" >> details.txt
-    docker run -ti --name crawler busybox /bin/sh
-    # docker run -d --entrypoint docker-crawl-entrypoint.sh --name $CRAWLER_NAME $CRAWLER_IMAGE -v $VERBOSE_LEVEL --workers-num $WORKERS_NUM --phantomjs-path /usr/local/bin/phantomjs --cache-dir "$CACHE_DIR" --local-dir "$LOCAL_DIR" $PARAMETERS
+    # docker run -ti --name crawler busybox /bin/sh
+    docker run -d --entrypoint docker-crawl-entrypoint.sh --name $CRAWLER_NAME $CRAWLER_IMAGE -v $VERBOSE_LEVEL --workers-num $WORKERS_NUM --phantomjs-path /usr/local/bin/phantomjs --cache-dir "$CACHE_DIR" --local-dir "$LOCAL_DIR" $PARAMETERS
     docker wait crawler &&
-    gcloud compute instances delete $CRAWLER_NAME
+    # gcloud compute instances delete $CRAWLER_NAME
     #save your output
 } || { # catch
     # save log for exception
