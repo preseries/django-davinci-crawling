@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2018-2019 PreSeries Tech, SL
 import logging
+import os
 
 from django.conf import settings
 from django.utils import timezone
@@ -35,6 +36,24 @@ def crawling_job(crawler_name):
     cache_dir = params.get("--cache-dir", "gs://davinci_cache")
     local_dir = params.get(
         "--local-dir", "fs:///data/harvest/local")
+
+    if hasattr(settings, "DAVINCI_CRAWLERS_ENV_PARAMS"):
+        for param_name in settings.DAVINCI_CRAWLERS_ENV_PARAMS:
+            if param_name not in params:
+                if param_name in os.environ:
+                    params[param_name] = os.environ[param_name]
+                else:
+                    _logger.warning(
+                        "The variable {} is not available in the "
+                        "environment.".format(param_name))
+            else:
+                _logger.warning(
+                    "The environment variable {} has been redefined in the "
+                    "crawler settings section. Environment value: {}. "
+                    "Settings value: {}".format(
+                        param_name,
+                        os.environ[param_name],
+                        params[param_name]))
 
     for base_key in base_config_keys:
         if base_key in params:
