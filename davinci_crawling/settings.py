@@ -113,6 +113,11 @@ WSGI_APPLICATION = 'davinci_crawling.wsgi.application'
 # the site admins on every HTTP 500 error when DEBUG=False.
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
+if os.getenv('GAE_SERVICE', ''):
+    LOGGING_FILE = "/var/log/davinci_crawling-debug.log"
+else:
+    LOGGING_FILE = "/data/davinci_crawling/log/davinci_crawling-debug.log"
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -141,6 +146,14 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'debug_log': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': LOGGING_FILE,
+            'maxBytes': 1024 * 1024 * 100,
+            'backupCount': 1,
+            'formatter': 'verbose'
         }
     },
     'loggers': {

@@ -37,23 +37,16 @@ def crawling_job(crawler_name):
     local_dir = params.get(
         "--local-dir", "fs:///data/harvest/local")
 
+    environment = {}
+
     if hasattr(settings, "DAVINCI_CRAWLERS_ENV_PARAMS"):
         for param_name in settings.DAVINCI_CRAWLERS_ENV_PARAMS:
-            if param_name not in params:
-                if param_name in os.environ:
-                    params[param_name] = os.environ[param_name]
-                else:
-                    _logger.warning(
-                        "The variable {} is not available in the "
-                        "environment.".format(param_name))
+            if param_name in os.environ:
+                environment[param_name] = os.environ[param_name]
             else:
                 _logger.warning(
-                    "The environment variable {} has been redefined in the "
-                    "crawler settings section. Environment value: {}. "
-                    "Settings value: {}".format(
-                        param_name,
-                        os.environ[param_name],
-                        params[param_name]))
+                    "The variable {} is not available in the "
+                    "environment.".format(param_name))
 
     for base_key in base_config_keys:
         if base_key in params:
@@ -69,7 +62,8 @@ def crawling_job(crawler_name):
             workers_num,
             cache_dir,
             local_dir,
-            params)
+            params,
+            environment)
 
         compute_service.wait_for_operation(crawler_name)
 
