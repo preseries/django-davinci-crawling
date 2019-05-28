@@ -26,7 +26,7 @@ apt-get update
 
 PARAMETERS=$(curl http://metadata/computeMetadata/v1/instance/attributes/parameters -H "Metadata-Flavor: Google")
 
-ENV_VARS=$(curl http://metadata/computeMetadata/v1/instance/attributes/environment-variables -H "Metadata-Flavor: Google")
+ENV_VARS=$(curl http://metadata/computeMetadata/v1/instance/attributes/environment-vars -H "Metadata-Flavor: Google")
 
 
 #if [ -z "$WORKERS_NUM" ]
@@ -46,7 +46,7 @@ echo "Custom parameters: $PARAMETERS" >> details.txt
 echo "Environment variales: $ENV_VARS" >> details.txt
 
 # Create the Google Cloud Storage bucket if it does not exists.
-gsutil mb $CACHE_DIR
+# gsutil mb $CACHE_DIR
 
 # python manage.py crawl bovespa \
 #    -v 0 --workers-num 10 \

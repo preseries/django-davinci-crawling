@@ -108,7 +108,7 @@ class GCPComputeService(object):
             "{} {}".format(key, val) for key, val in crawler_params.items()]
 
         variables = [
-            "{} {}".format(key, val) for key, val in environment_vars.items()]
+            "-e {}={}".format(key, val) for key, val in environment_vars.items()]
 
         items = [{
                 # Startup script is automatically executed by the
