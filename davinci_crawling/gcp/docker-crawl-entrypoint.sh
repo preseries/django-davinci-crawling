@@ -2,9 +2,6 @@
 
 cd /app
 
-# Environment variables
-# source environment.sh
-
 sed -e "s/\${DB_HOST}/$DB_HOST/" \
     -e "s/\${DB_PORT}/$DB_PORT/" \
     -e "s/\${DB_USER}/$DB_USER/" \

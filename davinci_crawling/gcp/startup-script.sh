@@ -58,9 +58,9 @@ echo "Environment variales: $ENV_VARS" >> details.txt
 # Start the crawler using the Docker image
 
 { # try
-    echo "docker run -d --entrypoint docker-crawl-entrypoint.sh --name $CRAWLER_NAME $CRAWLER_IMAGE -v $VERBOSE_LEVEL --workers-num $WORKERS_NUM --phantomjs-path /usr/local/bin/phantomjs --cache-dir "$CACHE_DIR" --local-dir "$LOCAL_DIR" $PARAMETERS" >> details.txt
+    echo "docker run -d --entrypoint docker-crawl-entrypoint.sh $ENV_VARS --name $CRAWLER_NAME $CRAWLER_IMAGE -v $VERBOSE_LEVEL --workers-num $WORKERS_NUM --phantomjs-path /usr/local/bin/phantomjs --cache-dir "$CACHE_DIR" --local-dir "$LOCAL_DIR" $PARAMETERS" >> details.txt
     # docker run -ti --name crawler busybox /bin/sh
-    docker run -d --entrypoint docker-crawl-entrypoint.sh --name $CRAWLER_NAME $CRAWLER_IMAGE -v $VERBOSE_LEVEL --workers-num $WORKERS_NUM --phantomjs-path /usr/local/bin/phantomjs --cache-dir "$CACHE_DIR" --local-dir "$LOCAL_DIR" $PARAMETERS
+    docker run -d --entrypoint docker-crawl-entrypoint.sh $ENV_VARS --name $CRAWLER_NAME $CRAWLER_IMAGE -v $VERBOSE_LEVEL --workers-num $WORKERS_NUM --phantomjs-path /usr/local/bin/phantomjs --cache-dir "$CACHE_DIR" --local-dir "$LOCAL_DIR" $PARAMETERS
     docker wait crawler &&
     # gcloud compute instances delete $CRAWLER_NAME
     #save your output
