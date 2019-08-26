@@ -92,13 +92,13 @@ class Scheduler:
 
         try:
             # Add configured jobs to scheduler
-            if hasattr(settings,"DAVINCI_CRAWLERS"):
+            if hasattr(settings, "DAVINCI_CRAWLERS"):
                 for name, conf in settings.DAVINCI_CRAWLERS.items():
                     if not self.scheduler.get_job(name):
                         if "cron" in conf:
                             _logger.info(
                                 "Registering the Crawling Job for: {}".
-                                    format(name))
+                                format(name))
                             cron = conf["cron"].split()
                             trigger = CronTrigger(month=cron[3], day=cron[2],
                                                   day_of_week=cron[4],
@@ -113,7 +113,7 @@ class Scheduler:
                         else:
                             _logger.info(
                                 "The Crawler {} do not have schedule details.".
-                                    format(name))
+                                format(name))
 
                 if settings.DEBUG:
                     self.scheduler.print_jobs()

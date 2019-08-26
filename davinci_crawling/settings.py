@@ -582,28 +582,27 @@ DAVINCI_CRAWLERS_ENV_PARAMS = [
 ]
 
 DAVINCI_CRAWLERS = {
-#    "bovespa": {
-#        "deployment": {
-#            # Google Cloud Platform
-#            "cloud": "gcp",
-#            "project": "dotted-ranger-212213",  # Sandbox
-#            "zone": "europe-west2-a",
-#
-#            # A list of available machine types can be found here:
-#            # https://cloud.google.com/compute/docs/machine-types
-#            "machine-type": "n1-standard-1",
-#
-#            # Container - Optimized OS
-#            # https://cloud.google.com/compute/docs/images?
-#            #   hl=es-419#os-compute-support
-#            "image": {
-#                "project": "cos-cloud",
-#                "family": "cos-stable"
-#            }
-#        },
-#        "arguments": {
-#            "cache-dir": "gs://vanggogh2_harvest"
-#        },
-#        "cron": "*/5 * * * *"
-#    }
+    # "bovespa": {
+    #    "deployment": {
+    #        # Google Cloud Platform
+    #        "cloud": "gcp",
+    #        "project": "dotted-ranger-212213",  # Sandbox
+    #        "zone": "europe-west2-a",
+
+    #        # A list of available machine types can be found here:
+    #        # https://cloud.google.com/compute/docs/machine-types
+    #        "machine-type": "n1-standard-1",#
+    #        # Container - Optimized OS
+    #        # https://cloud.google.com/compute/docs/images?
+    #        #   hl=es-419#os-compute-support
+    #        "image": {
+    #            "project": "cos-cloud",
+    #            "family": "cos-stable"
+    #        }
+    #    },
+    #    "arguments": {
+    #        "cache-dir": "gs://vanggogh2_harvest"
+    #    },
+    #    "cron": "*/5 * * * *"
+    # }
 }
