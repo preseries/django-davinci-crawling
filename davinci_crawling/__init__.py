@@ -9,7 +9,7 @@ r"""
 """
 
 __title__ = 'Django DaVinci Crawling Framework'
-__version__ = '0.1.2'
+__version__ = 'auto-deploy-crawlers'
 __author__ = 'Javier Alperte'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2018-2019 PreSeries Tech S.L.'
