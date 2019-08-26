@@ -6,13 +6,23 @@ from _datetime import datetime
 from abc import ABCMeta
 import abc
 
+from django.conf import settings
+
 from django.core.management import CommandParser
 from django.core.management.base import DjangoHelpFormatter
 
 from .time import mk_datetime
 
 
+def get_configuration(crawler_name):
+    return settings.DAVINCI_CRAWLERS[crawler_name] \
+        if crawler_name in settings.DAVINCI_CRAWLERS else {}
+
+
 class Crawler(metaclass=ABCMeta):
+
+    # The unique name of the crawler to be identified in the system
+    __crawler_name__ = None
 
     def __init__(self) -> None:
         super().__init__()

@@ -33,7 +33,7 @@ $ pip install django>=2
 $ django-admin.py startproject \
   --template=https://github.com/preseries/davinci-crawling-template-project/archive/master.zip \
   --name=Dockerfile \
-  --extension=py,md,env,sh,template,yamltemplate \
+  --extension=py,md,env,sh,template,yamltemplate,ini,conf,json \
   myproject
 ```
 
@@ -103,7 +103,6 @@ Avoid the destruction of the database after the tests have finished and the inde
 ```
 $ python manage.py test --testrunner=caravaggio_rest_api.testrunner.TestRunner --keepdb --keep-indexes
 ```
-
 
 ## Run the Crawler
 
@@ -219,5 +218,9 @@ Init instances:
 - Obtain lists of proxies (free)
 
     - FREE: list-proxies node module made exactly for that: https://github.com/chill117/proxy-lists it generates a proxy file that can be used by the previous rotation proxy code.
+<<<<<<< HEAD
     - https://proxymesh.com
 
+=======
+    - https://proxymesh.com
+>>>>>>> ea6276c48d87bc72bf89b256c09eaaa5dc4e6dd5

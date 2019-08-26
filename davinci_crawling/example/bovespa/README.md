@@ -1,6 +1,6 @@
 # Bovespa Crawler
 
-Infomation about the Bovespa crawler
+Information about the Bovespa crawler
 
 ## Context
 
@@ -862,3 +862,11 @@ The result of the query should something like this:
                 "version":"1.0"}]
           }}]}}}
 ```
+
+## TODO
+
+- Download the "Formulàrio Cadastral" from the B3 to obtain the Sector of Activity of the companies.
+
+- Obtain/Crawl the Tickers/Symbols of each company.
+
+- Obtain the historical stock prices. We can use "Yahoo Finance" and this [library](https://pypi.org/project/yahoo-finance/). 
