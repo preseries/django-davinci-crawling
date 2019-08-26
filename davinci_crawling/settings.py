@@ -64,8 +64,14 @@ INSTALLED_APPS = [
     'rest_framework_cache',
     'rest_framework_swagger',
     'haystack',
+
+    # 'django_apscheduler',
+
     'caravaggio_rest_api',
     'davinci_crawling',
+
+    # 'davinci_crawling.scheduler',
+
     'davinci_crawling.example.bovespa'
 ]
 
@@ -154,6 +160,16 @@ LOGGING = {
         'davinci_crawling': {
             'handlers': ['console', 'mail_admins'],
             'level': 'DEBUG',
+            'propagate': True,
+        },
+        # 'davinci_crawling.scheduler': {
+        #     'handlers': ['console', 'mail_admins'],
+        #     'level': 'DEBUG',
+        #     'propagate': False,
+        # },
+        'davinci_crawling.gcp': {
+            'handlers': ['console', 'debug_log', 'mail_admins'],
+            'level': 'ERROR',
             'propagate': True,
         },
         'davinci_crawler_bovespa': {
@@ -504,4 +520,78 @@ SWAGGER_SETTINGS = {
         'delete',
         'patch'
     ],
+}
+
+# APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"  # Default
+
+PROJECT_DOCKER_IMAGE = os.getenv(
+    "PROJECT_DOCKER_IMAGE",
+    "eu.gcr.io/dotted-ranger-212213/my-project:v0-0-1")
+
+DAVINCI_CRAWLERS_ENV_PARAMS = [
+    "DSE_SUPPORT",
+
+    "CASSANDRA_DB_HOST",
+    "CASSANDRA_DB_NAME",
+    "CASSANDRA_DB_PASSWORD",
+    "CASSANDRA_DB_REPLICATION",
+    "CASSANDRA_DB_STRATEGY",
+    "CASSANDRA_DB_USER",
+
+    "DB_HOST",
+    "DB_NAME",
+    "DB_PASSWORD",
+    "DB_PORT",
+    "DB_USER",
+    "DB_USER",
+
+    "HAYSTACK_ACTIVE",
+    "HAYSTACK_ADMIN_URL",
+    "HAYSTACK_KEYSPACE",
+    "HAYSTACK_URL",
+
+    "REDIS_HOST_PRIMARY",
+    "REDIS_PASS_PRIMARY",
+    "REDIS_PORT_PRIMARY",
+
+    "SECRET_KEY",
+    "SECURE_SSL_HOST",
+    "SECURE_SSL_REDIRECT",
+
+    "STATIC_URL",
+    "THROTTLE_ENABLED",
+
+    "EMAIL_HOST_PASSWORD",
+    "EMAIL_HOST_USER",
+
+    "GAE_SERVICE",
+
+    "GOOGLE_ANALYTICS_ID"
+]
+
+DAVINCI_CRAWLERS = {
+#    "bovespa": {
+#        "deployment": {
+#            # Google Cloud Platform
+#            "cloud": "gcp",
+#            "project": "dotted-ranger-212213",  # Sandbox
+#            "zone": "europe-west2-a",
+#
+#            # A list of available machine types can be found here:
+#            # https://cloud.google.com/compute/docs/machine-types
+#            "machine-type": "n1-standard-1",
+#
+#            # Container - Optimized OS
+#            # https://cloud.google.com/compute/docs/images?
+#            #   hl=es-419#os-compute-support
+#            "image": {
+#                "project": "cos-cloud",
+#                "family": "cos-stable"
+#            }
+#        },
+#        "arguments": {
+#            "cache-dir": "gs://vanggogh2_harvest"
+#        },
+#        "cron": "*/5 * * * *"
+#    }
 }

@@ -4,7 +4,7 @@
 #        prepare-lab-env.sh -n davinvi-crawling-lab
 #
 # In order to execute conda and activate conda environments we need to
-# setup acordingly the terminal session.
+# setup accordingly the terminal session.
 # echo ". $HOME/anaconda/etc/profile.d/conda.sh" >> ~/.bash_profile
 
 DIRECTORY="$( cd "$(dirname "$0")" ; pwd -P )"
