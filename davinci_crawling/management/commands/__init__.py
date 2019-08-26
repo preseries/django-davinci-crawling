@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2018-2019 PreSeries Tech, SL
+# Copyright (c) 2019 BuildGroup Data Services Inc.

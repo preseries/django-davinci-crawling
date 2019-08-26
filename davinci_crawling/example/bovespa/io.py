@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2018-2019 PreSeries Tech, SL
+# Copyright (c) 2019 BuildGroup Data Services Inc.
 
 import logging
 from davinci_crawling.io import get_base_dir, mkdirs, get_local_base_dir

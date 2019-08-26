@@ -39,7 +39,7 @@ Other resources:
 
 [MIT License](LICENSE)
 
-Copyright (c) 2018-2019 PreSeries Tech S.L.
+Copyright (c) 2019 BuildGroup Data Services Inc.
 
 
 ## Code

@@ -12,7 +12,7 @@ __title__ = 'Django DaVinci Crawling Framework'
 __version__ = '0.1.3'
 __author__ = 'Javier Alperte'
 __license__ = 'MIT'
-__copyright__ = 'Copyright 2018-2019 PreSeries Tech S.L.'
+__copyright__ = 'Copyright (c) 2019 BuildGroup Data Services Inc.'
 
 # Version synonym
 VERSION = __version__
