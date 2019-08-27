@@ -92,6 +92,10 @@ class Crawler(metaclass=ABCMeta):
             action='store_true', dest='no_color',
             help="Don't colorize the command output.",
         )
+        self._parser.add_argument(
+            '--force-color', action='store_true',
+            help='Force colorization of the command output.',
+        )
 
         # Cache storage
         # In production this folder could be volatile, losing all the data
