@@ -170,6 +170,7 @@ optional arguments:
                         "/home/djangoprojects/myproject".
   --traceback           Raise on CommandError exceptions
   --no-color            Don't colorize the command output.
+  --force-color         Force colorization of the command output.
 ```
 
 For example, if we want to start the crawler to crawl using __MY_CRAWLER_NAME__, we run:
@@ -182,45 +183,3 @@ $ python manage.py crawl <MY_CRAWLER_NAME> \
     --cache-dir "gs://vanggogh2_harvest" \
     --local-dir "fs:///data/harvest/local"
 ```
-
-## TODO
-
-### Start Docker Instances for crawl
-
-- Example to start a VM from python
-
-https://medium.com/google-cloud/using-app-engine-to-start-a-compute-engine-vm-be713c98d6a
-https://github.com/fivunlm/app-engine-start-vm/blob/master/main.py
-
-- Container Optimized OS instances
-
-https://cloud.google.com/container-optimized-os/docs/how-to/run-container-instance
-https://cloud.google.com/container-optimized-os/docs/how-to/create-configure-instance 
-
-
-Init instances:
-
-- Cloud-init to start the docker container instance)
-
-    https://cloud.google.com/container-optimized-os/docs/how-to/create-configure-instance#viewing_available_images
-
-- or, Startup script
-
-    https://cloud.google.com/compute/docs/startupscript
-    
-    
-### Proxies Support
-
-- Rotating proxies utilities:
-    - For Scrappy (we can extract ideas) https://github.com/TeamHG-Memex/scrapy-rotating-proxies
-    - The S1mbi0se proxy for conclas project: https://github.com/s1mbi0se/conclas/blob/master/conclas/miner/proxy.py 
-    
-- Obtain lists of proxies (free)
-
-    - FREE: list-proxies node module made exactly for that: https://github.com/chill117/proxy-lists it generates a proxy file that can be used by the previous rotation proxy code.
-<<<<<<< HEAD
-    - https://proxymesh.com
-
-=======
-    - https://proxymesh.com
->>>>>>> ea6276c48d87bc72bf89b256c09eaaa5dc4e6dd5
