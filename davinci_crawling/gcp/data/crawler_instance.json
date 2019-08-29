@@ -11,6 +11,6 @@
   "project": "dotted-ranger-212213",
   "zone": "europe-west2-a",
   "machine_type": "n1-standard-1",
-  "bucket": "preseries_crawler_myproject5"
+  "bucket": "bgds_crawler_myproject5"
 
 }

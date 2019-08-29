@@ -15,5 +15,5 @@ XlsxWriter>=1.1.2
 google-api-python-client>=1.7
 google-cloud-storage>=1.10
 
-https://github.com/preseries/django-cassandra-engine/tarball/1.5.4-preseries-1#egg=django-cassandra-engine-1.5.4-preseries-1
-https://github.com/preseries/django-caravaggio-rest-api/tarball/0.1.5#egg=django-caravaggio-rest-api-0.1.5
+https://github.com/buildgroupai/django-cassandra-engine/tarball/1.5.4-bgds-1#egg=django-cassandra-engine-1.5.4-bgds-1
+https://github.com/buildgroupai/django-caravaggio-rest-api/tarball/0.1.5#egg=django-caravaggio-rest-api-0.1.5

@@ -31,7 +31,7 @@ $ conda activate myproject
 $ pip install django>=2
 
 $ django-admin.py startproject \
-  --template=https://github.com/preseries/davinci-crawling-template-project/archive/master.zip \
+  --template=https://github.com/buildgroupai/davinci-crawling-template-project/archive/master.zip \
   --name=Dockerfile \
   --extension=py,md,env,sh,template,yamltemplate,ini,conf,json \
   myproject

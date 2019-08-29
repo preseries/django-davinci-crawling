@@ -189,7 +189,7 @@ Arguments:
     - and `number__startswith=1.01`
 - Sort results: `order_by=number`
 
-After [obtain our user Token](https://github.com/preseries/django-caravaggio-rest-api/blob/master/docs/local_environment.md#run-application-with-development-server), we can execute the following instruction:
+After [obtain our user Token](https://github.com/buildgroupai/django-caravaggio-rest-api/blob/master/docs/local_environment.md#run-application-with-development-server), we can execute the following instruction:
 
 ```
 $ curl -H 'Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b' \
@@ -344,7 +344,7 @@ Arguments:
     - and `number__iregex=1.01.(.*).01(.*)`
 - Sort results: `order_by=number`
 
-After [obtain our user Token](https://github.com/preseries/django-caravaggio-rest-api/blob/master/docs/local_environment.md#run-application-with-development-server), we can execute the following instruction:
+After [obtain our user Token](https://github.com/buildgroupai/django-caravaggio-rest-api/blob/master/docs/local_environment.md#run-application-with-development-server), we can execute the following instruction:
 
 ```
 $ curl -H 'Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b' \
@@ -493,7 +493,7 @@ Arguments:
 - Query: `updated_at__gte=2018-11-20T00:00:00Z`
 - Sort results: `updated_at`
 
-After [obtain our user Token](https://github.com/preseries/django-caravaggio-rest-api/blob/master/docs/local_environment.md#run-application-with-development-server), we can execute the following instruction:
+After [obtain our user Token](https://github.com/buildgroupai/django-caravaggio-rest-api/blob/master/docs/local_environment.md#run-application-with-development-server), we can execute the following instruction:
 
 ```
 $ curl -H 'Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b' \
@@ -645,7 +645,7 @@ Arguments:
 - Sort results: `-fiscal_date,-version`
 - Return the first result: `limit=1`
 
-After [obtain our user Token](https://github.com/preseries/django-caravaggio-rest-api/blob/master/docs/local_environment.md#run-application-with-development-server), we can execute the following instruction:
+After [obtain our user Token](https://github.com/buildgroupai/django-caravaggio-rest-api/blob/master/docs/local_environment.md#run-application-with-development-server), we can execute the following instruction:
 
 ```
 $ curl -H 'Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b' \
