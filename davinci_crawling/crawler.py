@@ -5,6 +5,7 @@ import django
 from _datetime import datetime
 from abc import ABCMeta
 import abc
+import logging
 
 from django.conf import settings
 
@@ -12,6 +13,11 @@ from django.core.management import CommandParser
 from django.core.management.base import DjangoHelpFormatter
 
 from .time import mk_datetime
+
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+
+_logger = logging.getLogger("davinci_crawling")
 
 
 def get_configuration(crawler_name):
@@ -34,6 +40,47 @@ class Crawler(metaclass=ABCMeta):
                 format(self.__class__))
 
         self.__prepare_parser()
+
+    @classmethod
+    def get_web_driver(cls, **options):
+        """
+        Initialized the Web Driver to allow dynamic web processing
+
+        :param options:
+        :return: the driver informed in the options (chromium has preference)
+        """
+
+        driver = None
+
+        # Chromium folder
+        chromium_file = options.get("chromium_bin_file", None)
+        if chromium_file:
+            chrome_options = Options()
+            chrome_options.add_argument("--headless")
+            chrome_options.add_argument("--no-sandbox")
+            chrome_options.add_argument("--disable-gpu")
+            chrome_options.add_argument("--disable-features=NetworkService")
+            chrome_options.binary_location = chromium_file
+
+            driver = webdriver.Chrome(
+                chrome_options=chrome_options)
+
+            _logger.info("Using CHROMIUM as Dynamic Web Driver. Driver {}".
+                         format(repr(driver)))
+        else:
+            # PhantomJS folder
+            phantomjs_path = options.get("phantomjs_path", None)
+            if phantomjs_path:
+                driver = webdriver.PhantomJS(
+                    executable_path=phantomjs_path)
+                _logger.info("Using PHANTOMJS as Dynamic Web Driver. Driver {}".
+                             format(repr(driver)))
+
+        if not driver:
+            _logger.warning("No Dynamic Web Driver loaded!!! "
+                            "(no Chromium neither PhantomJS specified)")
+
+        return driver
 
     def __get_version(self):
         """
@@ -136,13 +183,24 @@ class Crawler(metaclass=ABCMeta):
         # Location of the bin folder of the PhantomJS library
         self._parser.add_argument(
             '--phantomjs-path',
-            required=True,
+            required=False,
             action='store',
             dest='phantomjs_path',
             default=None,
             type=str,
             help="Absolute path to the bin directory of the PhantomJS library."
                  "Ex. '/phantomjs-2.1.1-macosx/bin/phantomjs'")
+
+        # Location of the bin folder of the PhantomJS library
+        self._parser.add_argument(
+            '--chromium-bin-file',
+            required=False,
+            action='store',
+            dest='chromium_bin_file',
+            default=None,
+            type=str,
+            help="Absolute path to the Chromium bin file."
+                 "Ex. '/Applications/Chromium.app/Contents/MacOS/Chromium'")
 
         # GCP Project
         self._parser.add_argument(
