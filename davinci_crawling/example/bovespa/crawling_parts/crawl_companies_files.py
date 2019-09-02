@@ -13,7 +13,7 @@ from dateutil.parser import parse as date_parse
 
 from bs4 import BeautifulSoup
 
-from selenium import webdriver
+# from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -23,7 +23,8 @@ from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.models import \
     BovespaCompany, BovespaCompanyFile, DOC_TYPES
 from davinci_crawling.crawling_throttle import Throttle
-from davinci_crawling.utils import setup_cassandra_object_mapper
+from davinci_crawling.utils import setup_cassandra_object_mapper, \
+    CrawlersRegistry
 
 try:
     from dse.cqlengine.query import LWTException
@@ -60,8 +61,9 @@ def extract_ENET_files_from_page(
     """
     Extract all the files to download from the listing HTML page
 
-    :param driver: the panthomjs driver with the current page loaded. We use
-                    the driver to navigate through the listing if needed
+    :param driver: the panthomjs or chromium driver with the current page
+                   loaded. We use the driver to navigate through the
+                   listing if needed
     :param bs: a BeautifulSoup object with the content of the listing page
     :return: a list of tuples with two components: the fiscal_period (date)
                 and the protocol code for each file in the list
@@ -182,12 +184,16 @@ def extract_ENET_files_from_page(
 
 @Throttle(minutes=1, rate=50, max_tokens=50)
 def obtain_company_files(
-        ccvm, phantomjs_path, doc_type, from_date=None):
+        ccvm, options, doc_type, from_date=None):
     """
     This function is responsible for get the relation of files to be
     processed for the company and start its download
 
     This function is being throttle allowing 20 downloads per minute
+
+    :param driver: the panthomjs or chromium driver with the current page
+               loaded. We use the driver to navigate through the
+               listing if needed
     """
 
     # We need to setup the Cassandra Object Mapper to work on multiprocessing
@@ -199,8 +205,8 @@ def obtain_company_files(
     driver = None
 
     try:
-        driver = webdriver.PhantomJS(
-            executable_path=phantomjs_path)
+        # driver = webdriver.PhantomJS(
+        #    executable_path=phantomjs_path)
 
         encoded_args = urlencode(
             {'CCVM': ccvm, 'TipoDoc': 'C', 'QtLinks': "1000"})
@@ -209,7 +215,8 @@ def obtain_company_files(
         # Let's navigate to the url and wait until the reload is being done
         # We control that the page is loaded looking for an element with
         # id = "AIR" in the page
-        driver.get(url)
+        driver = CrawlersRegistry().get_crawler(
+            BOVESPA_CRAWLER).get_web_driver(**options)()
         try:
             WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.NAME, 'AIR')))
@@ -269,8 +276,18 @@ def obtain_company_files(
 
 
 def crawl_companies_files(
-        phantomjs_path, workers_num=10,
+        options, workers_num=10,
         include_companies=None, from_date=None):
+    """
+
+    :param driver: the panthomjs or chromium driver with the current page
+                   loaded. We use the driver to navigate through the
+                   listing if needed
+    :param workers_num:
+    :param include_companies:
+    :param from_date:
+    :return:
+    """
 
     companies_files = []
     pool = Pool(processes=workers_num)
@@ -295,7 +312,7 @@ def crawl_companies_files(
 
             for doc_type in DOC_TYPES:
                 func_params.append([
-                    ccvm_code, phantomjs_path, doc_type, from_date])
+                    ccvm_code, options, doc_type, from_date])
 
         # call_results = pool.starmap(obtain_company_files, func_params)
         pool.starmap(obtain_company_files, func_params)

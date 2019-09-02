@@ -68,7 +68,8 @@ def process_listed_companies(options, checkpoint_data, current_execution_date):
         return
 
     # PhantomJS folder
-    phantomjs_path = options.get("phantomjs_path", None)
+    # phantomjs_path = options.get("phantomjs_path", None)
+    # driver = options.get("_driver", None)
 
     # Parallel processing - workers
     workers_num = options.get("workers_num", 10)
@@ -86,7 +87,7 @@ def process_listed_companies(options, checkpoint_data, current_execution_date):
 
     if do_crawl:
         crawl_listed_companies(
-            phantomjs_path, workers_num=workers_num)
+            options, workers_num=workers_num)
 
 
 def get_not_processed_files(options):
@@ -142,7 +143,8 @@ def process_companies_files(
 
     if do_crawl:
         # PhantomJS folder
-        phantomjs_path = options.get("phantomjs_path", None)
+        # phantomjs_path = options.get("phantomjs_path", None)
+        driver = options.get("_driver", None)
 
         # Parallel processing - workers
         workers_num = options.get("workers_num", 10)
@@ -152,7 +154,7 @@ def process_companies_files(
 
         # Get the list of files to be processed
         crawl_companies_files(
-            phantomjs_path,
+            driver,
             workers_num=workers_num,
             include_companies=include_companies,
             from_date=from_date)

@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 
 from multiprocessing.pool import Pool
 
-from selenium import webdriver
+# from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -21,7 +21,8 @@ from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.models import \
     BovespaCompany, SITUATION_CANCELLED, SITUATION_GRANTED
 from davinci_crawling.crawling_throttle import Throttle
-from davinci_crawling.utils import setup_cassandra_object_mapper
+from davinci_crawling.utils import setup_cassandra_object_mapper, \
+    CrawlersRegistry
 
 ALPHABET_LIST = list(map(chr, range(65, 91)))
 NUMBERS_LIST = list(range(0, 10))
@@ -40,7 +41,12 @@ _logger = logging.getLogger(
 
 
 @Throttle(minutes=1, rate=50, max_tokens=50)
-def update_listed_companies(letter, phantomjs_path):
+def update_listed_companies(letter, options):
+    """
+    :param letter:
+    :param driver:
+    :return:
+    """
 
     # We need to setup the Cassandra Object Mapper to work on multiprocessing
     # If we do not do that, the processes will be blocked when interacting
@@ -53,8 +59,8 @@ def update_listed_companies(letter, phantomjs_path):
                       format(letter))
 
         companies = []
-        driver = webdriver.PhantomJS(
-            executable_path=phantomjs_path)
+        # driver = webdriver.PhantomJS(
+        #    executable_path=phantomjs_path)
 
         url = COMPANIES_LISTING_URL.format(letter)
         _logger.debug("Crawling url: {}".format(url))
@@ -62,7 +68,8 @@ def update_listed_companies(letter, phantomjs_path):
         # Let's navigate to the url and wait until the page is completely
         # loaded. We control that the page is loaded looking for the
         #  presence of the table with id = "dlCiasCdCVM"
-        driver.get(url)
+        driver = CrawlersRegistry().get_crawler(
+            BOVESPA_CRAWLER).get_web_driver(**options)()
         try:
             WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.ID, 'dlCiasCdCVM')))
@@ -141,7 +148,7 @@ def update_listed_companies(letter, phantomjs_path):
             driver.quit()
 
 
-def crawl_listed_companies(phantomjs_path, workers_num=10):
+def crawl_listed_companies(options, workers_num=10):
 
     companies = []
 
@@ -150,7 +157,7 @@ def crawl_listed_companies(phantomjs_path, workers_num=10):
     try:
         func_params = []
         for letter in COMPANIES_LISTING_SEARCHER_LETTERS:
-            func_params.append([letter, phantomjs_path])
+            func_params.append([letter, options])
 
         call_results = pool.starmap(
                 update_listed_companies, func_params)
