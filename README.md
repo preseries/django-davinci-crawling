@@ -144,6 +144,9 @@ optional arguments:
   --phantomjs-path PHANTOMJS_PATH
                         Absolute path to the bin directory of the PhantomJS
                         library.Ex. '/phantomjs-2.1.1-macosx/bin/phantomjs'
+  --chromium-bin-file CHROMIUM_BIN_FILE
+                        Absolute path to the Chromium bin file.
+                        Ex. '/Applications/Chromium.app/Contents/MacOS/Chromium'
   --io-gs-project IO_GS_PROJECT
                         If we are using Google Storage to persist the files,
                         we could need to inform about the project of the

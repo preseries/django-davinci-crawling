@@ -138,7 +138,7 @@ If we want to start the crawler to crawl all the data available at Bovespa, we r
 ```
 $ python manage.py crawl bovespa \
     -v 0 --workers-num 10 \
-    --phantomjs-path /phantomjs-2.1.1-macosx/bin/phantomjs \
+    --chromium-bin-file '/Applications/Chromium.app/Contents/MacOS/Chromium' \
     --io-gs-project centering-badge-212119 \
     --cache-dir "gs://vanggogh2_harvest" \
     --local-dir "fs:///data/harvest/local"
@@ -149,7 +149,7 @@ If we want to crawl information about some specific companies:
 ```
 $ python manage.py crawl bovespa \
     -v 0 --workers-num 20 \
-    --phantomjs-path /phantomjs-2.1.1-macosx/bin/phantomjs \
+    --chromium-bin-file '/Applications/Chromium.app/Contents/MacOS/Chromium' \
     --io-gs-project centering-badge-212119 \
     --cache-dir "gs://vanggogh2_harvest" \
     --local-dir "fs:///data/harvest/local" \
