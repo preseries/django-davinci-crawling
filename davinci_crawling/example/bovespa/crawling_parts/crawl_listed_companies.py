@@ -12,7 +12,6 @@ from bs4 import BeautifulSoup
 
 from multiprocessing.pool import Pool
 
-# from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -55,12 +54,13 @@ def update_listed_companies(letter, options):
 
     driver = None
     try:
+        driver = CrawlersRegistry().get_crawler(
+            BOVESPA_CRAWLER).get_web_driver(**options)
+
         _logger.debug("Crawling companies listing for letter: {}".
                       format(letter))
 
         companies = []
-        # driver = webdriver.PhantomJS(
-        #    executable_path=phantomjs_path)
 
         url = COMPANIES_LISTING_URL.format(letter)
         _logger.debug("Crawling url: {}".format(url))
@@ -68,8 +68,7 @@ def update_listed_companies(letter, options):
         # Let's navigate to the url and wait until the page is completely
         # loaded. We control that the page is loaded looking for the
         #  presence of the table with id = "dlCiasCdCVM"
-        driver = CrawlersRegistry().get_crawler(
-            BOVESPA_CRAWLER).get_web_driver(**options)()
+        driver.get(url)
         try:
             WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.ID, 'dlCiasCdCVM')))
@@ -144,7 +143,7 @@ def update_listed_companies(letter, options):
             "Finishing to crawl listed companies for letter {}".format(letter))
         if driver:
             _logger.debug(
-                "Closing the PhantomJS driver for letter {}".format(letter))
+                "Closing the Selenium Driver for letter {}".format(letter))
             driver.quit()
 
 

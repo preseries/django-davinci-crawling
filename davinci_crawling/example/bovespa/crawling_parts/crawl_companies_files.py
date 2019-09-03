@@ -13,7 +13,6 @@ from dateutil.parser import parse as date_parse
 
 from bs4 import BeautifulSoup
 
-# from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -205,18 +204,18 @@ def obtain_company_files(
     driver = None
 
     try:
-        # driver = webdriver.PhantomJS(
-        #    executable_path=phantomjs_path)
+        driver = CrawlersRegistry().get_crawler(
+            BOVESPA_CRAWLER).get_web_driver(**options)
 
         encoded_args = urlencode(
             {'CCVM': ccvm, 'TipoDoc': 'C', 'QtLinks': "1000"})
         url = COMPANY_DOCUMENTS_URL.format(encoded_args)
+        _logger.debug("Crawling url: {}".format(url))
 
         # Let's navigate to the url and wait until the reload is being done
         # We control that the page is loaded looking for an element with
         # id = "AIR" in the page
-        driver = CrawlersRegistry().get_crawler(
-            BOVESPA_CRAWLER).get_web_driver(**options)()
+        driver.get(url)
         try:
             WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.NAME, 'AIR')))
@@ -269,7 +268,7 @@ def obtain_company_files(
             "[{ccvm} - {doc_type}] files: [{num_files}]".
             format(ccvm=ccvm, doc_type=doc_type, num_files=len(files)))
         if driver:
-            _logger.debug("Closing the phantomjs driver for company "
+            _logger.debug("Closing the Selenium Driver for company "
                           "[{ccvm} - {doc_type}]".
                           format(ccvm=ccvm, doc_type=doc_type))
             driver.quit()

@@ -66,8 +66,8 @@ setup(
         'google-api-python-client>=1.7',
         'google-cloud-storage>=1.10',
         'XlsxWriter>=1.1.2',
-        'django-cassandra-engine==1.5.4.bgds-1',
-        'django-caravaggio-rest-api==0.1.5'],
+        'django-cassandra-engine==1.5.5.bgds-1',
+        'django-caravaggio-rest-api==0.1.6'],
     python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
     zip_safe=False,
     classifiers=[
@@ -91,9 +91,9 @@ setup(
     ],
     dependency_links=[
         "https://github.com/buildgroupai/django-cassandra-engine/tarball/"
-        "1.5.4-bgds-1#egg=django-cassandra-engine-1.5.4.bgds-1",
+        "1.5.5-bgds-1#egg=django-cassandra-engine-1.5.5.bgds-1",
         "https://github.com/buildgroupai/django-caravaggio-rest-api/tarball/"
-        "0.1.5#egg=django-caravaggio-rest-api-0.1.5"
+        "0.1.6#egg=django-caravaggio-rest-api-0.1.6"
     ],
 )
 
