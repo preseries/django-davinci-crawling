@@ -132,7 +132,8 @@ def update_listed_companies(letter, options):
                     "Get bovespa company from DB: {}".format(ccvm_code))
                 companies.append(BovespaCompany.objects.get(ccvm=ccvm_code))
 
-        return companies
+        return [(company.ccvm, company.company_name,
+                 company.cnpj, company.situation) for company in companies]
     except Exception as ex:
         _logger.exception(
             "Unable to get, or crawl if it doesn't exists,"

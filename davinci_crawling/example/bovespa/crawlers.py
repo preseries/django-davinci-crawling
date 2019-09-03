@@ -67,10 +67,6 @@ def process_listed_companies(options, checkpoint_data, current_execution_date):
     if no_update:
         return
 
-    # PhantomJS folder
-    # phantomjs_path = options.get("phantomjs_path", None)
-    # driver = options.get("_driver", None)
-
     # Parallel processing - workers
     workers_num = options.get("workers_num", 10)
 
@@ -142,10 +138,6 @@ def process_companies_files(
         update_elapsetime else False
 
     if do_crawl:
-        # PhantomJS folder
-        # phantomjs_path = options.get("phantomjs_path", None)
-        driver = options.get("_driver", None)
-
         # Parallel processing - workers
         workers_num = options.get("workers_num", 10)
 
@@ -154,7 +146,7 @@ def process_companies_files(
 
         # Get the list of files to be processed
         crawl_companies_files(
-            driver,
+            options,
             workers_num=workers_num,
             include_companies=include_companies,
             from_date=from_date)
