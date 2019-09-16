@@ -67,22 +67,30 @@ setup(
         'google-cloud-storage>=1.10',
         'XlsxWriter>=1.1.2',
         'django-cassandra-engine==1.5.5.bgds-1',
-        'django-caravaggio-rest-api==0.1.6'],
+        'django-caravaggio-rest-api==0.1.7-SNAPSHOT'],
+    tests_require=[
+        'spitslurp>=0.4',
+
+        'django-debug-toolbar>=1.10.1',
+        'django-extensions>=2.1.3',
+
+        'psycopg2-binary>=2.7.5',
+
+        #cassandra-driver>=3.15.0
+        'dse-driver>=2.6',
+    ],
     python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
     zip_safe=False,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
         'Framework :: Django',
-        'Framework :: Django :: 1.11',
         'Framework :: Django :: 2.0',
         'Framework :: Django :: 2.1',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
@@ -90,10 +98,13 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
     ],
     dependency_links=[
-        "https://github.com/buildgroupai/django-cassandra-engine/tarball/"
-        "1.5.5-bgds-1#egg=django-cassandra-engine-1.5.5.bgds-1",
-        "https://github.com/buildgroupai/django-caravaggio-rest-api/tarball/"
-        "0.1.6#egg=django-caravaggio-rest-api-0.1.6"
+        "git+ssh://git@github.com/buildgroupai/django-cassandra-engine.git"
+        "@bgds-1#"
+        "egg=django-cassandra-engine-1.5.5-bgds-1",
+
+        "git+ssh://git@github.com/buildgroupai/django-caravaggio-rest-api.git"
+        "@clients-support_external-systems#"
+        "egg=django-caravaggio-rest-api-0.1.7-SNAPSHOT",
     ],
 )
 

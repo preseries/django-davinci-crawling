@@ -9,7 +9,7 @@ r"""
 """
 
 __title__ = 'Django DaVinci Crawling Framework'
-__version__ = '0.1.4'
+__version__ = '0.1.5-SNAPSHOT'
 __author__ = 'Javier Alperte'
 __license__ = 'MIT'
 __copyright__ = 'Copyright (c) 2019 BuildGroup Data Services Inc.'
