@@ -69,8 +69,6 @@ setup(
         'django-cassandra-engine==1.5.5.bgds-1',
         'django-caravaggio-rest-api==0.1.7-SNAPSHOT'],
     tests_require=[
-        'spitslurp>=0.4',
-
         'django-debug-toolbar>=1.10.1',
         'django-extensions>=2.1.3',
 
