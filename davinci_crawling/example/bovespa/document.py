@@ -78,6 +78,7 @@ def get_cap_composition_accounts(available_files, company_file):
         account = {
             "ccvm": company_file.ccvm,
             "period": company_file.fiscal_date,
+            "version": company_file.version,
             "balance_type": DFP_BALANCE_IF,
             "financial_info_type": DFP_FINANCIAL_INFO_DURATION,
             "number": acc_number,
@@ -93,7 +94,7 @@ def get_cap_composition_accounts(available_files, company_file):
         else:
             value = int(equity[acc_name]["$"])
 
-        account["value"] = int(value / quant_scale)
+        account["amount"] = int(value / quant_scale)
         account = BovespaAccount.create(**account)
         accounts.append(account)
 
@@ -115,6 +116,7 @@ def get_financial_info_accounts(available_files, company_file):
         account = {
             "ccvm": company_file.ccvm,
             "period": company_file.fiscal_date,
+            "version": company_file.version,
             "balance_type": BALANCE_TYPES[
                 int(acc_version["CodigoTipoDemonstracaoFinanceira"]["$"])],
             "financial_info_type": FINANCIAL_INFO_TYPES[
@@ -134,14 +136,14 @@ def get_financial_info_accounts(available_files, company_file):
             # Shares outstanding
             dmpl_account = dict(account)
             dmpl_account["comments"] = "Capital social integralizado"
-            dmpl_account["value"] = float(account_info["ValorConta1"]["$"])
+            dmpl_account["amount"] = float(account_info["ValorConta1"]["$"])
             dmpl_account = BovespaAccount.create(**dmpl_account)
             accounts.append(dmpl_account)
 
             # Reserves
             dmpl_account = dict(account)
             dmpl_account["comments"] = "Reservas de capital"
-            dmpl_account["value"] = \
+            dmpl_account["amount"] = \
                 float(account_info["ValorConta2"]["$"] / money_scale)
             dmpl_account = BovespaAccount.create(**dmpl_account)
             accounts.append(dmpl_account)
@@ -149,7 +151,7 @@ def get_financial_info_accounts(available_files, company_file):
             # Revenue reserves
             dmpl_account = dict(account)
             dmpl_account["comments"] = "Reservas de lucro"
-            dmpl_account["value"] = \
+            dmpl_account["amount"] = \
                 float(account_info["ValorConta3"]["$"] / money_scale)
             dmpl_account = BovespaAccount.create(**dmpl_account)
             accounts.append(dmpl_account)
@@ -157,7 +159,7 @@ def get_financial_info_accounts(available_files, company_file):
             # Accrued Profit/Loss
             dmpl_account = dict(account)
             dmpl_account["comments"] = "Lucros/Prejuízos acumulados"
-            dmpl_account["value"] = \
+            dmpl_account["amount"] = \
                 float(account_info["ValorConta4"]["$"] / money_scale)
             dmpl_account = BovespaAccount.create(**dmpl_account)
             accounts.append(dmpl_account)
@@ -165,7 +167,7 @@ def get_financial_info_accounts(available_files, company_file):
             # Accumulated other comprehensive income
             dmpl_account = dict(account)
             dmpl_account["comments"] = "Outros resultados abrangentes"
-            dmpl_account["value"] = \
+            dmpl_account["amount"] = \
                 float(account_info["ValorConta5"]["$"] / money_scale)
             dmpl_account = BovespaAccount.create(**dmpl_account)
             accounts.append(dmpl_account)
@@ -173,19 +175,19 @@ def get_financial_info_accounts(available_files, company_file):
             # Stockholder's equity
             dmpl_account = dict(account)
             dmpl_account["comments"] = "Patrimônio Líquido"
-            dmpl_account["value"] = \
+            dmpl_account["amount"] = \
                 float(account_info["ValorConta6"]["$"] / money_scale)
             dmpl_account = BovespaAccount.create(**dmpl_account)
             accounts.append(dmpl_account)
         else:
             if company_file.doc_type == DOC_TYPE_DFP:
-                account["value"] = \
+                account["amount"] = \
                     float(account_info["ValorConta1"]["$"]) / money_scale
             elif company_file.doc_type == DOC_TYPE_ITR:
                 # Profit and Los (ASSETS or LIABILITIES)
                 if account["balance_type"] in [
                         DFP_BALANCE_BPA, DFP_BALANCE_BPP]:
-                    account["value"] = \
+                    account["amount"] = \
                         float(account_info["ValorConta2"]["$"]) / money_scale
                 # Discounted Cash-flow (direct/indirect) and
                 #   Value Added Demostration
@@ -193,16 +195,16 @@ def get_financial_info_accounts(available_files, company_file):
                         DFP_BALANCE_DFC_MD,
                         DFP_BALANCE_DFC_MI,
                         DFP_BALANCE_DVA]:
-                    account["value"] = \
+                    account["amount"] = \
                         float(account_info["ValorConta4"]["$"]) / money_scale
                 else:
                     q = quarter(account["period"].date())
                     if q == 1:
-                        account["value"] = \
+                        account["amount"] = \
                             float(account_info["ValorConta4"]["$"]) / \
                             money_scale
                     else:
-                        account["value"] = \
+                        account["amount"] = \
                             float(account_info["ValorConta2"]["$"]) / \
                             money_scale
             account = BovespaAccount.create(**account)

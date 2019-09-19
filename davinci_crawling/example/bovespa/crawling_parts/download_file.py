@@ -88,7 +88,7 @@ def extract_files_to_process(options, company_file):
                     filename = ntpath.basename(dfp_file)
                     available_files["dfp/{}".format(filename)] = dfp_file
 
-    return available_files
+    return local_file, working_local_base_path, available_files
 
 
 @Throttle(minutes=1, rate=50, max_tokens=50)

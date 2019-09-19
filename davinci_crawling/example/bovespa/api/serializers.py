@@ -77,26 +77,26 @@ class BovespaCompanyFacetSerializerV1(HaystackFacetSerializer):
             "company_type": {},
             "situation": {},
             "created_at": {
-                "start_date": datetime.now() - timedelta(days=5 * 365),
-                "end_date": datetime.now(),
+                "start_date": datetime.utcnow() - timedelta(days=5 * 365),
+                "end_date": datetime.utcnow(),
                 "gap_by": "month",
                 "gap_amount": 1
             },
             "updated_at": {
-                "start_date": datetime.now() - timedelta(days=5 * 365),
-                "end_date": datetime.now(),
+                "start_date": datetime.utcnow() - timedelta(days=5 * 365),
+                "end_date": datetime.utcnow(),
                 "gap_by": "month",
                 "gap_amount": 1
             },
             "granted_date": {
                 "start_date": parse_date("1980-01-01"),
-                "end_date": datetime.now(),
+                "end_date": datetime.utcnow(),
                 "gap_by": "year",
                 "gap_amount": 1
             },
             "canceled_date": {
                 "start_date": parse_date("1980-01-01"),
-                "end_date": datetime.now(),
+                "end_date": datetime.utcnow(),
                 "gap_by": "year",
                 "gap_amount": 1
             }
@@ -195,26 +195,26 @@ class BovespaCompanyFileFacetSerializerV1(HaystackFacetSerializer):
             "fiscal_date_ym": {},
             "file_extension": {},
             "created_at": {
-                "start_date": datetime.now() - timedelta(days=5 * 365),
-                "end_date": datetime.now(),
+                "start_date": datetime.utcnow() - timedelta(days=5 * 365),
+                "end_date": datetime.utcnow(),
                 "gap_by": "month",
                 "gap_amount": 1
             },
             "updated_at": {
-                "start_date": datetime.now() - timedelta(days=5 * 365),
-                "end_date": datetime.now(),
+                "start_date": datetime.utcnow() - timedelta(days=5 * 365),
+                "end_date": datetime.utcnow(),
                 "gap_by": "month",
                 "gap_amount": 1
             },
             "delivery_date": {
                 "start_date": parse_date("2000-01-01"),
-                "end_date": datetime.now(),
+                "end_date": datetime.utcnow(),
                 "gap_by": "year",
                 "gap_amount": 1
             },
             "fiscal_date": {
                 "start_date": parse_date("2000-01-01"),
-                "end_date": datetime.now(),
+                "end_date": datetime.utcnow(),
                 "gap_by": "year",
                 "gap_amount": 1
             }
@@ -235,8 +235,9 @@ class BovespaAccountSerializerV1(
 
     class Meta:
         model = BovespaAccount
-        fields = ("ccvm", "period", "number", "financial_info_type",
-                  "balance_type", "name", "value",
+        fields = ("ccvm", "period", "version", "number",
+                  "financial_info_type",
+                  "balance_type", "name", "amount",
                   "created_at", "updated_at")
         read_only_fields = ("created_at", "updated_at")
 
@@ -259,9 +260,9 @@ class BovespaAccountSearchSerializerV1(
         # NOTE: Make sure you don't confuse these with model attributes. These
         # fields belong to the search index!
         fields = [
-            "ccvm", "period", "number", "name",
+            "ccvm", "period", "version", "number", "name",
             "financial_info_type", "balance_type", "comments",
-            "value",
+            "amount",
             "created_at", "updated_at",
             "score"]
 
@@ -277,32 +278,33 @@ class BovespaAccountFacetSerializerV1(HaystackFacetSerializer):
     class Meta:
         index_classes = [BovespaAccount]
         fields = [
-            "ccvm", "period", "number", "name",
+            "ccvm", "period", "version", "number", "name",
             "financial_info_type", "balance_type", "comments",
             "created_at", "updated_at"]
 
         field_options = {
             "ccvm": {},
+            "version": {},
             "number": {},
             "name": {},
             "financial_info_type": {},
             "balance_type": {},
             "comments": {},
             "created_at": {
-                "start_date": datetime.now() - timedelta(days=5 * 365),
-                "end_date": datetime.now(),
+                "start_date": datetime.utcnow() - timedelta(days=5 * 365),
+                "end_date": datetime.utcnow(),
                 "gap_by": "month",
                 "gap_amount": 1
             },
             "updated_at": {
-                "start_date": datetime.now() - timedelta(days=5 * 365),
-                "end_date": datetime.now(),
+                "start_date": datetime.utcnow() - timedelta(days=5 * 365),
+                "end_date": datetime.utcnow(),
                 "gap_by": "month",
                 "gap_amount": 1
             },
             "period": {
                 "start_date": parse_date("2000-01-01"),
-                "end_date": datetime.now(),
+                "end_date": datetime.utcnow(),
                 "gap_by": "year",
                 "gap_amount": 1
             },

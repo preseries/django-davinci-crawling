@@ -265,6 +265,10 @@ class BovespaAccount(CustomDjangoCassandraModel):
     # Date of the account value
     period = columns.Date(primary_key=True, clustering_order="DESC")
 
+    # The version of the account. The company could present different
+    # versions of the files
+    version = columns.Text(primary_key=True, clustering_order="DESC")
+
     # The account number. Ex. "1.01.01"
     number = columns.Text(primary_key=True, max_length=15)
 
@@ -277,8 +281,8 @@ class BovespaAccount(CustomDjangoCassandraModel):
     # The account name. Ex. "Receita de Venda de Bens e/ou Serviços"
     name = columns.Text(max_length=200, required=True)
 
-    # The value of the account
-    value = Decimal(required=True, max_digits=20, decimal_places=2)
+    # The amount of the account
+    amount = Decimal(required=True, max_digits=20, decimal_places=2)
 
     # The comments. Used for "DFP_BALANCE_DMPL" accounts, explaining the
     # meaning of the account: Shareholder's Equity, Accrued Profit/Loss, etc.

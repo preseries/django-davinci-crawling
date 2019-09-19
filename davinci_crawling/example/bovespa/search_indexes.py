@@ -192,6 +192,9 @@ class BovespaAccountIndex(BaseSearchIndex, indexes.Indexable):
     period = indexes.DateField(
         model_attr="period", faceted=True)
 
+    version = indexes.CharField(
+        model_attr="version", faceted=True)
+
     number = indexes.CharField(
         model_attr="number", faceted=True)
 
@@ -204,8 +207,8 @@ class BovespaAccountIndex(BaseSearchIndex, indexes.Indexable):
     name = indexes.CharField(
         model_attr="name", faceted=True)
 
-    value = indexes.DecimalField(
-        model_attr="value")
+    amount = indexes.DecimalField(
+        model_attr="amount")
 
     comments = indexes.CharField(
         model_attr="comments", faceted=True)

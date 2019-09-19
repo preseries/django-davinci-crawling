@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*
-from drf_haystack.filters import HaystackFilter, HaystackBoostFilter, \
-    HaystackGEOSpatialFilter, HaystackFacetFilter
-
-from caravaggio_rest_api.drf_haystack.filters import \
-    HaystackOrderingFilter
-
 from caravaggio_rest_api.drf_haystack.viewsets import \
-    CustomModelViewSet, CustomHaystackViewSet
+    CaravaggioCassandraModelViewSet, \
+    CaravaggioHaystackGEOSearchViewSet, \
+    CaravaggioHaystackFacetSearchViewSet
+
 
 # from rest_framework.authentication import \
 #    TokenAuthentication, SessionAuthentication
 # from rest_framework.permissions import IsAuthenticated
 
-from drf_haystack import mixins
-
-from .serializers import BovespaCompanySerializerV1, \
+from davinci_crawling.example.bovespa.api.serializers import \
+    BovespaCompanySerializerV1, \
     BovespaCompanySearchSerializerV1, BovespaCompanyFacetSerializerV1, \
     BovespaCompanyFileSerializerV1, BovespaCompanyFileSearchSerializerV1, \
     BovespaCompanyFileFacetSerializerV1, \
@@ -25,7 +21,7 @@ from davinci_crawling.example.bovespa.models import \
     BovespaCompany, BovespaCompanyFile, BovespaAccount
 
 
-class BovespaCompanyViewSet(CustomModelViewSet):
+class BovespaCompanyViewSet(CaravaggioCassandraModelViewSet):
     queryset = BovespaCompany.objects.all()
 
     # Defined in the settings as default authentication classes
@@ -37,14 +33,10 @@ class BovespaCompanyViewSet(CustomModelViewSet):
 
     serializer_class = BovespaCompanySerializerV1
 
-    filter_fields = ("ccvm", "created_at", "updated_at", "situation")
+    # filter_fields = ("ccvm", "created_at", "updated_at", "situation")
 
 
-class BovespaCompanySearchViewSet(mixins.FacetMixin, CustomHaystackViewSet):
-
-    filter_backends = [
-        HaystackFilter, HaystackBoostFilter,
-        HaystackFacetFilter, HaystackOrderingFilter]
+class BovespaCompanySearchViewSet(CaravaggioHaystackFacetSearchViewSet):
 
     # `index_models` is an optional list of which models you would like
     #  to include in the search result. You might have several models
@@ -76,7 +68,7 @@ class BovespaCompanySearchViewSet(mixins.FacetMixin, CustomHaystackViewSet):
         "created_at", "updated_at")
 
 
-class BovespaCompanyFileViewSet(CustomModelViewSet):
+class BovespaCompanyFileViewSet(CaravaggioCassandraModelViewSet):
     queryset = BovespaCompanyFile.objects.all()
 
     # Defined in the settings as default authentication classes
@@ -88,17 +80,12 @@ class BovespaCompanyFileViewSet(CustomModelViewSet):
 
     serializer_class = BovespaCompanyFileSerializerV1
 
-    filter_fields = (
-        "ccvm", "doc_type", "fiscal_date", "version",
-        "created_at", "updated_at")
+    # filter_fields = (
+    #     "ccvm", "doc_type", "fiscal_date", "version",
+    #     "created_at", "updated_at")
 
 
-class BovespaCompanyFileSearchViewSet(
-        mixins.FacetMixin, CustomHaystackViewSet):
-
-    filter_backends = [
-        HaystackFilter, HaystackBoostFilter,
-        HaystackFacetFilter, HaystackOrderingFilter]
+class BovespaCompanyFileSearchViewSet(CaravaggioHaystackFacetSearchViewSet):
 
     # `index_models` is an optional list of which models you would like
     #  to include in the search result. You might have several models
@@ -135,7 +122,7 @@ class BovespaCompanyFileSearchViewSet(
         "created_at", "updated_at")
 
 
-class BovespaAccountViewSet(CustomModelViewSet):
+class BovespaAccountViewSet(CaravaggioCassandraModelViewSet):
     queryset = BovespaAccount.objects.all()
 
     # Defined in the settings as default authentication classes
@@ -147,16 +134,12 @@ class BovespaAccountViewSet(CustomModelViewSet):
 
     serializer_class = BovespaAccountSerializerV1
 
-    filter_fields = (
-        "ccvm", "period", "number", "financial_info_type",
-        "created_at", "updated_at")
+    # filter_fields = (
+    #     "ccvm", "period", "number", "financial_info_type",
+    #     "created_at", "updated_at")
 
 
-class BovespaAccountSearchViewSet(mixins.FacetMixin, CustomHaystackViewSet):
-
-    filter_backends = [
-        HaystackFilter, HaystackBoostFilter,
-        HaystackFacetFilter, HaystackOrderingFilter]
+class BovespaAccountSearchViewSet(CaravaggioHaystackFacetSearchViewSet):
 
     # `index_models` is an optional list of which models you would like
     #  to include in the search result. You might have several models
@@ -183,7 +166,7 @@ class BovespaAccountSearchViewSet(mixins.FacetMixin, CustomHaystackViewSet):
     results_serializer_class = BovespaAccountSerializerV1
 
     ordering_fields = (
-        "ccvm", "period", "number", "name",
+        "ccvm", "period", "version", "number", "name",
         "financial_info_type", "balance_type", "comments",
         "value",
         "created_at", "updated_at",)

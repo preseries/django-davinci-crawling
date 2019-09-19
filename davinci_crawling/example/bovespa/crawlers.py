@@ -19,7 +19,8 @@ from davinci_crawling.example.bovespa.crawling_parts.process_file import \
 from .models import BovespaCompanyFile, FILE_STATUS_NOT_PROCESSED
 
 from davinci_crawling.crawler import Crawler
-from davinci_crawling.io import put_checkpoint_data, get_checkpoint_data
+from davinci_crawling.io import \
+    put_checkpoint_data, get_checkpoint_data, delete_all
 from davinci_crawling.time import mk_datetime
 from .crawling_parts.crawl_listed_companies import crawl_listed_companies
 from .crawling_parts.crawl_companies_files import crawl_companies_files
@@ -274,10 +275,15 @@ class BovespaCrawler(Crawler):
         # permanent storage for further processing.
         # It extract the files into a working folder and return the list of
         # files that can be processed
-        files_to_process = download_file(options, *crawling_params)
+        local_file, working_local_file, files_to_process = \
+            download_file(options, *crawling_params)
 
         # Open the files and process the content to generate the
         # BovespaCompanyNumbers with all the financial data of the company
         process_file(options, files_to_process, *crawling_params)
+
+        # Remove cached files
+        delete_all(options, local_file)
+        delete_all(options, working_local_file)
 
         return "Processing company file [{}]".format(crawling_params)
