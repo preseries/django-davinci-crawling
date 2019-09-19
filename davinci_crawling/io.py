@@ -315,17 +315,25 @@ def delete_all(options, path):
         except TypeError:
             clean_path = path
 
-        for the_file in os.listdir(clean_path):
-            file_path = os.path.join(clean_path, the_file)
+        if os.path.isfile(clean_path):
             try:
-                if os.path.isfile(file_path):
-                    os.unlink(file_path)
-                else:
-                    shutil.rmtree(file_path)
+                os.unlink(clean_path)
             except Exception as e:
                 raise Exception(
-                    "Unable to delete the files in folder [{0}]. "
+                    "Unable to delete the file [{0}]. "
                     "Clean version: [{1}]".format(path, clean_path))
+        else:
+            for the_file in os.listdir(clean_path):
+                file_path = os.path.join(clean_path, the_file)
+                try:
+                    if os.path.isfile(file_path):
+                        os.unlink(file_path)
+                    else:
+                        shutil.rmtree(file_path)
+                except Exception as e:
+                    raise Exception(
+                        "Unable to delete the files in folder [{0}]. "
+                        "Clean version: [{1}]".format(path, clean_path))
 
 
 def copy_file(options, source_file, dest_file):
