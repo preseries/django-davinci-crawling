@@ -232,11 +232,12 @@ def load_accounts(ccvm, period):
                       format(ccvm, str(filter)))
         paginator = CaravaggioSearchPaginator(
             query_string=str(filter),
+            sort='version_exact asc, number_exact asc',
             limit=5000, max_limit=5000). \
             models(BovespaAccount). \
-            select("number", "name",
+            select("version", "number", "name",
                    "financial_info_type", "balance_type", "comments",
-                   "value")
+                   "amount")
 
         while paginator.has_next():
             _logger.debug(
@@ -245,6 +246,7 @@ def load_accounts(ccvm, period):
                        paginator.get_hits()))
             paginator.next()
             for d in paginator.get_results():
+                _logger.debug("Raw Account: {}".format(d))
                 balance_type_accounts = \
                     period_data.setdefault(d.balance_type, {})
                 financial_type_accounts = balance_type_accounts.\
@@ -256,7 +258,7 @@ def load_accounts(ccvm, period):
                     "comments": d.comments,
                     "financial_info_type": d.financial_info_type,
                     "balance_type": d.balance_type,
-                    "value": float(d.value)}
+                    "amount": float(d.amount)}
         accounts_data_cache[key] = period_data
 
     return period_data
@@ -622,7 +624,7 @@ def export_data(ccvm, current_period):
             row += 2
             for acc_number, acc_name in accounts.items():
                 current_period_value = \
-                    current_instant_data[acc_number]["value"] \
+                    current_instant_data[acc_number]["amount"] \
                     if acc_number in current_instant_data else 0.0
 
                 other_period_values = []
@@ -639,7 +641,7 @@ def export_data(ccvm, current_period):
                         other_period_data = \
                             load_accounts(ccvm, other_period_date)
                         data = other_period_data[balance_type][info_type]
-                        value += data[acc_number]["value"] \
+                        value += data[acc_number]["amount"] \
                             if acc_number in data else 0.0
 
                     other_period_values.append(value)
@@ -689,12 +691,12 @@ def export_data(ccvm, current_period):
             if balance_type == DFP_BALANCE_DRE:
                 shares_data = current_period_data[
                     DFP_BALANCE_IF][DFP_FINANCIAL_INFO_DURATION]
-                ordinary_shares = shares_data["1.89.01"]["value"]
-                preferred_shares = shares_data["1.89.02"]["value"]
-                total_shares = shares_data["1.89.03"]["value"]
-                ordinary_shares_in_treasury = shares_data["1.89.04"]["value"]
-                preferred_shares_in_treasury = shares_data["1.89.05"]["value"]
-                total_shares_in_treasury = shares_data["1.89.06"]["value"]
+                ordinary_shares = shares_data["1.89.01"]["amount"]
+                preferred_shares = shares_data["1.89.02"]["amount"]
+                total_shares = shares_data["1.89.03"]["amount"]
+                ordinary_shares_in_treasury = shares_data["1.89.04"]["amount"]
+                preferred_shares_in_treasury = shares_data["1.89.05"]["amount"]
+                total_shares_in_treasury = shares_data["1.89.06"]["amount"]
 
                 worksheet.write(row, 0, "3.99.99.10")
                 worksheet.write(row, 1, "Ordinary shares in treasury")
