@@ -4,36 +4,54 @@ Information about the Bovespa crawler
 
 ## Context
 
-There are different approaches to investment analysis. One of these approaches is the Value Investing method.
+There are different approaches to investment analysis. One of these approaches 
+is the Value Investing method.
 
-This method tries to discover important gaps between the market price of the shares of the companies (official price on the stock exchange), and the real price of the company, known as the [Intrinsic Value] (https: / /www.investopedia.com/terms/i/intrinsicvalue.asp).
+This method tries to discover important gaps between the market price of the 
+shares of the companies (official price on the stock exchange), and the real 
+price of the company, known as the 
+[Intrinsic Value] (https: / /www.investopedia.com/terms/i/intrinsicvalue.asp).
 
-In Value Investing, the ultimate goal is to invest in those companies with a considerable low or high intrinsic value compared with the public value (stock exchange).
+In Value Investing, the ultimate goal is to invest in those companies with a 
+considerable low or high intrinsic value compared with the public 
+value (stock exchange).
 
-In order to be able to calculate the intrinsic value of Brazilian companies, we need to have access to the quarterly financial reports that companies deliver to Bovespa.
+In order to be able to calculate the intrinsic value of Brazilian companies, 
+we need to have access to the quarterly financial reports that companies 
+deliver to Bovespa.
 
-This crawler will extract the financial reports presented by the Brazilian companies on the stock market of São Paulo, and will persist all the information in a data backend that could be used later by ETLs to load the data to another service. 
+This crawler will extract the financial reports presented by the Brazilian 
+companies on the stock market of São Paulo, and will persist all the 
+information in a data backend that could be used later by ETLs to load the 
+data to another service. 
 
 ## What's Bovespa?
 
-The B3 (in full, B3 - Brasil Bolsa Balcão S.A. or B3 - Brazil, Stock Exchange and Over-the-Counter Market), formerly BM&FBOVESPA, is a Stock Exchange located at São Paulo, Brazil and the second oldest of the country
+The B3 (in full, B3 - Brasil Bolsa Balcão S.A. or B3 - Brazil, Stock Exchange 
+and Over-the-Counter Market), formerly BM&FBOVESPA, is a Stock Exchange 
+located at São Paulo, Brazil and the second oldest of the country
 
 ## Acknowledgments
 
 We used the following resources to implement the crawler:
 
-- Post [Automatização de balanços](http://clubinvest.boards.net/thread/367/automatiza-de-balan-os) explaining the documents available from Bovespa, and how to access to them.
-- [Denet](http://www.potuz.net/denet/). An implementation in C++ of a system to do fundamental analysis using the information from Bovespa.
+- Post [Automatização de balanços](http://clubinvest.boards.net/thread/367/automatiza-de-balan-os) 
+explaining the documents available from Bovespa, and how to access to them.
+- [Denet](http://www.potuz.net/denet/). An implementation in C++ of a system to do 
+fundamental analysis using the information from Bovespa.
 
 Technical resources:
 
 - Subirats, L., Calvo, M. (2018). Web Scraping. Editorial UOC.
-- Lawson, R. (2015). Web Scraping with Python. Packt Publishing Ltd. Chapter 2. Scraping the Data
+- Lawson, R. (2015). Web Scraping with Python. Packt Publishing Ltd. 
+Chapter 2. Scraping the Data
 
 Other resources:
 
-- Service to query the documentation delivered by the companies. [Link](http://sistemas.cvm.gov.br/port/ciasabertas/)
-- Utility to download multiple files from Bovespa (Not used, we do pure web scrapping instead). [Link](http://www.cvm.gov.br/menu/regulados/companhias/download_multiplo/index.html)
+- Service to query the documentation delivered by the companies. 
+[Link](http://sistemas.cvm.gov.br/port/ciasabertas/)
+- Utility to download multiple files from Bovespa (Not used, we do pure web 
+scrapping instead). [Link](http://www.cvm.gov.br/menu/regulados/companhias/download_multiplo/index.html)
 
 ## License
 
@@ -48,51 +66,85 @@ The `crawlers.py` file contains the declaration of the BovespaCrawler.
 
 The crawler is divided into two parts:
 
-- The `crawl_params` method. That will navigate through the web locating all the companies that have ever been in Bovespa (`BovespaCompany`), and will search for all the files delivered by the companies (`BovespaCompanyFile`), returning the list of all the files to be processed (not downloaded and processed yet). 
+- The `crawl_params` method. That will navigate through the web locating all 
+the companies that have ever been in Bovespa (`BovespaCompany`), and will 
+search for all the files delivered by the companies (`BovespaCompanyFile`), 
+returning the list of all the files to be processed (not downloaded and 
+processed yet). 
 
-- The `crawl` method. That will receive one file at a time that will be downloaded, put it into the permanent cache (GS), and into the volatile cache (Local FS), it will be uncompressed, we will extract all the financial data and create entries in the database for each Account-Value (`BovespaAccount`).
+- The `crawl` method. That will receive one file at a time that will be 
+downloaded, put it into the permanent cache (GS), and into the volatile 
+cache (Local FS), it will be uncompressed, we will extract all the financial 
+data and create entries in the database for each 
+Account-Value (`BovespaAccount`).
 
 
 The crawling code is mainly divided in the following parts:
 
-- `crawling_parts/listed_companies.py`: crawl all the listed companies in Bovespa (ancient and new)
+- `crawling_parts/listed_companies.py`: crawl all the listed companies 
+in Bovespa (ancient and new)
 
-- `crawling_parts/company_files.py`: crawl the list of delivered files by the companies to Bovespa.
+- `crawling_parts/company_files.py`: crawl the list of delivered files 
+by the companies to Bovespa.
 
-- `crawling_parts/download_file.py`: download the delivered files, extract the financial information from them, and generate the data/dataset.csv and data/dictionary.csv files
+- `crawling_parts/download_file.py`: download the delivered files, extract 
+the financial information from them, and generate the data/dataset.csv 
+and data/dictionary.csv files
 
 
 ### Throttling
 
-The following functions have been throttled to avoid a bad use of the access to the source, controlling the quantity of request we would do simultaneously to the source to extract all the required data:
+The following functions have been throttled to avoid a bad use of the access 
+to the source, controlling the quantity of request we would do simultaneously 
+to the source to extract all the required data:
 
-- `update_listed_companies` located at `crawling_parts/crawl_listed_companies.py`: 50 requests by minute.
+- `update_listed_companies` located 
+at `crawling_parts/crawl_listed_companies.py`: 50 requests by minute.
 
-- `obtain_company_files` located at `crawling_parts/crawl_companies_files.py`: 50 requests by minute.
+- `obtain_company_files` located 
+at `crawling_parts/crawl_companies_files.py`: 50 requests by minute.
 
-- `download_file` located at `crawling_parts/download_file.py`: 50 requests by minute.
+- `download_file` located 
+at `crawling_parts/download_file.py`: 50 requests by minute.
 
 
 ## Installation
 
-To run the crawler we will need to install the [PhantomJS](http://phantomjs.org/) library.
+First, we need to have the environment correctly setup (Caravaggio). You will found 
+instruction on how to prepare your local environment:
+ 
+ - [Setup your local environment](https://github.com/buildgroupai/django-caravaggio-rest-api/blob/master/docs/local_environment.md). 
 
-- In MacOS we can use brew to install it: `brew install phantomjs`
+After that, we will need to install other software that DaVinci, or more specifically our crawler, will need to do its job.
 
-- In [this page](http://phantomjs.org/download.html) we can also found the installers for all the platforms.
+To run the crawler we will need to install the 
+[Chromimum](https://www.chromium.org/Home) and 
+[Chromedriver](https://chromedriver.chromium.org/) tools 
+for scraping dynamic web pages like Bovespa.
 
-We will need to remember the installation folder because a reference to the `..../bin/phantomjs` folder will be needed.
-
-The crawler is implemented for Python 3.7. Then we will need a 3.7 environment ready to install the dependencies.
-
-We can use [Anaconda](https://conda.io/docs/installation.html) to manage the environment. Once Anaconda is present in our system, we can do the following steps:
-
+```shell script
+$ brew cask install chromium
+$ brew cask install chromedriver
 ```
-$ conda create -n bovespa_crawler python=3.7
+
+We will need to remember the installation folder because a reference to 
+the `/Applications/Chromium.app/Contents/MacOS/Chromium` folder will be needed.
+
+The crawler is implemented using Python 3.6. Then we will need a 3.6 environment
+ready to install the dependencies.
+
+We can use [Anaconda](https://conda.io/docs/installation.html) to manage 
+the environment. Once Anaconda is present in our system, we can do the 
+following steps:
+
+```shell script
+$ conda create -n bovespa_crawler python=3.6 pip
 $ conda activate bovespa_crawler
 
-$ pip install -r requirements.txt 
+$ pip install -r requirements.txt
+ 
 or
+
 $ python setup.py install
 ```
 
@@ -104,68 +156,151 @@ To run the crawler we only need to use the Django Command `crawl`.
 
 To see all the available options run:
 
-```
-$ python manage.py help crawl
+```shell script
+$ python manage.py crawl bovespa --help
 ```
 
-It will give you the following output:
+It will display usage information and a list of the arguments provided by 
+the bovespa crawler application:
 
-```
-usage: manage.py crawl [-h] [--version] [-v {0,1,2,3}] [--settings SETTINGS]
-                       [--pythonpath PYTHONPATH] [--traceback] [--no-color]
+```shell script
+INFO Calling crawler: bovespa
+usage: bovespa [-h] [--cache-dir CACHE_DIR] [--local-dir LOCAL_DIR]
+               [--workers-num WORKERS_NUM] [--phantomjs-path PHANTOMJS_PATH]
+               [--chromium-bin-file CHROMIUM_BIN_FILE]
+               [--io-gs-project IO_GS_PROJECT]
+               [--current-execution-date CURRENT_EXECUTION_DATE]
+               [--last-execution-date LAST_EXECUTION_DATE]
+               [--from-the-beginning] [--from-date FROM_DATE]
+               [--no-update-companies-listing]
+               [--companies-listing-update-elapsetime COMPANIES_LISTING_UPDATE_ELAPSETIME]
+               [--no-update-companies-files]
+               [--companies-files-update-elapsetime COMPANIES_FILES_UPDATE_ELAPSETIME]
+               [--force-download]
+               [--include-companies [INCLUDE_COMPANIES [INCLUDE_COMPANIES ...]]]
+               [--version] [-v {0,1,2,3}] [--settings SETTINGS]
+               [--pythonpath PYTHONPATH] [--traceback] [--no-color]
+               [--force-color]
 
-Crawl data from source
+Crawler settings
 
 optional arguments:
   -h, --help            show this help message and exit
-  --version             show program's version number and exit
+  --cache-dir CACHE_DIR
+                        The path where we will leave the files. Ex.
+                        fs:///data/harvest/permanent gs://davinci_harvest
+  --local-dir LOCAL_DIR
+                        The path where we will leave the files. Ex.
+                        fs///data/harvest/volatile
+  --workers-num WORKERS_NUM
+                        The number of workers (threads) to launch in parallel
+  --phantomjs-path PHANTOMJS_PATH
+                        Absolute path to the bin directory of the PhantomJS
+                        library.Ex. '/phantomjs-2.1.1-macosx/bin/phantomjs'
+  --chromium-bin-file CHROMIUM_BIN_FILE
+                        Absolute path to the Chromium bin file.Ex.
+                        '/Applications/Chromium.app/Contents/MacOS/Chromium'
+  --io-gs-project IO_GS_PROJECT
+                        If we are using Google Storage to persist the files,
+                        we could need to inform about the project of the
+                        bucket.Ex. centering-badge-212119
+  --current-execution-date CURRENT_EXECUTION_DATE
+                        The current time we are starting the crawler (UTC) Ex.
+                        '2008-09-03T20:56:35.450686Z
+  --last-execution-date LAST_EXECUTION_DATE
+                        The last time we executed the crawler (UTC) Ex.
+                        '2007-09-03T20:56:35.450686Z
+  --from-the-beginning  Crawl all the company files.It is a way to short-
+                        circuit the global last/current dates. Ex.
+                        '2007-09-03T20:56:35.450686Z
+  --from-date FROM_DATE
+                        The date from which we want to crawl all the company
+                        files.It is a way to short-circuit the global
+                        last/current dates. Ex. '2007-09-03T20:56:35.450686Z
+  --no-update-companies-listing
+                        If we do not want to update the listed companies
+                        crawling the listing from Bovespa. We should update
+                        the list once a month Ex. --no-update-companies-
+                        listing
+  --companies-listing-update-elapsetime COMPANIES_LISTING_UPDATE_ELAPSETIME
+                        The elapse time in days between updates of the
+                        companies listing Ex. 30
+  --no-update-companies-files
+                        If we want to update the file contents in the database
+                        although the file was already downloaded in the past.
+                        Ex. --no-update-companies-files
+  --companies-files-update-elapsetime COMPANIES_FILES_UPDATE_ELAPSETIME
+                        The elapse time in days between updates of the
+                        companies files. Ex. 30
+  --force-download      If we want to force the download of the file from
+                        bovespa and update the permanent and local caches. Ex.
+                        --force-download
+  --include-companies [INCLUDE_COMPANIES [INCLUDE_COMPANIES ...]]
+                        If we want to focus only on a specific companies.(ex:
+                        35 94 1384
+  --version             show program\'s version number and exit
   -v {0,1,2,3}, --verbosity {0,1,2,3}
                         Verbosity level; 0=minimal output, 1=normal output,
                         2=verbose output, 3=very verbose output
   --settings SETTINGS   The Python path to a settings module, e.g.
-                        "myproject.settings.main". If this isn't provided, the
+                        "myproject.settings.main". If this isn\'t provided, the
                         DJANGO_SETTINGS_MODULE environment variable will be
                         used.
   --pythonpath PYTHONPATH
                         A directory to add to the Python path, e.g.
                         "/home/djangoprojects/myproject".
   --traceback           Raise on CommandError exceptions
-  --no-color            Don't colorize the command output.
+  --no-color            Don\'t colorize the command output.
+  --force-color         Force colorization of the command output.
 ```
 
-If we want to start the crawler to crawl all the data available at Bovespa, we run:
+Instruction to start the crawler and crawl __all the data__ 
+available at Bovespa:
 
-```
+```shell script
 $ python manage.py crawl bovespa \
     -v 0 --workers-num 10 \
     --chromium-bin-file '/Applications/Chromium.app/Contents/MacOS/Chromium' \
     --io-gs-project centering-badge-212119 \
-    --cache-dir "gs://vanggogh2_harvest" \
+    --cache-dir "gs://bgds_harvester_cache" \
     --local-dir "fs:///data/harvest/local"
 ```
 
-If we want to crawl information about some specific companies:
+Crawl information about specific companies only:
 
-```
+```shell script
 $ python manage.py crawl bovespa \
     -v 0 --workers-num 20 \
     --chromium-bin-file '/Applications/Chromium.app/Contents/MacOS/Chromium' \
     --io-gs-project centering-badge-212119 \
-    --cache-dir "gs://vanggogh2_harvest" \
+    --cache-dir "gs://bgds_harvester_cache" \
     --local-dir "fs:///data/harvest/local" \
     --include-companies 13773 9512
 ```
 
 ## Command for generate a Financial Analysis report
 
-There is a command that we can use to generate an Excel with a basic analysis of the financial statements of a company for a given fiscal period.  
+There is a command that we can use to generate an Excel with a basic analysis 
+of the financial statements of a company for a given fiscal period.  
 
-```
+```shell script
 $ python manage.py gen_finstat --company-ccvm 13773 --fiscal-date "2013-06-30"
 ```
 
-This command will generate the file `13773_20130630.xlsx` with the analysis.
+This command will generate the Excel file `13773_20130630.xlsx` with the analysis.
 
+## Command for run the API to query the crawled data
+
+You will need to run the Django application as follows:
+
+```shell script 
+$ conda activate bovespa_crawler
+
+$ python manage.py runserver 8001
+```
+
+After [obtain our user Token](https://github.com/buildgroupai/django-caravaggio-rest-api/blob/master/docs/local_environment.md#run-application-with-development-server), 
+we will have everything we need to access the application.
 
 ## Advanced queries (using the API or Solr service)
 
@@ -174,6 +309,14 @@ Queries we can do using the Bovespa endpoints for each of the following entities
 - BovespaCompany
 - BovespaCompanyFile
 - BovespaAccount
+
+Queries:
+
+- [Obtain all the Current Assets for an specific company and period](#Obtain-all-the-Current-Assets-for-an-specific-company-and-period)
+- [Obtain all the accounts that follows a pattern (RegEx search)](QueryRegEx)
+- [Obtain all the new accounts keyed into the system after a specific date](QueryDate)
+- [Get the latest version of a delivered file closest a given fiscal date](Get-the-latest-version-of-a-delivered-file-closest-a-given-fiscal-date)
+- [Obtain the list of the latest versions of all documents delivered by the company 15300 that have been already processed](QueryGroupLast)
 
 ### Obtain all the Current Assets for an specific company and period
 
@@ -189,11 +332,56 @@ Arguments:
     - and `number__startswith=1.01`
 - Sort results: `order_by=number`
 
-After [obtain our user Token](https://github.com/buildgroupai/django-caravaggio-rest-api/blob/master/docs/local_environment.md#run-application-with-development-server), we can execute the following instruction:
-
-```
+```shell script
 $ curl -H 'Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b' \
     -X GET "http://localhost:8001/bovespa/company-account/search/?period=2018-06-30T00:00:00Z&ccvm=15300&balance_type=ASSETS&financial_info_type=INSTANT&number__startswith=1.01&order_by=number"
+```
+
+or in python after executing `python manage.py shell` in the base 
+dir of the project
+
+```python
+from datetime import datetime
+from caravaggio_rest_api.haystack.backends.utils import CaravaggioSearchPaginator
+from davinci_crawling.example.bovespa.models import BovespaAccount
+from solrq import Q, Value
+
+ccvm = "15300"
+period = datetime.strptime("2018-06-30", "%Y-%m-%d")
+
+filter = Q(period=period) & Q(ccvm=ccvm) & \
+    Q(balance_type="ASSETS") & Q(financial_info_type="INSTANT") & \
+    Q(number= Value("1.01*", safe=True))
+
+# In Caravaggio, fields marked as facets are indexed twice. One first time a 
+# field with the same name will be indexed without being marked as docValues 
+# that will allow us do free text searches on its content. And other field 
+# renamed to <field_name>_exact being marked as docValues that will optimize 
+# the process process of sorting and faceting using the field. The field 
+# marked as docValues (_exact) will be the field we use when sorting. If 
+# not, we are going to get the following exception
+#
+# Exception: Field cache is disabled, set the field=number to be 
+#   docValues=true and reindex.  Or if the field cache will not exceed 
+#   the heap usage, then place useFieldCache=true in the request parameters.
+#
+paginator = CaravaggioSearchPaginator(
+    query_string=str(filter),
+    sort='number_exact asc',
+    limit=5000, max_limit=5000). \
+    models(BovespaAccount). \
+    select("version", "number", "name",
+           "financial_info_type", "balance_type", "comments",
+           "amount")
+
+# Iterate through the results
+while paginator.has_next():
+    paginator.next()
+    for account in paginator.get_results():
+        print(account.version, account.number, 
+              account.name, account.comments,
+              account.financial_info_type, account.balance_type,
+              account.amount)
 ```
 
 And the result will be something like: (it shows 10 of the 36 accounts available for the period)
@@ -329,7 +517,7 @@ And the result will be something like: (it shows 10 of the 36 accounts available
 }
 ```
 
-### Obtain all the accounts that follows a pattern (RegEx search)
+### Obtain all the accounts that follows a pattern (RegEx search) [QueryRegEx] ###
 
 We will use the `/bovespa/company-account/search` endpoint to solve this request.
 
@@ -350,6 +538,54 @@ After [obtain our user Token](https://github.com/buildgroupai/django-caravaggio-
 $ curl -H 'Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b' \
     -X GET "http://localhost:8001/bovespa/company-account/search/?period=2018-06-30T00:00:00Z&ccvm=15300&balance_type=ASSETS&financial_info_type=INSTANT&number__iregex=1.01.(.*).01(.*)&order_by=number"
 ```
+
+or in python after executing `python manage.py shell` in the base 
+dir of the project
+
+```python
+from datetime import datetime
+from caravaggio_rest_api.haystack.backends.utils import CaravaggioSearchPaginator
+from davinci_crawling.example.bovespa.models import BovespaAccount
+from solrq import Q, Value
+
+ccvm = "15300"
+period = datetime.strptime("2018-06-30", "%Y-%m-%d")
+
+filter = Q(period=period) & Q(ccvm=ccvm) & \
+    Q(balance_type="ASSETS") & Q(financial_info_type="INSTANT") & \
+    Q(number= Value("/1.01.(.*).01(.*)/", safe=True))
+
+# In Caravaggio, fields marked as facets are indexed twice. One first time a 
+# field with the same name will be indexed without being marked as docValues 
+# that will allow us do free text searches on its content. And other field 
+# renamed to <field_name>_exact being marked as docValues that will optimize 
+# the process process of sorting and faceting using the field. The field 
+# marked as docValues (_exact) will be the field we use when sorting. If 
+# not, we are going to get the following exception
+#
+# Exception: Field cache is disabled, set the field=number to be 
+#   docValues=true and reindex.  Or if the field cache will not exceed 
+#   the heap usage, then place useFieldCache=true in the request parameters.
+#
+paginator = CaravaggioSearchPaginator(
+    query_string=str(filter),
+    sort='number_exact asc',
+    limit=5000, max_limit=5000). \
+    models(BovespaAccount). \
+    select("version", "number", "name",
+           "financial_info_type", "balance_type", "comments",
+           "amount")
+
+# Iterate through the results
+while paginator.has_next():
+    paginator.next()
+    for account in paginator.get_results():
+        print(account.version, account.number, 
+              account.name, account.comments,
+              account.financial_info_type, account.balance_type,
+              account.amount)
+```
+
 
 And the result will be something like: (it shows 10 of the 36 accounts available for the period)
 
@@ -484,7 +720,7 @@ And the result will be something like: (it shows 10 of the 36 accounts available
 }
 ```
  
-### Obtain all the new accounts keyed into the system after a specific date
+### Obtain all the new accounts keyed into the system after a specific date [QueryDate]
 
 To solve this query we use the API endpoint `/bovespa/company-acccount/search`
 
@@ -499,6 +735,53 @@ After [obtain our user Token](https://github.com/buildgroupai/django-caravaggio-
 $ curl -H 'Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b' \
     -X GET "http://localhost:8001/bovespa/company-account/search/?updated_at__gte=2018-11-20T00:00:00Z&order_by=updated_at"
 ```
+
+or in python after executing `python manage.py shell` in the base 
+dir of the project
+
+
+```python
+from datetime import datetime
+from caravaggio_rest_api.haystack.backends.utils import CaravaggioSearchPaginator
+from davinci_crawling.example.bovespa.models import BovespaAccount
+from solrq import Q, Value, Range
+
+ccvm = "15300"
+period = datetime.strptime("2019-09-20 07:07:00", "%Y-%m-%d %H:%M:%S")
+
+filter = Q(updated_at=Range(Value(period), '*', safe=True, boundaries="[]")) 
+
+# In Caravaggio, fields marked as facets are indexed twice. One first time a 
+# field with the same name will be indexed without being marked as docValues 
+# that will allow us do free text searches on its content. And other field 
+# renamed to <field_name>_exact being marked as docValues that will optimize 
+# the process process of sorting and faceting using the field. The field 
+# marked as docValues (_exact) will be the field we use when sorting. If 
+# not, we are going to get the following exception
+#
+# Exception: Field cache is disabled, set the field=number to be 
+#   docValues=true and reindex.  Or if the field cache will not exceed 
+#   the heap usage, then place useFieldCache=true in the request parameters.
+#
+paginator = CaravaggioSearchPaginator(
+    query_string=str(filter),
+    sort='updated_at desc',
+    limit=5000, max_limit=5000). \
+    models(BovespaAccount). \
+    select("version", "number", "name",
+           "financial_info_type", "balance_type", "comments",
+           "amount")
+
+# Iterate through the results
+while paginator.has_next():
+    paginator.next()
+    for account in paginator.get_results():
+        print(account.version, account.number, 
+              account.name, account.comments,
+              account.financial_info_type, account.balance_type,
+              account.amount)
+```
+
 
 And the result will be something like: (it shows 10 of the 2249174 of new accounts entered into the system)
 
@@ -634,7 +917,7 @@ And the result will be something like: (it shows 10 of the 2249174 of new accoun
 ```
 
 
-### Get the latest version of a delivered file closest a given fiscal date
+### Get the latest version of a delivered file closest (not included) a given fiscal date [QueryLastVersion]
 
 To solve this query we can use the API endpoint `/bovespa/company-file/search`.
 
@@ -649,8 +932,56 @@ After [obtain our user Token](https://github.com/buildgroupai/django-caravaggio-
 
 ```
 $ curl -H 'Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b' \
-    -X GET "http://localhost:8001/bovespa/company-file/search/?status=processed&ccvm=15300&order_by=-fiscal_date,-version&&fiscal_date__lte=2018-08-30T00:00:00Z&limit=1" 
+    -X GET "http://localhost:8001/bovespa/company-file/search/?status=processed&ccvm=15300&order_by=-fiscal_date,-version&&fiscal_date__lt=2018-08-30T00:00:00Z&limit=1" 
 ```
+
+or in python after executing `python manage.py shell` in the base 
+dir of the project
+
+
+```python
+from datetime import datetime
+from caravaggio_rest_api.haystack.backends.utils import CaravaggioSearchPaginator
+from davinci_crawling.example.bovespa.models import BovespaCompanyFile
+from solrq import Q, Range
+
+ccvm = "15300"
+fiscal_date = datetime.strptime("2018-08-30", "%Y-%m-%d")
+
+filter = Q(ccvm=ccvm) & \
+         Q(status='processed') & \
+         Q(fiscal_date=Range('*', fiscal_date, safe=True, boundaries='[}')) 
+
+# In Caravaggio, fields marked as facets are indexed twice. One first time a 
+# field with the same name will be indexed without being marked as docValues 
+# that will allow us do free text searches on its content. And other field 
+# renamed to <field_name>_exact being marked as docValues that will optimize 
+# the process process of sorting and faceting using the field. The field 
+# marked as docValues (_exact) will be the field we use when sorting. If 
+# not, we are going to get the following exception
+#
+# Exception: Field cache is disabled, set the field=number to be 
+#   docValues=true and reindex.  Or if the field cache will not exceed 
+#   the heap usage, then place useFieldCache=true in the request parameters.
+#
+paginator = CaravaggioSearchPaginator(
+    query_string=str(filter),
+    sort='fiscal_date desc, version_exact desc',
+    limit=1). \
+    models(BovespaCompanyFile). \
+    select("doc_type", "fiscal_date", "created_at",
+           "company_name", "company_cnpj",
+           "file_url")
+
+# Iterate through the results
+while paginator.has_next():
+    paginator.next()
+    for file in paginator.get_results():
+        print(file.doc_type, file.fiscal_date, 
+              file.created_at, file.company_name,
+              file.company_cnpj, file.file_url)
+```
+
 
 The results will be something like:
 
@@ -693,7 +1024,7 @@ The results will be something like:
 }
 ``` 
 
-### Obtain the list of the latest versions of all documents delivered by the company 15300 that have been already processed
+### Obtain the list of the latest versions of all documents delivered by the company 15300 that have been already processed [QueryGroupLast]
 
 To solve this query we need to make use of the Solr `groups` feature, something not supported yet by the RESTful API.
 
@@ -704,7 +1035,7 @@ Arguments:
 - Query: `q=status:processed`
 - Restrictions: `fq=ccvm:15300`
 - Sort results: `sort=fiscal_date asc,version desc`
-- Return 0-50 resultats: `start:&rows:50`
+- Return 0-50 resultats: `start:0&rows:50`
 - Fields of interest: `fl=doc_type,fiscal_date,version`
 - Group the results per fiscal date: `group=true&group.field=fiscal_date`
 - We are only interested in the first result of each group: `group.limit=1`
@@ -714,6 +1045,60 @@ Final url:
 ```
 curl -X GET "http://127.0.0.1:8983/solr/davinci.bovespa_company_file/select?q=status:processed&fq=ccvm:15300&sort=version_exact+desc&start=0&rows=50&fl=doc_type,fiscal_date,version&group=true&group.field=fiscal_date&group.limit=1&wt=json&indent=true"
 ``` 
+
+or in python after executing `python manage.py shell` in the base 
+dir of the project
+
+
+```python
+from datetime import datetime
+from caravaggio_rest_api.haystack.backends.utils import CaravaggioSearchPaginator
+from davinci_crawling.example.bovespa.models import BovespaCompanyFile
+from solrq import Q, Value, Range
+
+ccvm = "15300"
+fiscal_date = datetime.strptime("2018-08-30", "%Y-%m-%d")
+
+filter = Q(ccvm=ccvm) & \
+         Q(status='processed') & \
+         Q(fiscal_date=
+            Range('*', Value(fiscal_date), safe=True, boundaries='[}')) 
+
+# In Caravaggio, fields marked as facets are indexed twice. One first time a 
+# field with the same name will be indexed without being marked as docValues 
+# that will allow us do free text searches on its content. And other field 
+# renamed to <field_name>_exact being marked as docValues that will optimize 
+# the process process of sorting and faceting using the field. The field 
+# marked as docValues (_exact) will be the field we use when sorting. If 
+# not, we are going to get the following exception
+#
+# Exception: Field cache is disabled, set the field=number to be 
+#   docValues=true and reindex.  Or if the field cache will not exceed 
+#   the heap usage, then place useFieldCache=true in the request parameters.
+#
+paginator = CaravaggioSearchPaginator(
+    query_string=str(filter),
+    sort='version_exact desc',
+    rows=50,
+    group='true',
+    **{ 'group.field': 'fiscal_date',
+        'group.limit': 1}). \
+    models(BovespaCompanyFile). \
+    select("doc_type", "fiscal_date", "version")
+
+# Iterate through the results
+num_files = 0
+while paginator.has_next():
+    paginator.next()    
+    for group, files in paginator.get_results().items():
+        print("Group: {}".format(group))
+        for file in files:
+            num_files += 1
+            print("\t", file.doc_type, file.fiscal_date, file.version)
+
+print("Total groups processed: {}".format(paginator.get_loaded_docs()))
+print("Total files processed: {}".format(num_files))
+```
 
 The result of the query should something like this:
 
