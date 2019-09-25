@@ -2,6 +2,7 @@
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 
 import logging
+import json
 
 import xmljson
 from xml.etree.ElementTree import fromstring
@@ -113,17 +114,23 @@ def get_financial_info_accounts(available_files, company_file):
 
     for account_info in data["ArrayOfInfoFinaDFin"]["InfoFinaDFin"]:
         acc_version = account_info["PlanoConta"]["VersaoPlanoConta"]
-        account = {
-            "ccvm": company_file.ccvm,
-            "period": company_file.fiscal_date,
-            "version": company_file.version,
-            "balance_type": BALANCE_TYPES[
-                int(acc_version["CodigoTipoDemonstracaoFinanceira"]["$"])],
-            "financial_info_type": FINANCIAL_INFO_TYPES[
-                int(acc_version["CodigoTipoInformacaoFinanceira"]["$"]) - 1],
-            "number": str(account_info["PlanoConta"]["NumeroConta"]["$"]),
-            "name": str(account_info["DescricaoConta1"]["$"]),
-        }
+        try:
+            account = {
+                "ccvm": company_file.ccvm,
+                "period": company_file.fiscal_date,
+                "version": company_file.version,
+                "balance_type": BALANCE_TYPES[
+                    int(acc_version["CodigoTipoDemonstracaoFinanceira"]["$"])],
+                "financial_info_type": FINANCIAL_INFO_TYPES[
+                    int(acc_version["CodigoTipoInformacaoFinanceira"]["$"]) - 1],
+                "number": str(account_info["PlanoConta"]["NumeroConta"]["$"]),
+                "name": str(account_info["DescricaoConta1"]["$"]),
+            }
+        except KeyError as ex:
+            _logger.exception(
+                "Unable to found a field in account=[{}]".format(
+                    json.dumps(account_info, sort_keys=True, indent=4)), ex)
+            raise ex
 
         if account["balance_type"] == DFP_BALANCE_DMPL:
             period = account_info[
