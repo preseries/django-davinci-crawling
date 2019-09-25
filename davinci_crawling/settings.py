@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 
-
 """
 Django settings for DaVinci Crawling Framwork.
 """
@@ -40,6 +39,11 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "dev@domain.com")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "***")
+
+DSE_SUPPORT = os.getenv("DSE_SUPPORT", "True") == "True"
+
 # SECURITY WARNING: App Engine's security features ensure that it is safe to
 # have ALLOWED_HOSTS = ['*'] when the app is deployed. If you deploy a Django
 # app not on App Engine, make sure to set an appropriate host here.
@@ -53,8 +57,21 @@ if DEBUG:
             '127.0.0.1'
         ]
 
+# Security
 SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', "False") == "True"
 USE_X_FORWARDED_HOST = SECURE_SSL_REDIRECT
+
+CSRF_COOKIE_SECURE = SECURE_SSL_REDIRECT
+SESSION_COOKIE_SECURE = SECURE_SSL_REDIRECT
+SECURE_BROWSER_XSS_FILTER = SECURE_SSL_REDIRECT
+SECURE_CONTENT_TYPE_NOSNIFF = SECURE_SSL_REDIRECT
+SECURE_HSTS_INCLUDE_SUBDOMAINS = SECURE_SSL_REDIRECT
+SECURE_HSTS_SECONDS = 31536000
+SECURE_REDIRECT_EXEMPT = []
+SECURE_SSL_HOST = os.getenv('SECURE_SSL_HOST', None)
+SECURE_SSL_REDIRECT = SECURE_SSL_REDIRECT
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO',
+                           "https" if SECURE_SSL_REDIRECT else "http")
 
 # Application definition
 
@@ -76,16 +93,18 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_cache',
     'drf_yasg',
-    'haystack',
 
-    # 'django_apscheduler',
+    'compressor',
+
+    'haystack',
 
     'caravaggio_rest_api',
     'caravaggio_rest_api.users',
     'davinci_crawling',
+]
 
-    # 'davinci_crawling.scheduler',
-
+INSTALLED_APPS += [
+    # Add here the davinci crawlers (apps),
     'davinci_crawling.example.bovespa'
 ]
 
@@ -187,28 +206,23 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'django_cassandra_engine': {
+            'handlers': ['console', 'debug_log', 'mail_admins'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
         'caravaggio_rest_api': {
-            'handlers': ['console', 'mail_admins'],
+            'handlers': ['console', 'debug_log', 'mail_admins'],
             'level': 'DEBUG',
             'propagate': True,
         },
         'davinci_crawling': {
-            'handlers': ['console', 'mail_admins'],
+            'handlers': ['console', 'debug_log', 'mail_admins'],
             'level': 'DEBUG',
             'propagate': True,
         },
-        # 'davinci_crawling.scheduler': {
-        #     'handlers': ['console', 'mail_admins'],
-        #     'level': 'DEBUG',
-        #     'propagate': False,
-        # },
-        # 'davinci_crawling.gcp': {
-        #     'handlers': ['console', 'debug_log', 'mail_admins'],
-        #     'level': 'ERROR',
-        #     'propagate': True,
-        # },
         'davinci_crawler_bovespa': {
-            'handlers': ['console', 'mail_admins'],
+            'handlers': ['console', 'debug_log', 'mail_admins'],
             'level': 'DEBUG',
             'propagate': True,
         }
@@ -250,42 +264,89 @@ except ImportError:
 
 models.DEFAULT_KEYSPACE = CASSANDRA_DB_NAME
 
-# Running on production App Engine, so connect to Google Cloud SQL using
-# the unix socket at /cloudsql/<your-cloudsql-connection string>
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': DB_HOST,
-        'PORT': DB_PORT,
-        'NAME': DB_NAME,
-        'USER': DB_USER,
-        'PASSWORD': DB_PASSWORD,
-    },
-    'cassandra': {
-        'ENGINE': 'django_cassandra_engine',
-        'NAME': CASSANDRA_DB_NAME,
-        'TEST_NAME': "test_{}".format(CASSANDRA_DB_NAME),
-        'HOST': CASSANDRA_DB_HOST,
-        'USER': CASSANDRA_DB_USER,
-        'PASSWORD': CASSANDRA_DB_PASSWORD,
-        'OPTIONS': {
-            'replication': {
-                'strategy_class': CASSANDRA_DB_STRATEGY,
-                'replication_factor': CASSANDRA_DB_REPLICATION
-            },
-            'connection': {
-                'consistency': ConsistencyLevel.LOCAL_ONE,
-                'retry_connect': True
-                # + All connection options for cassandra.cluster.Cluster()
-            },
-            'session': {
-                'default_timeout': 10,
-                'default_fetch_size': 10000
-                # + All options for cassandra.cluster.Session()
+# Database
+# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
+if os.getenv("GAE_SERVICE", ""):
+    # The docker container starts a PGBouncer server in local to manage
+    # the pool of connections. We need to connect to the local pgbounce
+    # server
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            "HOST": "127.0.0.1",
+            "PORT": "6543",
+            'NAME': DB_NAME,
+            'USER': DB_USER,
+            'PASSWORD': DB_PASSWORD,
+        },
+        'cassandra': {
+            'ENGINE': 'django_cassandra_engine',
+            'NAME': CASSANDRA_DB_NAME,
+            'TEST_NAME': "test_{}".format(CASSANDRA_DB_NAME),
+            'HOST': CASSANDRA_DB_HOST,
+            'USER': CASSANDRA_DB_USER,
+            'PASSWORD': CASSANDRA_DB_PASSWORD,
+            'OPTIONS': {
+                'replication': {
+                    'strategy_class': CASSANDRA_DB_STRATEGY,
+                    'replication_factor': CASSANDRA_DB_REPLICATION
+
+                    # 'strategy_class': 'NetworkTopologyStrategy',
+                    # 'datacenter1': N1,
+                    # ...,
+                    # 'datacenterN': Nn
+                },
+                'connection': {
+                    'consistency': ConsistencyLevel.LOCAL_ONE,
+                    'retry_connect': True
+                    # + All connection options for cassandra.cluster.Cluster()
+                },
+                'session': {
+                    'default_timeout': 10,
+                    'default_fetch_size': 10000
+                    # + All options for cassandra.cluster.Session()
+                }
             }
         }
     }
-}
+
+else:
+    # Running on production App Engine, so connect to Google Cloud SQL using
+    # the unix socket at /cloudsql/<your-cloudsql-connection string>
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'HOST': DB_HOST,
+            'PORT': DB_PORT,
+            'NAME': DB_NAME,
+            'USER': DB_USER,
+            'PASSWORD': DB_PASSWORD,
+        },
+        'cassandra': {
+            'ENGINE': 'django_cassandra_engine',
+            'NAME': CASSANDRA_DB_NAME,
+            'TEST_NAME': "test_{}".format(CASSANDRA_DB_NAME),
+            'HOST': CASSANDRA_DB_HOST,
+            'USER': CASSANDRA_DB_USER,
+            'PASSWORD': CASSANDRA_DB_PASSWORD,
+            'OPTIONS': {
+                'replication': {
+                    'strategy_class': CASSANDRA_DB_STRATEGY,
+                    'replication_factor': CASSANDRA_DB_REPLICATION
+                },
+                'connection': {
+                    'consistency': ConsistencyLevel.LOCAL_ONE,
+                    'retry_connect': True
+                    # + All connection options for cassandra.cluster.Cluster()
+                },
+                'session': {
+                    'default_timeout': 10,
+                    'default_fetch_size': 10000
+                    # + All options for cassandra.cluster.Session()
+                }
+            }
+        }
+    }
 # [END db_setup]
 
 # Password validation
