@@ -182,6 +182,12 @@ pip install ipywidgets
 jupyter nbextension enable --py widgetsnbextension
 ```
 
+- Install ExecuteTime extension for iPython Notebooks.
+
+```shell script
+jupyter nbextension enable execute_time/ExecuteTime
+```
+
 - do a Conda install:
 
 ```shell script
