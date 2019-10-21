@@ -97,7 +97,7 @@ def update_listed_companies(letter, options):
             ccvm_code = cells[3].find("a").getText().strip()
 
             _logger.debug(
-                "Check existance bovespa company: {}".format(ccvm_code))
+                "Check existence bovespa company: {}".format(ccvm_code))
             if not BovespaCompany.objects.filter(ccvm=ccvm_code).exists():
                 _logger.debug(
                     "Bovespa company not found!: {}".format(ccvm_code))
@@ -149,14 +149,15 @@ def update_listed_companies(letter, options):
 
 
 def crawl_listed_companies(options, workers_num=10):
-
     companies = []
 
     pool = Pool(processes=workers_num)
 
     try:
         func_params = []
-        for letter in COMPANIES_LISTING_SEARCHER_LETTERS:
+        companies_initials = options.get("crawling_initials",
+                                         COMPANIES_LISTING_SEARCHER_LETTERS)
+        for letter in companies_initials:
             func_params.append([letter, options])
 
         call_results = pool.starmap(
