@@ -161,7 +161,7 @@ def crawl_listed_companies(options, workers_num=10):
             func_params.append([letter, options])
 
         call_results = pool.starmap(
-                update_listed_companies, func_params)
+            update_listed_companies, func_params)
 
         # Merge all the responses into one only list
         companies += list(

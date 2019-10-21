@@ -4,10 +4,11 @@ import os
 import re
 import shutil
 import sys
+import traceback
 from io import open
 
 from setuptools import setup
-import traceback
+from sphinx.setup_command import BuildDoc
 
 extra_params = {}
 setup_requires = [
@@ -51,8 +52,6 @@ if sys.argv[-1] == 'publish':
     shutil.rmtree('build')
     shutil.rmtree('django-davinci-crawling.egg-info')
     sys.exit()
-
-from sphinx.setup_command import BuildDoc
 
 cmd_class = {
     'docs': BuildDoc,

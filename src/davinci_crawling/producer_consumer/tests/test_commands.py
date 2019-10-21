@@ -9,18 +9,19 @@ from django.conf import settings
 
 # Default crawler params, you may change any default value if you want
 # All the things written with None value should be overwritten inside the test
-CRAWLER_PARAMS = {"chromium_bin_file":
-                         "/Applications/Chromium.app/Contents/MacOS/Chromium",
-                         "include_companies": None,
-                         "local_dir": "fs://%s/../log/local" %
-                                      settings.BASE_DIR,
-                         "cache_dir": "fs://%s/../log/cache" %
-                                      settings.BASE_DIR,
-                         "crawler": None,
-                         "from_date": None,
-                         "to_date": None,
-                         "crawling_initials": None,
-                         "workers_num": 4}
+CRAWLER_PARAMS = {
+    "chromium_bin_file":
+        "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    "include_companies": None,
+    "local_dir": "fs://%s/../log/local" %
+                 settings.BASE_DIR,
+    "cache_dir": "fs://%s/../log/cache" %
+                 settings.BASE_DIR,
+    "crawler": None,
+    "from_date": None,
+    "to_date": None,
+    "crawling_initials": None,
+    "workers_num": 4}
 
 
 class CommandsTest(CaravaggioBaseTest):
@@ -75,4 +76,3 @@ class CommandsTest(CaravaggioBaseTest):
         # With this options we always have 9 files, unless any file got deleted
         # this assert should be 9
         assert all_items == 9
-

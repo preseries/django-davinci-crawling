@@ -107,7 +107,7 @@ def process_listed_companies(options, checkpoint_data, current_execution_date):
             options, workers_num=workers_num)
 
 
-def  get_not_processed_files(options, producer):
+def get_not_processed_files(options, producer):
     filter = ~Q(file_url=Range(ANY, ANY)) | Q(status=FILE_STATUS_NOT_PROCESSED)
 
     if options.get("include_companies", None):
