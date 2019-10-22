@@ -85,8 +85,8 @@ class Crawler(metaclass=ABCMeta):
             if phantomjs_path:
                 driver = webdriver.PhantomJS(
                     executable_path=phantomjs_path)
-                _logger.info("Using PHANTOMJS as Dynamic Web Driver. Driver {}".
-                             format(repr(driver)))
+                _logger.info("Using PHANTOMJS as Dynamic Web Driver. Driver "
+                             "{}".format(repr(driver)))
 
         if not driver:
             _logger.warning("No Dynamic Web Driver loaded!!! "
@@ -257,7 +257,7 @@ class Crawler(metaclass=ABCMeta):
         pass
 
     @abc.abstractmethod
-    def crawl_params(self, **options):
+    def crawl_params(self, producer, **options):
         raise NotImplementedError()
 
     @abc.abstractmethod

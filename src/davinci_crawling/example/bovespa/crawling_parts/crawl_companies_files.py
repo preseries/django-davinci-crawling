@@ -5,10 +5,11 @@ import logging
 import re
 import traceback
 
-from multiprocessing.pool import Pool
+from multiprocessing.pool import ThreadPool as Pool
 
 from urllib.parse import urlencode
 
+import pytz
 from dateutil.parser import parse as date_parse
 
 from bs4 import BeautifulSoup
@@ -55,17 +56,51 @@ _logger = logging.getLogger("davinci_crawler_{}.crawling_part.company_files".
                             format(BOVESPA_CRAWLER))
 
 
+def compare_dates(date_a, date_b):
+    """
+    Compares two dates with offset-aware format.
+    Args:
+        date_a: The first date to compare
+        date_b: The second date to compare
+
+    Returns:
+        - if the date_b is greater than date_a = =1
+        - if the date_a is greater than date_b = 1
+        - otherwise = 0
+    """
+    try:
+        date_a_offset_aware = pytz.UTC.localize(date_a)
+    except ValueError:
+        date_a_offset_aware = date_a
+
+    try:
+        date_b_offset_aware = pytz.UTC.localize(date_b)
+    except ValueError:
+        date_b_offset_aware = date_b
+
+    if date_a_offset_aware > date_b_offset_aware:
+        return 1
+    elif date_b_offset_aware > date_a_offset_aware:
+        return -1
+    else:
+        return 0
+
+
 def extract_ENET_files_from_page(
-        ccvm, driver, bs, doc_type, from_date=None):
+        ccvm, driver, bs, doc_type, from_date=None, to_date=None):
     """
     Extract all the files to download from the listing HTML page
+    Args:
+        ccvm: the ccvm code of the companing that we're getting the files.
+        driver: the panthomjs or chromium driver with the current page
+           loaded. We use the driver to navigate through the
+           listing if needed.
+        bs: a BeautifulSoup object with the content of the listing page
+        doc_type: the doc type of the file to be downloaded.
+        from_date: the date that we should start considering the files.
+        to_date: the date that we should stop considering the files.
 
-    :param driver: the panthomjs or chromium driver with the current page
-                   loaded. We use the driver to navigate through the
-                   listing if needed
-    :param bs: a BeautifulSoup object with the content of the listing page
-    :return: a list of tuples with two components: the fiscal_period (date)
-                and the protocol code for each file in the list
+    Returns: the files that we extracted from the company.
     """
     files = []
 
@@ -116,8 +151,10 @@ def extract_ENET_files_from_page(
                 # We only continue processing files from the HTML page
                 # if are newer (deliver after) than the from_date argument.
                 # We look for newer delivery files
-                if from_date is not None and delivery_date <= from_date:
-                    break
+                if from_date is not None and \
+                        (compare_dates(delivery_date, from_date) <= 0
+                         or compare_dates(delivery_date, to_date) >= 0):
+                    continue
 
                 version = re.search(RE_VERSION, str(table))[1]
 
@@ -183,18 +220,21 @@ def extract_ENET_files_from_page(
 
 @Throttle(minutes=1, rate=50, max_tokens=50)
 def obtain_company_files(
-        ccvm, options, doc_type, from_date=None):
+        ccvm, options, doc_type, from_date=None, to_date=None):
     """
     This function is responsible for get the relation of files to be
-    processed for the company and start its download
+    processed for the company and start its download.
 
-    This function is being throttle allowing 20 downloads per minute
+    This function is being throttle allowing 20 downloads per minute.
+    Args:
+        ccvm: the ccvm code of the companing that we're getting the files.
+        options: the options that was specified on the command run.
+        doc_type: the doc type of the file to be downloaded.
+        from_date: the date that we should start considering the files.
+        to_date: the date that we should stop considering the files.
 
-    :param driver: the panthomjs or chromium driver with the current page
-               loaded. We use the driver to navigate through the
-               listing if needed
+    Returns: the files that we downloaded from company.
     """
-
     # We need to setup the Cassandra Object Mapper to work on multiprocessing
     # If we do not do that, the processes will be blocked when interacting
     # with the object mapper module
@@ -254,7 +294,7 @@ def obtain_company_files(
         # The ENET files are ZIP files that contains textual document that
         # we can parse and extract information from them
         files = extract_ENET_files_from_page(
-            ccvm, driver, bs, doc_type, from_date)
+            ccvm, driver, bs, doc_type, from_date, to_date)
 
         return files
     except NoSuchElementException as ex:
@@ -276,16 +316,18 @@ def obtain_company_files(
 
 def crawl_companies_files(
         options, workers_num=10,
-        include_companies=None, from_date=None):
+        include_companies=None, from_date=None, to_date=None):
     """
 
-    :param driver: the panthomjs or chromium driver with the current page
-                   loaded. We use the driver to navigate through the
-                   listing if needed
-    :param workers_num:
-    :param include_companies:
-    :param from_date:
-    :return:
+    Args:
+        options: the options that was specified on the command run.
+        workers_num:
+        include_companies:
+        from_date: the date that we should start considering the files.
+        to_date: the date that we should stop considering the files.
+
+    Returns:
+
     """
 
     companies_files = []
@@ -299,10 +341,13 @@ def crawl_companies_files(
         ccvm_codes = sorted(ccvm_codes)
 
         _logger.debug(
-            "Processing the files of {0} companies from {1}".
+            "Processing the files of {0} companies from {1} to {2}".
             format(len(ccvm_codes),
                    "{0:%Y-%m-%d}".format(from_date)
-                   if from_date else "THE BEGINNING"))
+                   if from_date else "THE BEGINNING",
+                   "{0:%Y-%m-%d}".format(to_date)
+                   if to_date else "THE END")
+        )
 
         func_params = []
         for ccvm_code in ccvm_codes:
@@ -311,7 +356,7 @@ def crawl_companies_files(
 
             for doc_type in DOC_TYPES:
                 func_params.append([
-                    ccvm_code, options, doc_type, from_date])
+                    ccvm_code, options, doc_type, from_date, to_date])
 
         # call_results = pool.starmap(obtain_company_files, func_params)
         pool.starmap(obtain_company_files, func_params)

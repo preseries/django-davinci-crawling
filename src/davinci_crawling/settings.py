@@ -125,8 +125,8 @@ class Common(Configuration):
     # the site admins on every HTTP 500 error when DEBUG=False.
     # See http://docs.djangoproject.com/en/dev/topics/logging for
     # more details on how to customize your logging configuration.
-    LOGGING_FILE = "/data/davinci_crawling/" \
-                   "log/davinci_crawling-debug.log"
+    LOGGING_FILE = os.getenv("LOGGING_FILE", "/data/davinci_crawling/"
+                                             "log/davinci_crawling-debug.log")
 
     LOGGING = {
         'version': 1,
@@ -202,7 +202,6 @@ class Common(Configuration):
     #    import pymysql
     #    pymysql.install_as_MySQLdb()
 
-
     # [START db_setup]
     DB_HOST = os.getenv("DB_HOST", "127.0.0.1")
     DB_PORT = os.getenv("DB_PORT", "6543")
@@ -215,7 +214,8 @@ class Common(Configuration):
     CASSANDRA_DB_NAME = os.getenv("CASSANDRA_DB_NAME", "davinci")
     CASSANDRA_DB_USER = os.getenv("CASSANDRA_DB_USER", "davinci")
     CASSANDRA_DB_PASSWORD = os.getenv("CASSANDRA_DB_PASSWORD", "davinci")
-    CASSANDRA_DB_STRATEGY = os.getenv("CASSANDRA_DB_STRATEGY", "SimpleStrategy")
+    CASSANDRA_DB_STRATEGY = os.getenv("CASSANDRA_DB_STRATEGY",
+                                      "SimpleStrategy")
     CASSANDRA_DB_REPLICATION = os.getenv("CASSANDRA_DB_REPLICATION", 1)
 
     try:
@@ -315,8 +315,8 @@ class Common(Configuration):
     # If you set this to False, Django will not use timezone-aware datetimes.
     USE_TZ = True
 
-    # Absolute filesystem path to the directory that will hold user-uploaded files.
-    # Example: "/home/media/media.lawrence.com/media/"
+    # Absolute filesystem path to the directory that will hold user-uploaded
+    # files. Example: "/home/media/media.lawrence.com/media/"
     MEDIA_ROOT = ''
 
     # URL that handles the media served from MEDIA_ROOT. Make sure to use a
@@ -487,9 +487,9 @@ class Common(Configuration):
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
             "LOCATION": "redis://{0}{1}:{2}/1".format(
-                    ":{0}@".format(REDIS_PASS_PRIMARY)
-                    if REDIS_PASS_PRIMARY else "",
-                    REDIS_HOST_PRIMARY, REDIS_PORT_PRIMARY),
+                ":{0}@".format(REDIS_PASS_PRIMARY)
+                if REDIS_PASS_PRIMARY else "",
+                REDIS_HOST_PRIMARY, REDIS_PORT_PRIMARY),
             "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
             },
@@ -626,11 +626,13 @@ class Development(Common):
     """
     DEBUG = os.getenv("DEBUG", "True") == "True"
 
+    TESTS_TMP_DIR = "/tmp/davinci/tests"
+
     ALLOWED_HOSTS = []
 
     INTERNAL_IPS = [
-            '127.0.0.1'
-        ]
+        '127.0.0.1'
+    ]
 
     INSTALLED_APPS = Common.INSTALLED_APPS + [
         'django_extensions', 'debug_toolbar'

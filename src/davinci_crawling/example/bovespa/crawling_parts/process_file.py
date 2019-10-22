@@ -2,6 +2,7 @@
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 
 import logging
+import multiprocessing
 
 from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.document import load_account_details
@@ -31,4 +32,5 @@ def process_file(
 
     # The data has been loaded into the database, we can set the flag
     # of the company file to PROCESSED
-    company_file.update(status=FILE_STATUS_PROCESSED)
+    company_file.update(status=FILE_STATUS_PROCESSED,
+                        thread_id=multiprocessing.current_process().pid)
