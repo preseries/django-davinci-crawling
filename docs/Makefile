@@ -8,8 +8,8 @@ PAPER         =
 BUILDDIR      = ../build/sphinx/
 AUTODOCDIR    = api
 AUTODOCBUILD  = sphinx-apidoc
-PROJECT       = django_caravaggio_rest_api
-MODULEDIR     = ../src/caravaggio_rest_api
+PROJECT       = django_davinci_crawling
+MODULEDIR     = ../src/davinci_crawling
 
 # User-friendly check for sphinx-build
 ifeq ($(shell which $(SPHINXBUILD) >/dev/null 2>&1; echo $?), 1)

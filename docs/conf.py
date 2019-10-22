@@ -14,7 +14,7 @@ import sys
 import inspect
 import shutil
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'caravaggio_rest_api.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'davinci_crawling.settings')
 os.environ.setdefault('DJANGO_CONFIGURATION', 'Development')
 
 __location__ = os.path.join(os.getcwd(), os.path.dirname(
@@ -40,7 +40,7 @@ except ImportError:
     from sphinx import apidoc
 
 output_dir = os.path.join(__location__, "api")
-module_dir = os.path.join(__location__, "../src/caravaggio_rest_api")
+module_dir = os.path.join(__location__, "../src/davinci_crawling")
 try:
     shutil.rmtree(output_dir)
 except FileNotFoundError:
@@ -89,7 +89,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'django-caravaggio-rest-api'
+project = u'django-davinci-crawling'
 copyright = u'2019, BuildGroup Data Services, Inc'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -159,7 +159,7 @@ html_theme_options = {
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
 try:
-    from caravaggio_rest_api import __version__ as version
+    from davinci_crawling import __version__ as version
 except ImportError:
     pass
 else:
@@ -224,7 +224,7 @@ html_static_path = ['_static']
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'django-caravaggio-rest-api-doc'
+htmlhelp_basename = 'django-davinci-crawling-doc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -243,7 +243,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'user_guide.tex', u'Caravaggio REST API Documentation',
+  ('index', 'user_guide.tex', u'Davinci Crawling Documentation',
    u'BGDS Team', 'manual'),
 ]
 

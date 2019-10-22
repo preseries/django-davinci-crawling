@@ -1,8 +1,8 @@
-==========================
-Django Caravaggio REST API
-==========================
+=======================
+Django Davinci Crawling
+=======================
 
-This is the documentation of **Django Caravaggio REST API**.
+This is the documentation of **Django Davinci Crawling**.
 
 .. note::
 
@@ -31,7 +31,7 @@ Contents
 
    License <license>
    Authors <authors>
-   Caravaggio API <caravaggio/caravaggio_index>
+   Davinci Crawling API <davinci/davinci_index>
    Changelog <changelog>
    TODO <todo>
    Module Reference <api/modules>
