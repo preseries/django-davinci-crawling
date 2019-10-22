@@ -90,13 +90,17 @@ def extract_ENET_files_from_page(
         ccvm, driver, bs, doc_type, from_date=None, to_date=None):
     """
     Extract all the files to download from the listing HTML page
+    Args:
+        ccvm: the ccvm code of the companing that we're getting the files.
+        driver: the panthomjs or chromium driver with the current page
+           loaded. We use the driver to navigate through the
+           listing if needed.
+        bs: a BeautifulSoup object with the content of the listing page
+        doc_type: the doc type of the file to be downloaded.
+        from_date: the date that we should start considering the files.
+        to_date: the date that we should stop considering the files.
 
-    :param driver: the panthomjs or chromium driver with the current page
-                   loaded. We use the driver to navigate through the
-                   listing if needed
-    :param bs: a BeautifulSoup object with the content of the listing page
-    :return: a list of tuples with two components: the fiscal_period (date)
-                and the protocol code for each file in the list
+    Returns: the files that we extracted from the company.
     """
     files = []
 
@@ -219,13 +223,17 @@ def obtain_company_files(
         ccvm, options, doc_type, from_date=None, to_date=None):
     """
     This function is responsible for get the relation of files to be
-    processed for the company and start its download
+    processed for the company and start its download.
 
-    This function is being throttle allowing 20 downloads per minute
+    This function is being throttle allowing 20 downloads per minute.
+    Args:
+        ccvm: the ccvm code of the companing that we're getting the files.
+        options: the options that was specified on the command run.
+        doc_type: the doc type of the file to be downloaded.
+        from_date: the date that we should start considering the files.
+        to_date: the date that we should stop considering the files.
 
-    :param driver: the panthomjs or chromium driver with the current page
-               loaded. We use the driver to navigate through the
-               listing if needed
+    Returns: the files that we downloaded from company.
     """
     # We need to setup the Cassandra Object Mapper to work on multiprocessing
     # If we do not do that, the processes will be blocked when interacting
@@ -311,13 +319,15 @@ def crawl_companies_files(
         include_companies=None, from_date=None, to_date=None):
     """
 
-    :param driver: the panthomjs or chromium driver with the current page
-                   loaded. We use the driver to navigate through the
-                   listing if needed
-    :param workers_num:
-    :param include_companies:
-    :param from_date:
-    :return:
+    Args:
+        options: the options that was specified on the command run.
+        workers_num:
+        include_companies:
+        from_date: the date that we should start considering the files.
+        to_date: the date that we should stop considering the files.
+
+    Returns:
+
     """
 
     companies_files = []

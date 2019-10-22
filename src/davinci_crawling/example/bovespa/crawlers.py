@@ -203,7 +203,7 @@ class BovespaCrawler(Crawler):
             help="The date from which we want to crawl all the company files."
                  "It is a way to short-circuit the global last/current dates."
                  " Ex. '2007-09-03T20:56:35.450686Z")
-        # Process files from an specific date
+        # Process files until an specific date
         self._parser.add_argument(
             '--to-date',
             required=False,
@@ -211,10 +211,8 @@ class BovespaCrawler(Crawler):
             dest='to_date',
             default=None,
             type=mk_datetime,
-            help="The date to which we want to crawl all the company files."
-                 "It is a way to short-circuit the global last/current dates."
-                 " Ex. '2007-09-03T20:56:35.450686Z")
-        # Process files from an specific date
+            help="The date to which we want to crawl all the company files.")
+        # Crawl only the companies where the name starts with these initials
         self._parser.add_argument(
             '--crawling-initials',
             required=False,

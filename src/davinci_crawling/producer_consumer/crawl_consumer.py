@@ -21,11 +21,14 @@ class CrawlConsumer(object):
     """
     consumers = []
 
-    def __init__(self, crawler, qty_workers=2, empty_queue_times=10):
+    def __init__(self, crawler, qty_workers=2, initial_empty_queue_times=200,
+                 empty_queue_times=10):
         """
         Args:
             crawler: the crawler implementation that should be used.
             qty_workers: The quantity of consumers that we want to start.
+            initial_empty_queue_times: how many times before any object arrives
+            that we need so the consumer get shutdown.
             empty_queue_times: The amount of times that the consumer should
             run with empty values to consider it`s over.
         """
@@ -35,6 +38,7 @@ class CrawlConsumer(object):
         # Used to store all the processes that we`re using on the
         # multiprocessing
         self.empty_queue_times = empty_queue_times
+        self.initial_empty_queue_times = initial_empty_queue_times
         self.consumers = []
         self.crawler = crawler
         self.qty_workers = qty_workers
@@ -87,26 +91,27 @@ class CrawlConsumer(object):
         Will run forever until the method close is called, when the close is
         called the self.started is set to False.
         """
-        empty_queue_times = -1
+        empty_queue_times = 0
+        limit_empty_times = self.initial_empty_queue_times
         while True:
-            if empty_queue_times >= self.empty_queue_times \
+            if empty_queue_times >= limit_empty_times \
                     and not self.started.value:
                 return
 
             try:
                 crawl_param, options = multiprocess_queue.get(block=False)
                 empty_queue_times = 0
+                # as soon as we get the first message, we change the limit to
+                # the non-initial one
+                limit_empty_times = self.empty_queue_times
                 _logger.debug("Reading a queue value %s", crawl_param)
                 self._crawl(crawl_param, options)
             except queue.Empty:
                 # Means that the queue is empty and we need to count many times
-                # that the occurs to the close logic.
-                if empty_queue_times >= 0:
-                    empty_queue_times += 1
-                    _logger.debug("No objects found on queue, waiting for 1 "
-                                  "second, already had %d empty queues" % (
-                                      empty_queue_times))
-                else:
-                    _logger.debug("No objects found on queue, waiting for 1 "
-                                  "second, not started yet")
+                # that the occurs to the close logic, we just start counting
+                # when at least the queue received one
+                empty_queue_times += 1
+                _logger.debug("No objects found on queue, waiting for 1 "
+                              "second, already had %d empty queues" % (
+                                  empty_queue_times))
                 time.sleep(1)
