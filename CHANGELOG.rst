@@ -10,6 +10,7 @@ New Features
 - Support for parallelism on crawl command using the producer/consumer pattern
     - The `crawl_params` calls a `produce.add_crawl_params` method to add a crawl param.
     - The `crawl` now is called by a consumer that runs in background.
+- Add the Sphinx documentation to the davinci crawling
 
 Improvements or Changes
 ***********************
