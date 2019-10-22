@@ -21,7 +21,7 @@ class CrawlConsumer(object):
     """
     consumers = []
 
-    def __init__(self, crawler, qty_workers=2, empty_queue_times=20):
+    def __init__(self, crawler, qty_workers=2, empty_queue_times=10):
         """
         Args:
             crawler: the crawler implementation that should be used.
@@ -87,7 +87,7 @@ class CrawlConsumer(object):
         Will run forever until the method close is called, when the close is
         called the self.started is set to False.
         """
-        empty_queue_times = 0
+        empty_queue_times = -1
         while True:
             if empty_queue_times >= self.empty_queue_times \
                     and not self.started.value:
@@ -101,8 +101,12 @@ class CrawlConsumer(object):
             except queue.Empty:
                 # Means that the queue is empty and we need to count many times
                 # that the occurs to the close logic.
-                empty_queue_times += 1
-                _logger.debug("No objects found on queue, waiting for 1 "
-                              "second, already had %d empty queues" % (
-                                  empty_queue_times))
+                if empty_queue_times >= 0:
+                    empty_queue_times += 1
+                    _logger.debug("No objects found on queue, waiting for 1 "
+                                  "second, already had %d empty queues" % (
+                                      empty_queue_times))
+                else:
+                    _logger.debug("No objects found on queue, waiting for 1 "
+                                  "second, not started yet")
                 time.sleep(1)

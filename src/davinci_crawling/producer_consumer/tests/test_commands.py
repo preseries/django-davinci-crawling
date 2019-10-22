@@ -13,10 +13,10 @@ CRAWLER_PARAMS = {
     "chromium_bin_file":
         "/Applications/Chromium.app/Contents/MacOS/Chromium",
     "include_companies": None,
-    "local_dir": "fs://%s/../log/local" %
-                 settings.BASE_DIR,
-    "cache_dir": "fs://%s/../log/cache" %
-                 settings.BASE_DIR,
+    "local_dir": "fs://%s/log/local" %
+                 settings.TESTS_TMP_DIR,
+    "cache_dir": "fs://%s/log/cache" %
+                 settings.TESTS_TMP_DIR,
     "crawler": None,
     "from_date": None,
     "to_date": None,
@@ -31,6 +31,8 @@ class CommandsTest(CaravaggioBaseTest):
     This test guarantees that the que queue works and that the consumer is
     parallel.
     """
+
+    all_files_count = 0
 
     @classmethod
     def setUpTestData(cls):
@@ -50,11 +52,13 @@ class CommandsTest(CaravaggioBaseTest):
 
         crawl_command(BovespaCrawler, **crawler_params)
 
-        all_items = BovespaCompanyFile.objects.filter(
+        files_count = BovespaCompanyFile.objects.filter(
             status=FILE_STATUS_PROCESSED).count()
         # With this options we always have 5 files, unless any file got deleted
         # this assert should be 5
-        assert all_items == 5
+        assert files_count == self.all_files_count + 5
+
+        self.all_files_count += files_count
 
     def test_for_four_companies(self):
         crawler_params = CRAWLER_PARAMS.copy()
@@ -71,8 +75,10 @@ class CommandsTest(CaravaggioBaseTest):
 
         crawl_command(BovespaCrawler, **crawler_params)
 
-        all_items = BovespaCompanyFile.objects.filter(
+        files_count = BovespaCompanyFile.objects.filter(
             status=FILE_STATUS_PROCESSED).count()
         # With this options we always have 9 files, unless any file got deleted
         # this assert should be 9
-        assert all_items == 9
+        assert files_count == self.all_files_count + 9
+
+        self.all_files_count += files_count

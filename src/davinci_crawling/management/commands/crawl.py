@@ -3,12 +3,11 @@
 
 import sys
 import logging
-from multiprocessing.pool import Pool
+from multiprocessing.pool import ThreadPool
 
 from davinci_crawling.producer_consumer.crawl_consumer import CrawlConsumer
 from davinci_crawling.producer_consumer.crawl_params_queue_producer import \
     CrawlParamsQueueProducer
-from davinci_crawling.producer_consumer.non_daemon_pool import NoDaemonPool
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError, \
     handle_default_options
@@ -37,8 +36,7 @@ def crawl_params(_crawler_clazz, **options):
     # We need to setup the Cassandra Object Mapper to work on multiprocessing
     # If we do not do that, the processes will be blocked when interacting
     # with the object mapper module
-    # TODO add this again
-    # setup_cassandra_object_mapper()
+    setup_cassandra_object_mapper()
 
     _crawler = _crawler_clazz()
 
@@ -60,14 +58,12 @@ def crawl_command(_crawler_clazz, **options):
     crawl_consumer = CrawlConsumer(_crawler, workers_num)
     _logger.info("Starting a consumer of %d processes" % workers_num)
     crawl_consumer.start()
-    crawl_params_producer = NoDaemonPool(processes=1)
+    crawl_params_producer = ThreadPool(processes=1)
 
     try:
         _logger.info("Starting crawling params")
 
-        # TODO add this parallelism again
-        # crawl_params_producer.apply(crawl_params, (_crawler_clazz,), options)
-        crawl_params(_crawler_clazz, **options)
+        crawl_params_producer.apply(crawl_params, (_crawler_clazz,), options)
     except TimeoutError:
         _logger.error("Timeout error")
     finally:

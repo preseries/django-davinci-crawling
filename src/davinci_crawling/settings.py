@@ -626,6 +626,8 @@ class Development(Common):
     """
     DEBUG = os.getenv("DEBUG", "True") == "True"
 
+    TESTS_TMP_DIR = "/tmp/davinci/tests"
+
     ALLOWED_HOSTS = []
 
     INTERNAL_IPS = [

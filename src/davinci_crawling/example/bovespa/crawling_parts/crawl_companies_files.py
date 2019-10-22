@@ -5,7 +5,7 @@ import logging
 import re
 import traceback
 
-from multiprocessing.pool import Pool
+from multiprocessing.pool import ThreadPool as Pool
 
 from urllib.parse import urlencode
 

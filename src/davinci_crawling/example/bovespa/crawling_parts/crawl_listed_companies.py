@@ -10,7 +10,7 @@ from dateutil.parser import parse as date_parse
 
 from bs4 import BeautifulSoup
 
-from multiprocessing.pool import Pool
+from multiprocessing.pool import ThreadPool as Pool
 
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
