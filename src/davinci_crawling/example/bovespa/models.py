@@ -169,6 +169,9 @@ class BovespaCompanyFile(CustomDjangoCassandraModel):
     # The extension of the filename
     file_extension = columns.Text()
 
+    # id of the thread that processed the file
+    thread_id = columns.Integer()
+
     # Each key represents the name of the file in the ENER arquive.
     # The value is the original content converted into JSON - when possible -
     # and persisted as Text

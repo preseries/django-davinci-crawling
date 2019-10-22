@@ -9,6 +9,8 @@ from django.conf import settings
 
 # Default crawler params, you may change any default value if you want
 # All the things written with None value should be overwritten inside the test
+WORKERS_NUM = 4
+
 CRAWLER_PARAMS = {
     "chromium_bin_file":
         "/Applications/Chromium.app/Contents/MacOS/Chromium",
@@ -21,7 +23,7 @@ CRAWLER_PARAMS = {
     "from_date": None,
     "to_date": None,
     "crawling_initials": None,
-    "workers_num": 4}
+    "workers_num": WORKERS_NUM}
 
 
 class CommandsTest(CaravaggioBaseTest):
@@ -52,12 +54,15 @@ class CommandsTest(CaravaggioBaseTest):
 
         crawl_command(BovespaCrawler, **crawler_params)
 
-        files_count = BovespaCompanyFile.objects.filter(
-            status=FILE_STATUS_PROCESSED).count()
+        files = BovespaCompanyFile.objects.filter(
+            status=FILE_STATUS_PROCESSED).all()
         # With this options we always have 5 files, unless any file got deleted
         # this assert should be 5
+        files_count = len(files)
         assert files_count == self.all_files_count + 5
 
+        threads_count = len(set([x.thread_id for x in files]))
+        assert threads_count == WORKERS_NUM
         self.all_files_count += files_count
 
     def test_for_four_companies(self):
@@ -75,10 +80,13 @@ class CommandsTest(CaravaggioBaseTest):
 
         crawl_command(BovespaCrawler, **crawler_params)
 
-        files_count = BovespaCompanyFile.objects.filter(
-            status=FILE_STATUS_PROCESSED).count()
+        files = BovespaCompanyFile.objects.filter(
+            status=FILE_STATUS_PROCESSED).all()
         # With this options we always have 9 files, unless any file got deleted
         # this assert should be 9
+        files_count = len(files)
         assert files_count == self.all_files_count + 9
 
+        threads_count = len(set([x.thread_id for x in files]))
+        assert threads_count == WORKERS_NUM
         self.all_files_count += files_count
