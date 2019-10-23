@@ -152,8 +152,9 @@ def extract_ENET_files_from_page(
                 # if are newer (deliver after) than the from_date argument.
                 # We look for newer delivery files
                 if from_date is not None and \
-                        (compare_dates(delivery_date, from_date) <= 0
-                         or compare_dates(delivery_date, to_date) >= 0):
+                        (compare_dates(
+                            delivery_date, from_date) <= 0 or compare_dates(
+                            delivery_date, to_date) >= 0):
                     continue
 
                 version = re.search(RE_VERSION, str(table))[1]

@@ -7,9 +7,12 @@ from multiprocessing import Process, Value
 
 from davinci_crawling.utils import setup_cassandra_object_mapper
 
-from davinci_crawling.producer_consumer import multiprocess_queue
+from multiprocessing import Queue
 
 _logger = logging.getLogger("davinci_crawling.queue")
+
+# stores the multiprocess queue used between crawl_params and crawl method
+multiprocess_queue = Queue()
 
 
 class CrawlConsumer(object):

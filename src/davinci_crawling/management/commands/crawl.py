@@ -5,8 +5,8 @@ import sys
 import logging
 from multiprocessing.pool import ThreadPool
 
-from davinci_crawling.producer_consumer.crawl_consumer import CrawlConsumer
-from davinci_crawling.producer_consumer.crawl_params_queue_producer import \
+from davinci_crawling.management.commands.consumer import CrawlConsumer
+from davinci_crawling.management.commands.queue_producer import \
     CrawlParamsQueueProducer
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError, \

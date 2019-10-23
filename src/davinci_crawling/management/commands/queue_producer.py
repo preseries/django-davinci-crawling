@@ -2,8 +2,8 @@
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 import logging
 
-from davinci_crawling.producer_consumer import multiprocess_queue
-from davinci_crawling.producer_consumer.crawl_params_producer import \
+from davinci_crawling.management.commands.consumer import multiprocess_queue
+from davinci_crawling.management.producer import \
     CrawlParamsProducer
 
 _logger = logging.getLogger("davinci_crawling.queue")

@@ -8,7 +8,6 @@ import traceback
 from io import open
 
 from setuptools import setup
-from sphinx.setup_command import BuildDoc
 
 extra_params = {}
 setup_requires = [
@@ -16,7 +15,7 @@ setup_requires = [
     'sphinxcontrib-inlinesyntaxhighlight==0.2']
 
 try:
-    from pip._internal import main
+    from pip._internal.main import main
     main(['install'] + setup_requires)
     setup_requires = []
 except Exception:
@@ -53,6 +52,7 @@ if sys.argv[-1] == 'publish':
     shutil.rmtree('django-davinci-crawling.egg-info')
     sys.exit()
 
+from sphinx.setup_command import BuildDoc   # nopep8
 cmd_class = {
     'docs': BuildDoc,
 }
