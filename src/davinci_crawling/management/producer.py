@@ -4,7 +4,7 @@ import abc
 from abc import ABCMeta
 
 
-class CrawlParamsProducer(metaclass=ABCMeta):
+class Producer(metaclass=ABCMeta):
     """
     An abstract class that defines the necessary methods to be a producer.
 

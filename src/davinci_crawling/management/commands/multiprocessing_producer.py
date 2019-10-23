@@ -4,12 +4,12 @@ import logging
 
 from davinci_crawling.management.commands.consumer import multiprocess_queue
 from davinci_crawling.management.producer import \
-    CrawlParamsProducer
+    Producer
 
 _logger = logging.getLogger("davinci_crawling.queue")
 
 
-class CrawlParamsQueueProducer(CrawlParamsProducer):
+class MultiprocessingProducer(Producer):
     """
     Uses a multiprocessing queue to add params.
     """

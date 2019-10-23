@@ -6,8 +6,8 @@ import logging
 from multiprocessing.pool import ThreadPool
 
 from davinci_crawling.management.commands.consumer import CrawlConsumer
-from davinci_crawling.management.commands.queue_producer import \
-    CrawlParamsQueueProducer
+from davinci_crawling.management.commands.multiprocessing_producer import \
+    MultiprocessingProducer
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError, \
     handle_default_options
@@ -40,7 +40,7 @@ def crawl_params(_crawler_clazz, **options):
 
     _crawler = _crawler_clazz()
 
-    _crawler.crawl_params(CrawlParamsQueueProducer(), **options)
+    _crawler.crawl_params(MultiprocessingProducer(), **options)
 
 
 def crawl_command(_crawler_clazz, **options):
