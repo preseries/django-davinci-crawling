@@ -122,7 +122,8 @@ def get_financial_info_accounts(available_files, company_file):
                 "balance_type": BALANCE_TYPES[
                     int(acc_version["CodigoTipoDemonstracaoFinanceira"]["$"])],
                 "financial_info_type": FINANCIAL_INFO_TYPES[
-                    int(acc_version["CodigoTipoInformacaoFinanceira"]["$"]) - 1],
+                    int(acc_version["CodigoTipoInformacaoFinanceira"][
+                        "$"]) - 1],
                 "number": str(account_info["PlanoConta"]["NumeroConta"]["$"]),
                 "name": str(account_info["DescricaoConta1"]["$"]),
             }

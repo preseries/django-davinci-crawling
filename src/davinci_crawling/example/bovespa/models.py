@@ -169,6 +169,10 @@ class BovespaCompanyFile(CustomDjangoCassandraModel):
     # The extension of the filename
     file_extension = columns.Text()
 
+    # id of the thread that processed the file, we use this to test the
+    # parallel processing of the bovespa crawler
+    thread_id = columns.Integer()
+
     # Each key represents the name of the file in the ENER arquive.
     # The value is the original content converted into JSON - when possible -
     # and persisted as Text

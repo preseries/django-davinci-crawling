@@ -112,38 +112,38 @@ class GCPComputeService(object):
             for key, val in environment_vars.items()]
 
         items = [{
-                # Startup script is automatically executed by the
-                # instance upon startup.
-                'key': 'startup-script',
-                'value': startup_script
-            }, {
-                'key': 'crawler-image',
-                'value': crawler_image
-            }, {
-                'key': 'crawler-name',
-                'value': crawler_name
-            }, {
-                'key': '--current-date',
-                'value': current_date
-            }, {
-                'key': '--verbosity',
-                'value': verbosity
-            }, {
-                'key': '--workers-num',
-                'value': workers_num
-            }, {
-                'key': '--cache-dir',
-                'value': cache_dir
-            }, {
-                'key': '--local-dir',
-                'value': local_dir
-            }, {
-                'key': 'parameters',
-                'value': " ".join(paramaters)
-            }, {
-                'key': 'environment-vars',
-                'value': " ".join(variables)
-            }]
+            # Startup script is automatically executed by the
+            # instance upon startup.
+            'key': 'startup-script',
+            'value': startup_script
+        }, {
+            'key': 'crawler-image',
+            'value': crawler_image
+        }, {
+            'key': 'crawler-name',
+            'value': crawler_name
+        }, {
+            'key': '--current-date',
+            'value': current_date
+        }, {
+            'key': '--verbosity',
+            'value': verbosity
+        }, {
+            'key': '--workers-num',
+            'value': workers_num
+        }, {
+            'key': '--cache-dir',
+            'value': cache_dir
+        }, {
+            'key': '--local-dir',
+            'value': local_dir
+        }, {
+            'key': 'parameters',
+            'value': " ".join(paramaters)
+        }, {
+            'key': 'environment-vars',
+            'value': " ".join(variables)
+        }]
 
         _logger.debug("Metadata Items: {}".format(json.dumps(items, indent=4)))
 

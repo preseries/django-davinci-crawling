@@ -172,6 +172,8 @@ usage: bovespa [-h] [--cache-dir CACHE_DIR] [--local-dir LOCAL_DIR]
                [--current-execution-date CURRENT_EXECUTION_DATE]
                [--last-execution-date LAST_EXECUTION_DATE]
                [--from-the-beginning] [--from-date FROM_DATE]
+               [--to-date TO_DATE]
+               [--crawling-initials [CRAWLING_INITIALS [CRAWLING_INITIALS ...]]]
                [--no-update-companies-listing]
                [--companies-listing-update-elapsetime COMPANIES_LISTING_UPDATE_ELAPSETIME]
                [--no-update-companies-files]
@@ -217,6 +219,11 @@ optional arguments:
                         The date from which we want to crawl all the company
                         files.It is a way to short-circuit the global
                         last/current dates. Ex. '2007-09-03T20:56:35.450686Z
+  --to-date TO_DATE     The date to which we want to crawl all the company
+                        files.
+  --crawling-initials [CRAWLING_INITIALS [CRAWLING_INITIALS ...]]
+                        If we want to specify the initial letter of the
+                        companiesto crawl (ex A B C)
   --no-update-companies-listing
                         If we do not want to update the listed companies
                         crawling the listing from Bovespa. We should update
@@ -269,13 +276,15 @@ $ python manage.py crawl bovespa \
 Crawl information about specific companies only:
 
 ```shell script
+# Crawling data from PBG S.A and VALE S.A.
 $ python manage.py crawl bovespa \
-    -v 0 --workers-num 20 \
+    -v 0 --workers-num 10 \
     --chromium-bin-file '/Applications/Chromium.app/Contents/MacOS/Chromium' \
     --io-gs-project centering-badge-212119 \
     --cache-dir "gs://bgds_harvester_cache" \
     --local-dir "fs:///data/harvest/local" \
-    --include-companies 13773 9512
+    --include-companies 13773 4170 \
+    --crawling-initials P V
 ```
 
 ## Command for generate a Financial Analysis report

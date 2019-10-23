@@ -3,8 +3,11 @@
 
 import sys
 import logging
-from multiprocessing.pool import Pool
+from multiprocessing.pool import ThreadPool
 
+from davinci_crawling.management.commands.consumer import CrawlConsumer
+from davinci_crawling.management.commands.multiprocessing_producer import \
+    MultiprocessingProducer
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError, \
     handle_default_options
@@ -21,16 +24,53 @@ crawler_clazz = None
 crawler = None
 
 
-def crawl(crawler_param, options):
+def crawl_params(_crawler_clazz, **options):
+    """
+    Calls the crawl_params inside the crawler, this function is only used to
+    facilitate the call by the Poll on the crawl command.
+    Args:
+        _crawler_clazz: The crawler class that should be used to generate the
+         params;
+        **options: The options that will be used to generate the params.
+    """
     # We need to setup the Cassandra Object Mapper to work on multiprocessing
     # If we do not do that, the processes will be blocked when interacting
     # with the object mapper module
     setup_cassandra_object_mapper()
 
-    _logger.debug("Calling crawl method: {0}".
-                  format(getattr(crawler, "crawl")))
+    _crawler = _crawler_clazz()
 
-    return crawler.crawl(crawler_param, options)
+    _crawler.crawl_params(MultiprocessingProducer(), **options)
+
+
+def crawl_command(_crawler_clazz, **options):
+    """
+    Call the crawler to both crawl_params and crawl the data.
+    Args:
+        _crawler_clazz: The crawler class, as we can't pickle the crawler obj
+        we use the class to them create the object when necessary.
+        _crawler: the crawler implementation that will be used to process
+    the data.
+        options: the options that the command received.
+    """
+    workers_num = options.get("workers_num", 1)
+    _crawler = _crawler_clazz()
+    crawl_consumer = CrawlConsumer(_crawler, workers_num)
+    _logger.info("Starting a consumer of %d processes" % workers_num)
+    crawl_consumer.start()
+    crawl_params_producer = ThreadPool(processes=1)
+
+    try:
+        _logger.info("Starting crawling params")
+
+        crawl_params_producer.apply(crawl_params, (_crawler_clazz,), options)
+    except TimeoutError:
+        _logger.error("Timeout error")
+    finally:
+        crawl_consumer.close()
+        crawl_params_producer.close()
+        crawl_params_producer.join()
+        crawl_params_producer.terminate()
 
 
 class Command(BaseCommand):
@@ -76,41 +116,6 @@ class Command(BaseCommand):
                 pass
 
     def handle(self, *args, **options):
-        global crawler_clazz, crawler
+        global crawler_clazz
 
-        workers_num = options.get("workers_num", 1)
-
-        results = []
-        pool = Pool(processes=workers_num)
-
-        try:
-            crawler_params = crawler.crawl_params(**options)
-
-            _logger.info("Starting crawling with {0} params.".
-                         format(len(crawler_params)))
-
-            func_params = []
-            for crawler_param in crawler_params:
-                func_params.append([crawler_param, options])
-
-            _logger.info(
-                "Starting a Pool of %d processes" % workers_num)
-
-            # crawl(*func_params[0])
-            # call_results = pool.starmap(crawl, func_params)
-            pool.starmap(crawl, func_params)
-
-            # Merge all the responses into one only list
-            # if call_results:
-            #    results += list(
-            #        itertools.chain.from_iterable(call_results))
-            #    _logger.info("Crawler results ({0}): {1}".
-            #             format(len(results), results))
-
-            _logger.info("Crawler successfully finished!")
-        except TimeoutError:
-            _logger.error("Timeout error")
-        finally:
-            pool.close()
-            pool.join()
-            pool.terminate()
+        crawl_command(crawler_clazz, **options)

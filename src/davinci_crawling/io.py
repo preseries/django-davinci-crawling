@@ -152,7 +152,8 @@ def get_base_dir(options):
     _logger.debug("Backend: {}".format(backend))
 
     if backend == "fs":
-        local_path = pathlib.Path(cache_dir, crawler_name)
+        file_path = re.match(FILE_PATH_RE, cache_dir)[1]
+        local_path = pathlib.Path(file_path, crawler_name)
         if not local_path.exists():
             _logger.info("Local control dir doesn't exits. Creating it...")
             local_path.mkdir(parents=True, exist_ok=True)
@@ -161,7 +162,7 @@ def get_base_dir(options):
 
         output_dir = str(local_path.absolute())
         _logger.debug("Output dir: {}".format(output_dir))
-        return output_dir
+        return "fs://%s" % output_dir
     elif backend == "gs":
         storage_client = get_gs_client(options)
         bucket_name = re.match(BUCKET_NAME_RE, cache_dir)[1]

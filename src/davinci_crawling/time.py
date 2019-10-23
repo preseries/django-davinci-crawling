@@ -14,5 +14,5 @@ def mk_datetime(datetime_str):
 
 def milliseconds(datetime_val):
     epoch = time.mktime(datetime_val.timetuple()) + \
-                (datetime_val.microsecond / 1000000.)
+        (datetime_val.microsecond / 1000000.)
     return int(round((float('%f' % epoch) * 1000)))

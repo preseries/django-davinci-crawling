@@ -172,7 +172,7 @@ PERIODS_BY_BALANCE_TYPE = (
       (
           ("Quarter Evolution", (1, 3)),
           ("Accum. Evolution", (2, 4)),
-       ))),
+      ))),
     (DFP_BALANCE_DRA,
      ("Comprehensive (DRA)",
       # Other periods to compare with

@@ -9,10 +9,10 @@ from datetime import datetime
 
 from dateutil.parser import parse as date_parse
 
-from solrq import Q, Range, ANY
+from solrq import Q, Range, ANY, Value
 
 from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
-from davinci_crawling.example.bovespa.crawling_parts import \
+from davinci_crawling.example.bovespa.crawling_parts.process_file import \
     process_file
 from .models import BovespaCompanyFile, FILE_STATUS_NOT_PROCESSED
 
@@ -40,12 +40,12 @@ def get_from_date(options, checkpoint_data):
     from_date = checkpoint_data.get(
         LAST_EXECUTION_DATE_CTL_FIELD, from_date)
 
-    if isinstance(from_date, str):
-        from_date = date_parse(from_date)
-
     # Check if the user is forcing a different date
     if options.get("from_date", None):
         from_date = options.get("from_date")
+
+    if isinstance(from_date, str):
+        from_date = date_parse(from_date)
 
     # Check if the user is forcing to crawl everything again
     from_the_beginning = options.get("from_the_beginning", False)
@@ -57,6 +57,28 @@ def get_from_date(options, checkpoint_data):
                          format(from_date) if from_date else "BEGINNING"))
 
     return from_date
+
+
+def get_to_date(options):
+    """
+    Mounts the to_date if the user specifies it on the options, this will parse
+    the date to date format if it is a string.
+    Args:
+        options: the options object with all the options that the user added
+        on command line.
+    Returns: the parsed date or None if the date was not specified.
+    """
+    # Check if the user is forcing a to date
+    to_date = options.get("to_date", None)
+
+    if isinstance(to_date, str):
+        to_date = date_parse(to_date)
+
+    _logger.debug("To date: {}".
+                  format("{0:%Y-%m-%d}".
+                         format(to_date) if to_date else "END"))
+
+    return to_date
 
 
 def process_listed_companies(options, checkpoint_data, current_execution_date):
@@ -85,14 +107,12 @@ def process_listed_companies(options, checkpoint_data, current_execution_date):
             options, workers_num=workers_num)
 
 
-def get_not_processed_files(options):
-    files = []
-
+def get_not_processed_files(options, producer):
     filter = ~Q(file_url=Range(ANY, ANY)) | Q(status=FILE_STATUS_NOT_PROCESSED)
 
     if options.get("include_companies", None):
-        filter = Q(ccvm=" ".join(
-            options.get("include_companies", []))) & (filter)
+        filter = Q(ccvm=Value("({})".format(" ".join(
+            options.get("include_companies", []))), safe=True)) & (filter)
 
     _logger.debug("Loading from database the files to be crawled...")
     paginator = CaravaggioSearchPaginator(
@@ -106,24 +126,26 @@ def get_not_processed_files(options):
             "{0}/{1} files loaded from database...".
             format(paginator.get_loaded_docs(), paginator.get_hits()))
         paginator.next()
-        files.extend([(d.ccvm, d.doc_type, d.fiscal_date, d.version)
-                      for d in paginator.get_results()])
+        for d in paginator.get_results():
+            producer.add_crawl_params((d.ccvm, d.doc_type, d.fiscal_date,
+                                       d.version), options)
 
     # return [file for file in
     #        CaravaggioSearchQuerySet().models(BovespaCompanyFile).
     #            raw_search(str(filter)).
     #            values_list("ccvm", "doc_type", "fiscal_date", "version")]
-    return files
 
 
 def process_companies_files(
-        options, checkpoint_data, current_execution_date, from_date):
+        options, checkpoint_data, current_execution_date, from_date,
+        to_date, producer):
 
     no_update = options.get("no_update_companies_files", False)
 
     # We do not want to crawl the companies listing
     if no_update:
-        return get_not_processed_files(options)
+        get_not_processed_files(options, producer)
+        return
 
     update_elapsetime = \
         options.get("companies_files_update_elapsetime", None)
@@ -148,11 +170,11 @@ def process_companies_files(
             options,
             workers_num=workers_num,
             include_companies=include_companies,
-            from_date=from_date)
+            from_date=from_date, to_date=to_date)
 
     # Let's find all the company files without file_url (not downloaded
     # and processed yet) or not processed (status)
-    return get_not_processed_files(options)
+    get_not_processed_files(options, producer)
 
 
 class BovespaCrawler(Crawler):
@@ -181,6 +203,25 @@ class BovespaCrawler(Crawler):
             help="The date from which we want to crawl all the company files."
                  "It is a way to short-circuit the global last/current dates."
                  " Ex. '2007-09-03T20:56:35.450686Z")
+        # Process files until an specific date
+        self._parser.add_argument(
+            '--to-date',
+            required=False,
+            action='store',
+            dest='to_date',
+            default=None,
+            type=mk_datetime,
+            help="The date to which we want to crawl all the company files.")
+        # Crawl only the companies where the name starts with these initials
+        self._parser.add_argument(
+            '--crawling-initials',
+            required=False,
+            action='store',
+            dest='crawling_initials',
+            default=None,
+            nargs='*',
+            help="If we want to specify the initial letter of the companies"
+                 "to crawl (ex A B C)")
         # Do not update the companies listing from Bovespa
         self._parser.add_argument(
             '--no-update-companies-listing',
@@ -241,7 +282,7 @@ class BovespaCrawler(Crawler):
             help="If we want to focus only on a specific companies."
                  "(ex: 35 94 1384")
 
-    def crawl_params(self, **options):
+    def crawl_params(self, producer, **options):
         now = options.get("current_execution_date", datetime.utcnow())
 
         # Check if there is an internal checkpoint, use it instead of the
@@ -250,19 +291,18 @@ class BovespaCrawler(Crawler):
             BOVESPA_CRAWLER, BOVESPA_FILE_CTL, default={})\
 
         from_date = get_from_date(options, checkpoint_data)
+        to_date = get_to_date(options)
 
         process_listed_companies(options, checkpoint_data, now)
 
-        files_to_crawl = process_companies_files(
-            options, checkpoint_data, now, from_date)
+        process_companies_files(options, checkpoint_data, now, from_date,
+                                to_date, producer)
 
         # Let's signal that we have processed the latest files (til 'now')
         # To process the new ones the last time we run the process
         put_checkpoint_data(BOVESPA_CRAWLER,
                             BOVESPA_FILE_CTL,
                             checkpoint_data)
-
-        return files_to_crawl
 
     def crawl(self, crawling_params, options):
         _logger.info(
