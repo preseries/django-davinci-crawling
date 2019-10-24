@@ -9,7 +9,6 @@ Subpackages
    davinci_crawling.example
    davinci_crawling.gcp
    davinci_crawling.management
-   davinci_crawling.producer_consumer
    davinci_crawling.scheduler
 
 Submodules
