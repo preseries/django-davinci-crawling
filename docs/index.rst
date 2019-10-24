@@ -35,6 +35,7 @@ Contents
    Changelog <changelog>
    TODO <todo>
    Module Reference <api/modules>
+    :ref:`ProxyMesh <davinci_proxy_mesh>`
 
 
 Indices and tables

@@ -8,6 +8,18 @@ Subpackages
 
    davinci_crawling.management.commands
 
+Submodules
+----------
+
+davinci\_crawling.management.producer module
+--------------------------------------------
+
+.. automodule:: davinci_crawling.management.producer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
 Module contents
 ---------------
 

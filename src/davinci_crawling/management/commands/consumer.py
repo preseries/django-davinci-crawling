@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*
-# Copyright (c) 2018-2019 BuildGroup Data Services Inc.
+# Copyright (c) 2019 BuildGroup Data Services Inc.
 import logging
 import queue
 import time
