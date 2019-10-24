@@ -69,7 +69,7 @@ To make a simple web request we can use the ``requests`` python module,
 on this example we will mount the proxies host/port and then request to
 a api that simple return the ip that connected to the service.
 
-.. code:: python
+.. code-block:: python
 
     import requests
     import random
@@ -127,7 +127,7 @@ Below you can find an example of using ProxyMesh to request the
 hit this page the IP will change, indicating that the Proxy is working
 properly.
 
-.. code:: python
+.. code-block:: python
 
     from selenium import webdriver
     from selenium.webdriver.chrome.options import Options
