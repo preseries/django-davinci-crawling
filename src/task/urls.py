@@ -2,7 +2,7 @@
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 
 """
-bgds_task URL Configuration
+task URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2./topics/http/urls/
@@ -21,14 +21,14 @@ from django.conf.urls import url, include
 
 from rest_framework.schemas import get_schema_view
 
-from bgds_task.api.urls import urlpatterns as bgds_task_urls
+from task.api.urls import urlpatterns as task_urls
 
 urlpatterns = [
-    url(r'^api-schema/bgds_task/$',
-        get_schema_view(title="Bgds_task API",
-                        patterns=[url(r'^bgds_task/',
-                                      include(bgds_task_urls))])),
+    url(r'^api-schema/task/$',
+        get_schema_view(title="Task API",
+                        patterns=[url(r'^task/',
+                                      include(task_urls))])),
 
-    # Bgds_task API version
-    url(r'^bgds_task/', include(bgds_task_urls)),
+    # Task API version
+    url(r'^', include(task_urls)),
 ]

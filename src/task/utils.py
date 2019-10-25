@@ -4,7 +4,7 @@ import logging
 
 from dateutil.parser import parse as date_parse
 
-from bgds_task import CRAWLER_NAME
+from task import CRAWLER_NAME
 
 # A field to save in the checkpoint records
 LAST_EXECUTION_DATE_CTL_FIELD = "last_execution_date"
