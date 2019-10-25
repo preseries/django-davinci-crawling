@@ -2,9 +2,9 @@
 Changelog
 =========
 
-Version 0.1
+Current
 ===========
 
-- Feature A added
-- FIX: nasty bug #1729 fixed
-- add your changes here!
+New Features
+************
+- Add the BGDS task to represent crawler tasks on the API and BD

@@ -5,12 +5,6 @@ from caravaggio_rest_api.drf_haystack.viewsets import \
     CaravaggioHaystackGEOSearchViewSet, \
     CaravaggioHaystackFacetSearchViewSet
 
-# from rest_framework.authentication import \
-#    TokenAuthentication, SessionAuthentication
-# from rest_framework.permissions import IsAuthenticated
-
-from drf_haystack import mixins
-
 from .serializers import TaskSerializerV1, \
     TaskSearchSerializerV1, \
     TaskGEOSearchSerializerV1, \

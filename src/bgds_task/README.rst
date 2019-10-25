@@ -1,4 +1,4 @@
-{{ app_name | capfirst }} Crawler
+BGDS Task
 ===================================
 
 **Title**:

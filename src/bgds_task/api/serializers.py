@@ -104,7 +104,9 @@ class TaskGEOSearchSerializerV1(
 
 
 class TaskFacetSerializerV1(HaystackFacetSerializer):
-
+    """
+    A facet view to use facets on the API.
+    """
     # Setting this to True will serialize the
     # queryset into an `objects` list. This
     # is useful if you need to display the faceted

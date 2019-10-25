@@ -4,17 +4,12 @@ import os
 import json
 import logging
 import time
-import math
-
-from datetime import datetime, timedelta
-from dateutil import relativedelta
 
 from caravaggio_rest_api.utils import delete_all_records
 from bgds_task.models import Task
 
 from rest_framework import status
 from django.urls import reverse
-from django.contrib.auth.models import User
 
 from caravaggio_rest_api.utils import default
 
@@ -22,10 +17,7 @@ from caravaggio_rest_api.tests import CaravaggioBaseTest
 
 # Create your tests here.
 from bgds_task.api.serializers import \
-    TaskSerializerV1, \
-    TaskSearchSerializerV1, \
-    TaskGEOSearchSerializerV1, \
-    TaskFacetSerializerV1
+    TaskSerializerV1
 
 CONTENTTYPE_JSON = "application/json"
 
