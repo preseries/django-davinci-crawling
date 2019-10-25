@@ -6,7 +6,7 @@ import logging
 import time
 
 from caravaggio_rest_api.utils import delete_all_records
-from bgds_task.models import Task
+from task.models import Task
 
 from rest_framework import status
 from django.urls import reverse
@@ -16,7 +16,7 @@ from caravaggio_rest_api.utils import default
 from caravaggio_rest_api.tests import CaravaggioBaseTest
 
 # Create your tests here.
-from bgds_task.api.serializers import \
+from task.api.serializers import \
     TaskSerializerV1
 
 CONTENTTYPE_JSON = "application/json"
@@ -25,7 +25,7 @@ _logger = logging.getLogger()
 
 
 class GetAllTest(CaravaggioBaseTest):
-    """ Test module for bgds_taskResource model """
+    """ Test module for Task model """
     resources = []
 
     persisted_resources = []
@@ -50,7 +50,7 @@ class GetAllTest(CaravaggioBaseTest):
             first_name="Jorge",
             last_name="Clooney")
 
-        # We clean the test database (bgds_taskResource)
+        # We clean the test database (Task)
         delete_all_records(Task)
 
         # We load the test data from the data.json file using the
@@ -63,7 +63,9 @@ class GetAllTest(CaravaggioBaseTest):
     def step1_create_resources(self):
         for resource in self.resources:
             _logger.info("POST Resource: {}".format(resource["kind"]))
-            response = self.api_client.post(reverse("bgds_task-list"),
+            import pydevd_pycharm
+            pydevd_pycharm.settrace('localhost', port=8787, stdoutToServer=True, stderrToServer=True)
+            response = self.api_client.post(reverse("task-list"),
                                             data=json.dumps(
                                                 resource, default=default),
                                             content_type=CONTENTTYPE_JSON)
@@ -94,7 +96,7 @@ class GetAllTest(CaravaggioBaseTest):
         ]
 
         for resource in invalid_resources:
-            response = self.api_client.post(reverse("bgds_task-list"),
+            response = self.api_client.post(reverse("task-list"),
                                             data=json.dumps(
                                                 resource, default=default),
                                             content_type=CONTENTTYPE_JSON)
@@ -103,7 +105,7 @@ class GetAllTest(CaravaggioBaseTest):
     def step2_get_resources(self):
         for index, resource_id in enumerate(self.persisted_resources):
             original_resource = self.post_resources[index]
-            path = "{0}{1}/".format(reverse("bgds_task-list"), resource_id)
+            path = "{0}{1}/".format(reverse("task-list"), resource_id)
             _logger.info("Path: {}".format(path))
             response = self.api_client.get(path)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -119,7 +121,7 @@ class GetAllTest(CaravaggioBaseTest):
         a field that concentrates all the textual fields
         (corpus of the resource)
         """
-        path = "{0}?kind=bovespa".format(reverse("bgds_task-search-list"))
+        path = "{0}?kind=bovespa".format(reverse("task-search-list"))
         _logger.info("Path: {}".format(path))
         response = self.api_client.get(path)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -139,7 +141,7 @@ class GetAllTest(CaravaggioBaseTest):
         in their name but do not have "Hardware"
         """
         path = "{0}?status=0".\
-            format(reverse("bgds_task-search-list"))
+            format(reverse("task-search-list"))
         _logger.info("Path: {}".format(path))
         response = self.api_client.get(path)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -147,7 +149,7 @@ class GetAllTest(CaravaggioBaseTest):
         # Get resources that contains *Internet* in their specialties
         # but do not contains "Hardware"
         path = "{0}?status=1".\
-            format(reverse("bgds_task-search-list"))
+            format(reverse("task-search-list"))
         _logger.info("Path: {}".format(path))
         response = self.api_client.get(path)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -158,7 +160,7 @@ class GetAllTest(CaravaggioBaseTest):
         Will get all the faces for the existent resources
         """
         path = "{0}facets/?kind=limit:2".\
-            format(reverse("bgds_task-search-list"))
+            format(reverse("task-search-list"))
         _logger.info("Path: {}".format(path))
         response = self.api_client.get(path)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -187,7 +189,7 @@ class GetAllTest(CaravaggioBaseTest):
     def step6_put_not_allowed(self):
         for resource in self.post_resources:
             _logger.info("DELETE Resource: {}".format(resource["task_id"]))
-            response = self.api_client.put(reverse("bgds_task-list"),
+            response = self.api_client.put(reverse("task-list"),
                                            data=json.dumps(
                                                resource, default=default),
                                            content_type=CONTENTTYPE_JSON)
@@ -197,7 +199,7 @@ class GetAllTest(CaravaggioBaseTest):
     def step7_patch_not_allowed(self):
         for resource in self.post_resources:
             _logger.info("Patch Resource: {}".format(resource["task_id"]))
-            response = self.api_client.patch(reverse("bgds_task-list"),
+            response = self.api_client.patch(reverse("task-list"),
                                              data=json.dumps(
                                                  resource, default=default),
                                              content_type=CONTENTTYPE_JSON)
@@ -208,13 +210,13 @@ class GetAllTest(CaravaggioBaseTest):
         for resource in self.post_resources:
             resource_id = resource["task_id"]
             _logger.info("Delete Resource: {}".format(resource_id))
-            path = "{0}{1}/".format(reverse("bgds_task-list"),
+            path = "{0}{1}/".format(reverse("task-list"),
                                     resource_id)
             response = self.api_client.delete(path)
             self.assertEqual(response.status_code,
                              status.HTTP_204_NO_CONTENT)
 
-            path = "{0}{1}/".format(reverse("bgds_task-list"), resource_id)
+            path = "{0}{1}/".format(reverse("task-list"), resource_id)
             _logger.info("Path: {}".format(path))
             response = self.api_client.get(path)
             self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

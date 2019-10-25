@@ -24,6 +24,6 @@ HTTP_HEADER_ENCODING = 'iso-8859-1'
 ISO_8601 = 'iso-8601'
 
 # Crawler name
-CRAWLER_NAME = 'bgds_task'
+CRAWLER_NAME = 'task'
 
-app_config = 'bgds_task.apps.DaVinciCrawlerConfig'
+app_config = 'task.apps.DaVinciCrawlerConfig'

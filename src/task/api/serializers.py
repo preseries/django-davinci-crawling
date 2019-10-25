@@ -13,8 +13,8 @@ from rest_framework_cache.registry import cache_registry
 from caravaggio_rest_api.drf_haystack import serializers as dse_serializers
 from caravaggio_rest_api import fields as dse_fields
 
-from bgds_task.models import Task, ON_DEMAND_TASK, STATUS_CREATED
-from bgds_task.search_indexes import TaskIndex
+from task.models import Task, ON_DEMAND_TASK, STATUS_CREATED
+from task.search_indexes import TaskIndex
 
 
 class TaskSerializerV1(

@@ -10,7 +10,7 @@ from .serializers import TaskSerializerV1, \
     TaskGEOSearchSerializerV1, \
     TaskFacetSerializerV1
 
-from bgds_task.models import Task
+from task.models import Task
 
 
 class TaskViewSet(CaravaggioCassandraModelViewSet):

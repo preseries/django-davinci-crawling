@@ -6,7 +6,7 @@ import time
 from caravaggio_rest_api.haystack.backends.utils import \
     CaravaggioSearchPaginator
 from caravaggio_rest_api.utils import delete_all_records
-from bgds_task.models import Task, STATUS_CREATED, ON_DEMAND_TASK
+from task.models import Task, STATUS_CREATED, ON_DEMAND_TASK
 
 from caravaggio_rest_api.tests import CaravaggioBaseTest
 

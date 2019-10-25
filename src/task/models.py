@@ -18,7 +18,7 @@ try:
 except ImportError:
     from cassandra.cqlengine import columns, ValidationError
 
-from bgds_task import CRAWLER_NAME
+from task import CRAWLER_NAME
 
 _logger = logging.getLogger("davinci_crawler_{}.models".format(CRAWLER_NAME))
 

@@ -6,8 +6,8 @@ from django.apps import AppConfig
 
 
 class DaVinciCrawlerConfig(AppConfig):
-    name = 'bgds_task'
-    verbose_name = "Django DaVinci Crawler bgds_task"
+    name = 'task'
+    verbose_name = "Django DaVinci Crawler task"
 
     def ready(self):
         pass
