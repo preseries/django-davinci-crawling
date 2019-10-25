@@ -37,6 +37,8 @@ try:
 except TypeError:
     pass
 
+from bgds_task.urls import urlpatterns as task_urls
+
 urls.handler500 = 'rest_framework.exceptions.server_error'
 urls.handler400 = 'rest_framework.exceptions.bad_request'
 
@@ -73,6 +75,8 @@ urlpatterns = [
 
     # API
     url(r'^bovespa/', include(bovespa_crawler_urls)),
+
+    url(r'^bgds_task/', include(task_urls)),
 
 ]
 

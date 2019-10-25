@@ -11,16 +11,16 @@ from caravaggio_rest_api.drf_haystack.viewsets import \
 
 from drf_haystack import mixins
 
-from .serializers import Bgds_taskResourceSerializerV1, \
-    Bgds_taskResourceSearchSerializerV1, \
-    Bgds_taskResourceGEOSearchSerializerV1, \
-    Bgds_taskResourceFacetSerializerV1
+from .serializers import TaskSerializerV1, \
+    TaskSearchSerializerV1, \
+    TaskGEOSearchSerializerV1, \
+    TaskFacetSerializerV1
 
-from bgds_task.models import Bgds_taskResource
+from bgds_task.models import Task
 
 
-class Bgds_taskResourceViewSet(CaravaggioCassandraModelViewSet):
-    queryset = Bgds_taskResource.objects.all()
+class TaskViewSet(CaravaggioCassandraModelViewSet):
+    queryset = Task.objects.all()
 
     # Defined in the settings as default authentication classes
     # authentication_classes = (
@@ -29,10 +29,11 @@ class Bgds_taskResourceViewSet(CaravaggioCassandraModelViewSet):
     # Defined in the settings as default permission classes
     # permission_classes = (IsAuthenticated,)
 
-    serializer_class = Bgds_taskResourceSerializerV1
+    serializer_class = TaskSerializerV1
+    http_method_names = ['get', 'post', 'delete']
 
 
-class Bgds_taskResourceSearchViewSet(CaravaggioHaystackFacetSearchViewSet):
+class TaskSearchViewSet(CaravaggioHaystackFacetSearchViewSet):
 
     # `index_models` is an optional list of which models you would like
     #  to include in the search result. You might have several models
@@ -40,7 +41,7 @@ class Bgds_taskResourceSearchViewSet(CaravaggioHaystackFacetSearchViewSet):
     #  for this particular view.
     # (Translates to `SearchQuerySet().models(*index_models)`
     # behind the scenes.
-    index_models = [Bgds_taskResource]
+    index_models = [Task]
 
     # Defined in the settings as default authentication classes
     # authentication_classes = (
@@ -49,14 +50,14 @@ class Bgds_taskResourceSearchViewSet(CaravaggioHaystackFacetSearchViewSet):
     # Defined in the settings as default permission classes
     # permission_classes = (IsAuthenticated,)
 
-    serializer_class = Bgds_taskResourceSearchSerializerV1
+    serializer_class = TaskSearchSerializerV1
 
-    facet_serializer_class = Bgds_taskResourceFacetSerializerV1
+    facet_serializer_class = TaskFacetSerializerV1
 
     # The Search viewsets needs information about the serializer to be use
     # with the results. The previous serializer is used to parse
     # the search requests adding fields like text, autocomplete, score, etc.
-    results_serializer_class = Bgds_taskResourceSerializerV1
+    results_serializer_class = TaskSerializerV1
 
     ordering_fields = (
         "_id", "name", "short_description", "long_description",
@@ -64,7 +65,7 @@ class Bgds_taskResourceSearchViewSet(CaravaggioHaystackFacetSearchViewSet):
         "created_at", "updated_at")
 
 
-class Bgds_taskResourceGEOSearchViewSet(CaravaggioHaystackGEOSearchViewSet):
+class TaskGEOSearchViewSet(CaravaggioHaystackGEOSearchViewSet):
 
     # `index_models` is an optional list of which models you would like
     #  to include in the search result. You might have several models
@@ -72,7 +73,7 @@ class Bgds_taskResourceGEOSearchViewSet(CaravaggioHaystackGEOSearchViewSet):
     #  for this particular view.
     # (Translates to `SearchQuerySet().models(*index_models)`
     # behind the scenes.
-    index_models = [Bgds_taskResource]
+    index_models = [Task]
 
     # Defined in the settings as default authentication classes
     # authentication_classes = (
@@ -81,12 +82,12 @@ class Bgds_taskResourceGEOSearchViewSet(CaravaggioHaystackGEOSearchViewSet):
     # Defined in the settings as default permission classes
     # permission_classes = (IsAuthenticated,)
 
-    serializer_class = Bgds_taskResourceGEOSearchSerializerV1
+    serializer_class = TaskGEOSearchSerializerV1
 
     # The Search viewsets needs information about the serializer to be use
     # with the results. The previous serializer is used to parse
     # the search requests adding fields like text, autocomplete, score, etc.
-    results_serializer_class = Bgds_taskResourceSerializerV1
+    results_serializer_class = TaskSerializerV1
 
     ordering_fields = ("_id", "created_at", "updated_at", "foundation_date",
                        "country_code", "specialties")

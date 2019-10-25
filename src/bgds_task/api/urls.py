@@ -20,9 +20,9 @@ from django.conf import settings
 from django.conf.urls import url, include
 
 from bgds_task.api.views import \
-    Bgds_taskResourceViewSet, \
-    Bgds_taskResourceSearchViewSet, \
-    Bgds_taskResourceGEOSearchViewSet
+    TaskViewSet, \
+    TaskSearchViewSet, \
+    TaskGEOSearchViewSet
 
 from rest_framework import routers
 
@@ -32,22 +32,22 @@ api_BGDS_TASK = routers.DefaultRouter()
 
 if settings.DSE_SUPPORT:
     api_BGDS_TASK.register(r'bgds_task/search',
-                            Bgds_taskResourceSearchViewSet,
-                            base_name="bgds_task-search")
+                           TaskSearchViewSet,
+                           base_name="bgds_task-search")
 
     api_BGDS_TASK.register(r'bgds_task/search/facets',
-                            Bgds_taskResourceSearchViewSet,
-                            base_name="bgds_task-search-facets")
+                           TaskSearchViewSet,
+                           base_name="bgds_task-search-facets")
 
     api_BGDS_TASK.register(r'bgds_task/geosearch',
-                            Bgds_taskResourceGEOSearchViewSet,
-                            base_name="bgds_task-geosearch")
+                           TaskGEOSearchViewSet,
+                           base_name="bgds_task-geosearch")
 
 api_BGDS_TASK.register(r'bgds_task',
-                        Bgds_taskResourceViewSet,
-                        base_name="bgds_task")
+                       TaskViewSet,
+                       base_name="bgds_task")
 
 urlpatterns = [
     # Company API version
-    url(r'^', include(api_BGDS_TASK.urls), name="bgds_task-api"),
+    url(r'^', include(api_BGDS_TASK.urls), name="task-api"),
 ]

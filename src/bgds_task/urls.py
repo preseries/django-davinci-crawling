@@ -21,8 +21,6 @@ from django.conf.urls import url, include
 
 from rest_framework.schemas import get_schema_view
 
-from caravaggio_rest_api.views import get_swagger_view
-
 from bgds_task.api.urls import urlpatterns as bgds_task_urls
 
 urlpatterns = [

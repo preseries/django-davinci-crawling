@@ -2,6 +2,7 @@
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 
 import logging
+
 from django.utils import timezone
 import uuid
 
@@ -78,10 +79,10 @@ class Task(CustomDjangoCassandraModel):
 
     status = columns.SmallInt()
 
-    kind = columns.Text()
+    kind = columns.Text(required=True)
 
     params = KeyEncodedMap(
-        key_type=columns.Text, value_type=columns.Text)
+        key_type=columns.Text, value_type=columns.Text, required=True)
 
     times_performed = columns.SmallInt(default=0)
 

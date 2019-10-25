@@ -2,6 +2,8 @@
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 
 import logging
+from datetime import datetime
+
 from django.utils import timezone
 
 from haystack import indexes
@@ -20,11 +22,11 @@ class TaskIndex(BaseSearchIndex, indexes.Indexable):
     user = indexes.CharField(
         model_attr="user")
 
-    created_at = indexes.DateField(
-        model_attr="created_at")
+    created_at = indexes.DateTimeField(
+        model_attr="created_at", faceted=True)
 
-    updated_at = indexes.DateField(
-        model_attr="created_at")
+    updated_at = indexes.DateTimeField(
+        model_attr="updated_at")
 
     is_deleted = indexes.BooleanField(
         model_attr="is_deleted", faceted=True)
@@ -46,7 +48,7 @@ class TaskIndex(BaseSearchIndex, indexes.Indexable):
 
     class Meta:
 
-        text_fields = ["short_description", "long_description", "extra_data"]
+        text_fields = []
 
         # Once the index has been created it cannot be changed
         # with sync_indexes. Changes should be made by hand.
@@ -61,6 +63,6 @@ class TaskIndex(BaseSearchIndex, indexes.Indexable):
 
     def index_queryset(self, using=None):
         return self.get_model().objects.filter(
-            created_at__lte=timezone.now(),
+            created_at__lte=datetime.utcnow(),
             is_deleted=False
         )
