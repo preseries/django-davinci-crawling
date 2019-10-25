@@ -33,7 +33,6 @@ class ModelsTest(CaravaggioBaseTest):
 
         assert len(total) == 0
 
-        user_name = "someuser"
         params = {
             "workers_num": "4",
             "chromium_bin_file":
@@ -45,23 +44,27 @@ class ModelsTest(CaravaggioBaseTest):
             "crawling_initials": '["V", "P"]'
         }
         task_data = {
-            "user": user_name,
+            "user": "user1",
             "status": STATUS_CREATED,
             "kind": "bovespa",
             "params": params,
             "type": ON_DEMAND_TASK
         }
         Task.create(**task_data)
+        task_data["user"] = "user2"
+        Task.create(**task_data)
+        task_data["user"] = "user3"
+        Task.create(**task_data)
         total = Task.objects.all()
 
-        assert len(total) == 1
+        assert len(total) == 3
 
         # we need a tiny sleep here
         time.sleep(1)
 
         # test without conditions
         paginator = CaravaggioSearchPaginator(
-            query_string=str("*:*"),
+            query_string=str("user:user1"),
             limit=1000, max_limit=1000). \
             models(Task). \
             select("task_id*",)
