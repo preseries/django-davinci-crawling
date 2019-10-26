@@ -3,11 +3,16 @@
 import logging
 import queue
 import time
-from multiprocessing import Process, Value
+from threading import Thread
 
-from davinci_crawling.utils import setup_cassandra_object_mapper
+from davinci_crawling.management.commands.utils.db_utils import \
+    update_task_status
+from davinci_crawling.utils import setup_cassandra_object_mapper, \
+    CrawlersRegistry
 
 from multiprocessing import Queue
+
+from task.models import STATUS_IN_PROGRESS, STATUS_FAULTY, STATUS_FINISHED
 
 _logger = logging.getLogger("davinci_crawling.queue")
 
@@ -24,27 +29,17 @@ class CrawlConsumer(object):
     """
     consumers = []
 
-    def __init__(self, crawler, qty_workers=2, initial_empty_queue_times=200,
-                 empty_queue_times=10):
+    def __init__(self, qty_workers=2, times_to_run=None):
         """
         Args:
-            crawler: the crawler implementation that should be used.
             qty_workers: The quantity of consumers that we want to start.
-            initial_empty_queue_times: how many times before any object arrives
-            that we need so the consumer get shutdown.
-            empty_queue_times: The amount of times that the consumer should
-            run with empty values to consider it`s over.
+            times_to_run: how many time to run on the thread. [ONLY FOR
+             TESTING]
         """
-        # Multiprocessing variable that indicates if the threads should stop,
-        # this variable must be thread-safe to be used on all spawned threads.
-        self.started = Value('b', True)
-        # Used to store all the processes that we`re using on the
-        # multiprocessing
-        self.empty_queue_times = empty_queue_times
-        self.initial_empty_queue_times = initial_empty_queue_times
         self.consumers = []
-        self.crawler = crawler
         self.qty_workers = qty_workers
+        self.cached_crawlers = {}
+        self.times_to_run = times_to_run
 
     def start(self):
         """
@@ -52,13 +47,23 @@ class CrawlConsumer(object):
         self.consumers list.
         """
         for i in range(self.qty_workers):
-            p = Process(target=self._crawl_params)
+            p = Thread(target=self._crawl_params)
             self.consumers.append(p)
 
         for consumer in self.consumers:
             consumer.start()
 
-    def _crawl(self, crawler_param, options):
+    def _get_crawler_by_name(self, crawler_name):
+        crawler = self.cached_crawlers.get(crawler_name)
+        if not crawler:
+            crawler_clazz = CrawlersRegistry().get_crawler(crawler_name)
+
+            crawler = crawler_clazz()
+            self.cached_crawlers[crawler_name] = crawler
+
+        return crawler
+
+    def _crawl(self, crawler_name, crawler_param, options):
         """
         Calls the crawl method inside the crawler being used.
         Args:
@@ -73,16 +78,16 @@ class CrawlConsumer(object):
         # when interacting with the object mapper module
         setup_cassandra_object_mapper()
 
+        crawler = self._get_crawler_by_name(crawler_name)
         _logger.debug("Calling crawl method: {0}".
-                      format(getattr(self.crawler, "crawl")))
-        return self.crawler.crawl(crawler_param, options)
+                      format(getattr(crawler, "crawl")))
+        return crawler.crawl(crawler_param, options)
 
     def close(self):
         """
         Close the consumers, and wait them to join.
         """
-        _logger.debug("Stopping consumers")
-        self.started.value = False
+        _logger.debug("Joining consumers")
         for consumer in self.consumers:
             consumer.join()
 
@@ -91,30 +96,29 @@ class CrawlConsumer(object):
         Read the multiprocessing queue and call the crawl method to execute the
         crawling logic.
 
-        Will run forever until the method close is called, when the close is
-        called the self.started is set to False.
+        Will run forever than we need to Ctrl+C to finish this.
         """
-        empty_queue_times = 0
-        limit_empty_times = self.initial_empty_queue_times
+        times_run = 0
         while True:
-            if empty_queue_times >= limit_empty_times \
-                    and not self.started.value:
+            if self.times_to_run and times_run > self.times_to_run:
                 return
-
+            task_id = None
             try:
-                crawl_param, options = multiprocess_queue.get(block=False)
-                empty_queue_times = 0
-                # as soon as we get the first message, we change the limit to
-                # the non-initial one
-                limit_empty_times = self.empty_queue_times
+                crawl_param, options = multiprocess_queue.get(
+                    block=False)
+                crawler_name = options.get("crawler")
+                task_id = options.get("task_id")
+                update_task_status(task_id, STATUS_IN_PROGRESS)
                 _logger.debug("Reading a queue value %s", crawl_param)
-                self._crawl(crawl_param, options)
+                self._crawl(crawler_name, crawl_param, options)
             except queue.Empty:
                 # Means that the queue is empty and we need to count many times
                 # that the occurs to the close logic, we just start counting
                 # when at least the queue received one
-                empty_queue_times += 1
                 _logger.debug("No objects found on queue, waiting for 1 "
-                              "second, already had %d empty queues" % (
-                                  empty_queue_times))
+                              "second and try again")
                 time.sleep(1)
+            except Exception:
+                if task_id:
+                    update_task_status(task_id, STATUS_FAULTY)
+            times_run += 1

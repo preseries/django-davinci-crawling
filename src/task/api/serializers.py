@@ -25,10 +25,13 @@ class TaskSerializerV1(
     """
     user = serializers.HiddenField(
         default=dse_fields.CurrentUserNameDefault())
+
+    params = fields.JSONField(required=True)
+
     type = serializers.IntegerField(default=ON_DEMAND_TASK)
     status = serializers.IntegerField(default=STATUS_CREATED)
 
-    params = fields.DictField(required=True, child=fields.CharField())
+    params_map = fields.DictField(child=fields.CharField(), required=False)
     kind = fields.CharField(required=True)
 
     class Meta:
@@ -37,10 +40,10 @@ class TaskSerializerV1(
                   "created_at", "updated_at",
                   "is_deleted", "status", "kind",
                   "params", "times_performed",
-                  "type")
+                  "type", "params_map")
         read_only_fields = ("user", "created_at", "updated_at",
                             "is_deleted", "status",
-                            "times_performed", "type")
+                            "times_performed", "type", "params_map")
 
 
 class TaskSearchSerializerV1(

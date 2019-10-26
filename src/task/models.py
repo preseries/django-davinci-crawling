@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*
 # Copyright (c) 2019 BuildGroup Data Services Inc.
-
+import json
 import logging
 
 from django.utils import timezone
@@ -77,16 +77,18 @@ class Task(CustomDjangoCassandraModel):
     # Controls if the entity is active or has been deleted
     is_deleted = columns.Boolean(default=False)
 
-    status = columns.SmallInt()
+    status = columns.SmallInt(default=STATUS_CREATED)
 
     kind = columns.Text(required=True)
 
-    params = KeyEncodedMap(
-        key_type=columns.Text, value_type=columns.Text, required=True)
+    params_map = KeyEncodedMap(
+        key_type=columns.Text, value_type=columns.Text)
+
+    params = columns.Text(required=True)
 
     times_performed = columns.SmallInt(default=0)
 
-    type = columns.SmallInt()
+    type = columns.SmallInt(default=ON_DEMAND_TASK)
 
     class Meta:
         get_pk_field = "task_id"
@@ -101,7 +103,7 @@ class Task(CustomDjangoCassandraModel):
 
         if self.status not in ALL_STATUS:
             raise ValidationError(
-                "Invalid task type [{0}]. Valid types are: "
+                "Invalid task status [{0}]. Valid status are: "
                 "{1}.".format(self.status, ALL_STATUS))
 
 
@@ -109,4 +111,21 @@ class Task(CustomDjangoCassandraModel):
 @receiver(pre_save, sender=Task)
 def pre_save_task(
         sender, instance=None, using=None, update_fields=None, **kwargs):
+    keys_to_remove = []
+    if instance.params and isinstance(instance.params, dict):
+        for key, value in instance.params.items():
+            if value is None:
+                keys_to_remove.append(key)
+                continue
+            if isinstance(value, (list, dict)):
+                instance.params_map[key] = json.dumps(value)
+            elif not isinstance(value, str):
+                instance.params_map[key] = str(value)
+            else:
+                instance.params_map[key] = value
+
+        instance.params = json.dumps(instance.params)
+
+    for key in keys_to_remove:
+        del instance.params[key]
     instance.updated_at = timezone.now()

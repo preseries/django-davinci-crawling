@@ -63,8 +63,6 @@ class GetAllTest(CaravaggioBaseTest):
     def step1_create_resources(self):
         for resource in self.resources:
             _logger.info("POST Resource: {}".format(resource["kind"]))
-            import pydevd_pycharm
-            pydevd_pycharm.settrace('localhost', port=8787, stdoutToServer=True, stderrToServer=True)
             response = self.api_client.post(reverse("task-list"),
                                             data=json.dumps(
                                                 resource, default=default),

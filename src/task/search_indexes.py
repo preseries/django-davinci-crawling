@@ -37,8 +37,8 @@ class TaskIndex(BaseSearchIndex, indexes.Indexable):
     kind = indexes.CharField(
         model_attr="kind", faceted=True)
 
-    params = indexes.MultiValueField(
-        null=True, model_attr="params")
+    params_map = indexes.MultiValueField(
+        null=True, model_attr="params_map")
 
     times_performed = indexes.IntegerField(
         model_attr="times_performed")

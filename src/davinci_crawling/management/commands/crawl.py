@@ -5,8 +5,8 @@ import sys
 import logging
 from multiprocessing.pool import ThreadPool
 
-from davinci_crawling.management.commands.consumer import CrawlConsumer
-from davinci_crawling.management.commands.multiprocessing_producer import \
+from davinci_crawling.management.commands.utils.consumer import CrawlConsumer
+from davinci_crawling.management.commands.utils.multiprocessing_producer import \
     MultiprocessingProducer
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError, \
@@ -22,7 +22,6 @@ _logger = logging.getLogger("davinci_crawling.commands")
 
 crawler_clazz = None
 crawler = None
-
 
 def crawl_params(_crawler_clazz, **options):
     """
