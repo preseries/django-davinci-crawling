@@ -5,8 +5,8 @@ import queue
 import time
 from threading import Thread
 
-from davinci_crawling.management.commands.utils.db_utils import \
-    update_task_status
+from davinci_crawling.management.commands.utils.utils import \
+    update_task_status, get_crawler_by_name
 from davinci_crawling.utils import setup_cassandra_object_mapper, \
     CrawlersRegistry
 
@@ -53,16 +53,6 @@ class CrawlConsumer(object):
         for consumer in self.consumers:
             consumer.start()
 
-    def _get_crawler_by_name(self, crawler_name):
-        crawler = self.cached_crawlers.get(crawler_name)
-        if not crawler:
-            crawler_clazz = CrawlersRegistry().get_crawler(crawler_name)
-
-            crawler = crawler_clazz()
-            self.cached_crawlers[crawler_name] = crawler
-
-        return crawler
-
     def _crawl(self, crawler_name, crawler_param, options):
         """
         Calls the crawl method inside the crawler being used.
@@ -78,7 +68,7 @@ class CrawlConsumer(object):
         # when interacting with the object mapper module
         setup_cassandra_object_mapper()
 
-        crawler = self._get_crawler_by_name(crawler_name)
+        crawler = get_crawler_by_name(crawler_name)
         _logger.debug("Calling crawl method: {0}".
                       format(getattr(crawler, "crawl")))
         return crawler.crawl(crawler_param, options)
@@ -118,7 +108,9 @@ class CrawlConsumer(object):
                 _logger.debug("No objects found on queue, waiting for 1 "
                               "second and try again")
                 time.sleep(1)
-            except Exception:
+            except Exception as e:
+                import pydevd_pycharm
+                pydevd_pycharm.settrace('localhost', port=8787, stdoutToServer=True, stderrToServer=True)
                 if task_id:
                     update_task_status(task_id, STATUS_FAULTY)
             times_run += 1

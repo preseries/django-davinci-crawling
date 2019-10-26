@@ -2,6 +2,7 @@
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 import json
 import logging
+from datetime import datetime
 
 from django.utils import timezone
 import uuid
@@ -111,12 +112,16 @@ class Task(CustomDjangoCassandraModel):
 @receiver(pre_save, sender=Task)
 def pre_save_task(
         sender, instance=None, using=None, update_fields=None, **kwargs):
-    keys_to_remove = []
     if instance.params and isinstance(instance.params, dict):
+        keys_to_remove = []
         for key, value in instance.params.items():
             if value is None:
                 keys_to_remove.append(key)
                 continue
+            if isinstance(value, datetime):
+                string_date = value.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+                instance.params_map[key] = string_date
+                instance.params[key] = string_date
             if isinstance(value, (list, dict)):
                 instance.params_map[key] = json.dumps(value)
             elif not isinstance(value, str):
@@ -124,8 +129,8 @@ def pre_save_task(
             else:
                 instance.params_map[key] = value
 
-        instance.params = json.dumps(instance.params)
+        for key in keys_to_remove:
+            del instance.params[key]
 
-    for key in keys_to_remove:
-        del instance.params[key]
+        instance.params = json.dumps(instance.params)
     instance.updated_at = timezone.now()

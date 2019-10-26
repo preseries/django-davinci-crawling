@@ -5,7 +5,7 @@ import logging
 from caravaggio_rest_api.tests import CaravaggioBaseTest
 from davinci_crawling.example.bovespa.models import BovespaCompanyFile, \
     FILE_STATUS_PROCESSED
-from davinci_crawling.management.commands.tasks_pool import start_tasks_pool
+from davinci_crawling.management.commands.crawl import start_tasks_pool
 from django.conf import settings
 
 # Default crawler params, you may change any default value if you want
@@ -71,7 +71,7 @@ class TasksPoolTest(CaravaggioBaseTest):
         self.create_task("bovespa", ["4170"], "2011-01-01T00:00:00.000000Z",
                          "2011-12-31T00:00:00.000000Z", ["V"])
 
-        start_tasks_pool(workers_num=5, interval=1, times_to_run=20)
+        start_tasks_pool(workers_num=WORKERS_NUM, interval=1, times_to_run=20)
 
         files = BovespaCompanyFile.objects.filter(
             status=FILE_STATUS_PROCESSED).all()

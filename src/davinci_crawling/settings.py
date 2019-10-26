@@ -128,6 +128,25 @@ class Common(Configuration):
     # more details on how to customize your logging configuration.
     LOGGING_FILE = os.getenv("LOGGING_FILE", "/data/davinci_crawling/"
                                              "log/davinci_crawling-debug.log")
+    LOGGING_DIR = "/".join(LOGGING_FILE.split("/")[:-1])
+
+    CRAWLER_OPTIONS_DEFAULTS = {
+        "default": {
+            "verbosity": 1,
+            "no_color": False,
+            "force_color": False,
+            "local_dir": "fs://%s/log/local" % LOGGING_DIR,
+            "cache_dir": "fs://%s/log/cache" % LOGGING_DIR,
+            "workers_num": 10,
+            'chromium_bin_file':
+                '/Applications/Chromium.app/Contents/MacOS/Chromium',
+            'io_gs_project': 'centering-badge-212119',
+        },
+        "bovespa": {
+            'companies_listing_update_elapsetime': 30,
+            'companies_files_update_elapsetime': 30
+        }
+    }
 
     LOGGING = {
         'version': 1,
