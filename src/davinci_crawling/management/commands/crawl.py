@@ -9,6 +9,7 @@ import sys
 import logging
 import time
 import traceback
+from datetime import datetime
 from threading import Thread
 
 from davinci_crawling.management.commands.utils.utils import \
@@ -50,8 +51,12 @@ def _pool_tasks(interval, times_to_run):
                 options = options.copy()
                 options["crawler"] = crawler_name
                 options["task_id"] = task.task_id
-                options.update(settings.DAVINCI_CONF["default"])
-                options.update(settings.DAVINCI_CONF[crawler_name])
+
+                options.update(settings.DAVINCI_CONF.get("default", {}))
+                options.update(settings.DAVINCI_CONF.get(crawler_name, {}))
+
+                # fixed options
+                options["current_execution_date"] = datetime.utcnow()
 
                 params = json.loads(task.params)
 
@@ -59,7 +64,7 @@ def _pool_tasks(interval, times_to_run):
                 update_task_status(task, STATUS_QUEUED)
             except Exception as e:
                 update_task_status(task, STATUS_FAULTY)
-                traceback.print_exc()
+                _logger.error("Error while adding params to queue", e)
         time.sleep(interval)
         if times_to_run:
             times_run += 1

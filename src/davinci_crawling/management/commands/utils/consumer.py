@@ -113,5 +113,5 @@ class CrawlConsumer(object):
                 if task_id:
                     update_task_status(task_id, STATUS_FAULTY)
 
-                traceback.print_exc()
+                _logger.error("Error while crawling params from queue", e)
             times_run += 1
