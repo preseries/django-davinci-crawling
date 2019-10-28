@@ -76,7 +76,7 @@ urlpatterns = [
     # API
     url(r'^bovespa/', include(bovespa_crawler_urls)),
 
-    url(r'^davinci_crawling_task/', include(task_urls)),
+    url(r'^davinci_crawling/', include(task_urls)),
 
 ]
 
