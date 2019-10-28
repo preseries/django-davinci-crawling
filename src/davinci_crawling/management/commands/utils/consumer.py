@@ -3,6 +3,7 @@
 import logging
 import queue
 import time
+import traceback
 from threading import Thread
 
 from davinci_crawling.management.commands.utils.utils import \
@@ -52,7 +53,7 @@ class CrawlConsumer(object):
         for consumer in self.consumers:
             consumer.start()
 
-    def _crawl(self, crawler_name, crawler_param, options):
+    def _crawl(self, crawler_name, task_id, crawler_param, options):
         """
         Calls the crawl method inside the crawler being used.
         Args:
@@ -70,7 +71,7 @@ class CrawlConsumer(object):
         crawler = get_crawler_by_name(crawler_name)
         _logger.debug("Calling crawl method: {0}".
                       format(getattr(crawler, "crawl")))
-        return crawler.crawl(crawler_param, options)
+        return crawler.crawl(task_id, crawler_param, options)
 
     def close(self):
         """
@@ -99,7 +100,7 @@ class CrawlConsumer(object):
                 task_id = options.get("task_id")
                 update_task_status(task_id, STATUS_IN_PROGRESS)
                 _logger.debug("Reading a queue value %s", crawl_param)
-                self._crawl(crawler_name, crawl_param, options)
+                self._crawl(crawler_name, task_id, crawl_param, options)
                 update_task_status(task_id, STATUS_FINISHED)
             except queue.Empty:
                 # Means that the queue is empty and we need to count many times
@@ -111,4 +112,6 @@ class CrawlConsumer(object):
             except Exception as e:
                 if task_id:
                     update_task_status(task_id, STATUS_FAULTY)
+
+                traceback.print_exc()
             times_run += 1

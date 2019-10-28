@@ -8,6 +8,7 @@ import json
 import sys
 import logging
 import time
+import traceback
 from threading import Thread
 
 from davinci_crawling.management.commands.utils.utils import \
@@ -58,6 +59,7 @@ def _pool_tasks(interval, times_to_run):
                 update_task_status(task, STATUS_QUEUED)
             except Exception as e:
                 update_task_status(task, STATUS_FAULTY)
+                traceback.print_exc()
         time.sleep(interval)
         if times_to_run:
             times_run += 1

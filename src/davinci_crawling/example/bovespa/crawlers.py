@@ -309,7 +309,7 @@ class BovespaCrawler(Crawler):
                             BOVESPA_FILE_CTL,
                             checkpoint_data)
 
-    def crawl(self, crawling_params, options):
+    def crawl(self, task_id, crawling_params, options):
         _logger.info(
             "Processing company file [{}]".
             format(crawling_params))
