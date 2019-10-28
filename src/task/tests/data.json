@@ -1,20 +1,38 @@
 [
    {
       "kind":"bovespa",
-      "params":{
+      "options":{
          "workers_num":10
-      }
+      },
+      "params": {
+         "ccvm": 4170,
+         "doc_type": "DFP",
+         "fiscal_date": "2018-12-31",
+         "version": "2.0"
+     }
    },
    {
       "kind":"bovespa",
-      "params":{
+      "options":{
          "workers_num":20
-      }
+      },
+      "params": {
+         "ccvm": 4171,
+         "doc_type": "DFP",
+         "fiscal_date": "2018-12-31",
+         "version": "2.0"
+     }
    },
    {
       "kind":"web",
-      "params":{
+      "options":{
          "workers_num":20
-      }
+      },
+      "params": {
+         "ccvm": 4172,
+         "doc_type": "DFP",
+         "fiscal_date": "2018-12-31",
+         "version": "2.0"
+     }
    }
 ]

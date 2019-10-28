@@ -58,7 +58,14 @@ class Task(CustomDjangoCassandraModel):
             - 4 (Faulty)
             - 5 (Unknown)
         kind: the name of the crawler that will execute the task.
-        params: the set of params used to execute the crawler command.
+        params: the set of params used to execute the crawler command, this
+        will be saved as Text.
+        params_map: the exactly same content as `params` but saved on a way
+        that we can search using solr (KeyEncodedMap).
+        options: the set of options that is used to guide the crawler during
+        the execution, this will be saved as text.
+        options_map: the exactly same content as `options` but saved on a way
+        that we can search using solr (KeyEncodedMap).
         times_performed: keep track on how many times the task was run.
         type: the type of the task, could be OnDemand(1) or Batch(2)
     """
@@ -87,6 +94,10 @@ class Task(CustomDjangoCassandraModel):
 
     params = columns.Text(required=True)
 
+    options_map = KeyEncodedMap(key_type=columns.Text, value_type=columns.Text)
+
+    options = columns.Text(required=True)
+
     times_performed = columns.SmallInt(default=0)
 
     type = columns.SmallInt(default=ON_DEMAND_TASK)
@@ -112,25 +123,37 @@ class Task(CustomDjangoCassandraModel):
 @receiver(pre_save, sender=Task)
 def pre_save_task(
         sender, instance=None, using=None, update_fields=None, **kwargs):
-    if instance.params and isinstance(instance.params, dict):
+    params_string = generate_key_encoded_map(instance.params,
+                                             instance.params_map)
+    if params_string:
+        instance.params = params_string
+
+    options_string = generate_key_encoded_map(instance.options,
+                                              instance.options_map)
+    if options_string:
+        instance.options = options_string
+    instance.updated_at = timezone.now()
+
+
+def generate_key_encoded_map(json_map, key_encoded_map):
+    if json_map and isinstance(json_map, dict):
         keys_to_remove = []
-        for key, value in instance.params.items():
+        for key, value in json_map.items():
             if value is None:
                 keys_to_remove.append(key)
                 continue
             if isinstance(value, datetime):
                 string_date = value.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-                instance.params_map[key] = string_date
-                instance.params[key] = string_date
+                key_encoded_map[key] = string_date
+                json_map[key] = string_date
             if isinstance(value, (list, dict)):
-                instance.params_map[key] = json.dumps(value)
+                key_encoded_map[key] = json.dumps(value)
             elif not isinstance(value, str):
-                instance.params_map[key] = str(value)
+                key_encoded_map[key] = str(value)
             else:
-                instance.params_map[key] = value
+                key_encoded_map[key] = value
 
         for key in keys_to_remove:
-            del instance.params[key]
+            del json_map[key]
 
-        instance.params = json.dumps(instance.params)
-    instance.updated_at = timezone.now()
+        return json.dumps(json_map)

@@ -28,10 +28,13 @@ class TaskSerializerV1(
 
     params = fields.JSONField(required=True)
 
+    options = fields.JSONField(required=True)
+
     type = serializers.IntegerField(default=ON_DEMAND_TASK)
     status = serializers.IntegerField(default=STATUS_CREATED)
 
     params_map = fields.DictField(child=fields.CharField(), required=False)
+    options_map = fields.DictField(child=fields.CharField(), required=False)
     kind = fields.CharField(required=True)
 
     class Meta:
@@ -40,10 +43,11 @@ class TaskSerializerV1(
                   "created_at", "updated_at",
                   "is_deleted", "status", "kind",
                   "params", "times_performed",
-                  "type", "params_map")
+                  "type", "params_map", "options", "options_map")
         read_only_fields = ("user", "created_at", "updated_at",
                             "is_deleted", "status",
-                            "times_performed", "type", "params_map")
+                            "times_performed", "type", "params_map",
+                            "options_map")
 
 
 class TaskSearchSerializerV1(

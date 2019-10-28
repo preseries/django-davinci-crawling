@@ -4,8 +4,6 @@
 import logging
 from datetime import datetime
 
-from django.utils import timezone
-
 from haystack import indexes
 
 from caravaggio_rest_api.haystack.indexes import BaseSearchIndex
@@ -39,6 +37,9 @@ class TaskIndex(BaseSearchIndex, indexes.Indexable):
 
     params_map = indexes.MultiValueField(
         null=True, model_attr="params_map")
+
+    options_map = indexes.MultiValueField(
+        null=True, model_attr="options_map")
 
     times_performed = indexes.IntegerField(
         model_attr="times_performed")

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*
 # Copyright (c) 2019 BuildGroup Data Services Inc.
+import json
 import logging
 import time
 
@@ -33,7 +34,7 @@ class ModelsTest(CaravaggioBaseTest):
 
         assert len(total) == 0
 
-        params = {
+        options = {
             "workers_num": "4",
             "chromium_bin_file":
                 "/Applications/Chromium.app/Contents/MacOS/Chromium",
@@ -43,10 +44,19 @@ class ModelsTest(CaravaggioBaseTest):
             "from_date": "2018-01-01T00:00:00.000000Z",
             "crawling_initials": '["V", "P"]'
         }
+
+        params = {
+            "ccvm": 4170,
+            "doc_type": "DFP",
+            "fiscal_date": "2018-12-31",
+            "version": "2.0"
+        }
+
         task_data = {
             "user": "user1",
             "status": STATUS_CREATED,
             "kind": "bovespa",
+            "options": options,
             "params": params,
             "type": ON_DEMAND_TASK
         }
@@ -79,6 +89,12 @@ class ModelsTest(CaravaggioBaseTest):
         all_tasks = Task.objects.filter(task_id__in=all_tasks).all()
         assert len(all_tasks) == 1
         for task in all_tasks:
-            assert isinstance(task.params, dict)
-            assert len(task.params) == len(params)
-            assert task.params == params
+            task_params = json.loads(task.params)
+            assert isinstance(task_params, dict)
+            assert len(task_params) == len(params)
+            assert task_params == params
+
+            task_options = json.loads(task.options)
+            assert isinstance(task_options, dict)
+            assert len(task_options) == len(options)
+            assert task_options == options

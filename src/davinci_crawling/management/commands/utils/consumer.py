@@ -109,8 +109,6 @@ class CrawlConsumer(object):
                               "second and try again")
                 time.sleep(1)
             except Exception as e:
-                import pydevd_pycharm
-                pydevd_pycharm.settrace('localhost', port=8787, stdoutToServer=True, stderrToServer=True)
                 if task_id:
                     update_task_status(task_id, STATUS_FAULTY)
             times_run += 1
