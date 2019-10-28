@@ -4,6 +4,7 @@
 import sys
 import logging
 
+from davinci_crawling.management.producer import Producer
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError, \
     handle_default_options
@@ -20,6 +21,18 @@ _logger = logging.getLogger("davinci_crawling.commands")
 crawler_clazz = None
 crawler = None
 
+generated_params = []
+
+
+class CrawlParamsProducer(Producer):
+    """
+    Uses a multiprocessing queue to add params.
+    """
+
+    def add_crawl_params(self, param, options):
+        _logger.debug("Adding param %s to queue", param)
+        generated_params.append([param, options])
+
 
 def crawl_command_to_task(**options):
     """
@@ -27,14 +40,22 @@ def crawl_command_to_task(**options):
     Args:
         options: the options that the command received.
     """
-    data = {
-        # TODO change this to a correct user
-        "user": "batchuser",
-        "kind": options.pop("crawler"),
-        "params": options,
-        "type": BATCH_TASK
-    }
-    Task.create(**data)
+    crawler_name = options.get("crawler")
+    _crawler_clazz = CrawlersRegistry().get_crawler(crawler_name)
+
+    _crawler = _crawler_clazz()
+
+    _crawler.crawl_params(CrawlParamsProducer(), **options)
+
+    for param_options in generated_params:
+        data = {
+            "user": "batchuser",
+            "kind": crawler_name,
+            "params": param_options[0],
+            "options": param_options[1],
+            "type": BATCH_TASK
+        }
+        Task.create(**data)
 
 
 class Command(BaseCommand):

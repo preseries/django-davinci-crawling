@@ -11,15 +11,21 @@ from davinci_crawling.management.commands.crawl_params import \
 
 # Default crawler params, you may change any default value if you want
 # All the things written with None value should be overwritten inside the test
-from davinci_crawling.task.models import Task, STATUS_IN_PROGRESS
+from davinci_crawling.task.models import Task, STATUS_FINISHED
+from django.conf import settings
 
-CRAWLER_PARAMS = {
-    'from_date': None, 'to_date': None,
-    'crawling_initials': None,
-    'no_update_companies_listing': False,
-    'no_update_companies_files': False,
-    'force_download': False, 'include_companies': None,
-    'crawler': 'bovespa'
+CRAWLER_OPTIONS = {
+    "chromium_bin_file":
+        "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    "include_companies": None,
+    "local_dir": "fs://%s/log/local" %
+                 settings.TESTS_TMP_DIR,
+    "cache_dir": "fs://%s/log/cache" %
+                 settings.TESTS_TMP_DIR,
+    "crawler": "bovespa",
+    "from_date": None,
+    "to_date": None,
+    "crawling_initials": None
 }
 
 WORKERS_NUM = 5
@@ -42,12 +48,12 @@ class TasksPoolTest(CaravaggioBaseTest):
         pass
 
     def test_pool(self):
-        CRAWLER_PARAMS["crawling_initials"] = ["V"]
-        CRAWLER_PARAMS["include_companies"] = ["4170"]
-        CRAWLER_PARAMS["from_date"] = "2011-01-01T00:00:00.000000Z"
-        CRAWLER_PARAMS["to_date"] = "2011-12-31T00:00:00.000000Z"
+        CRAWLER_OPTIONS["crawling_initials"] = ["V"]
+        CRAWLER_OPTIONS["include_companies"] = ["4170"]
+        CRAWLER_OPTIONS["from_date"] = "2011-01-01T00:00:00.000000Z"
+        CRAWLER_OPTIONS["to_date"] = "2011-12-31T00:00:00.000000Z"
 
-        crawl_command_to_task(**CRAWLER_PARAMS)
+        crawl_command_to_task(**CRAWLER_OPTIONS)
         start_tasks_pool(workers_num=WORKERS_NUM, interval=1, times_to_run=20)
 
         files = BovespaCompanyFile.objects.filter(
@@ -60,5 +66,5 @@ class TasksPoolTest(CaravaggioBaseTest):
         threads_count = len(set([x.thread_id for x in files]))
         assert threads_count == WORKERS_NUM
 
-        tasks = Task.objects.filter(status=STATUS_IN_PROGRESS).all()
-        self.assertEqual(len(tasks), 1)
+        tasks = Task.objects.filter(status=STATUS_FINISHED).all()
+        self.assertEqual(len(tasks), 5)

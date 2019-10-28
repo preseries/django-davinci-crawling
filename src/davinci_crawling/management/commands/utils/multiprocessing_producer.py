@@ -16,6 +16,4 @@ class MultiprocessingProducer(Producer):
 
     def add_crawl_params(self, param, options):
         _logger.debug("Adding param %s to queue", param)
-        num_params = options.get("num_params", 0)
-        options[num_params] = num_params + 1
         multiprocess_queue.put([param, options])
