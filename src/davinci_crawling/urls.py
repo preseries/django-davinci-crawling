@@ -37,7 +37,7 @@ try:
 except TypeError:
     pass
 
-from task.urls import urlpatterns as task_urls
+from davinci_crawling.task.urls import urlpatterns as task_urls
 
 urls.handler500 = 'rest_framework.exceptions.server_error'
 urls.handler400 = 'rest_framework.exceptions.bad_request'

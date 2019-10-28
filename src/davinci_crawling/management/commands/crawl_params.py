@@ -3,11 +3,7 @@
 
 import sys
 import logging
-from multiprocessing.pool import ThreadPool
 
-from davinci_crawling.management.commands.utils.consumer import CrawlConsumer
-from davinci_crawling.management.commands.utils.multiprocessing_producer import \
-    MultiprocessingProducer
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError, \
     handle_default_options
@@ -15,8 +11,8 @@ from django.core.management.base import SystemCheckError
 from django.db import connections
 
 from davinci_crawling.utils import \
-    CrawlersRegistry, setup_cassandra_object_mapper
-from task.models import Task, BATCH_TASK
+    CrawlersRegistry
+from davinci_crawling.task.models import Task, BATCH_TASK
 
 _logger = logging.getLogger("davinci_crawling.commands")
 

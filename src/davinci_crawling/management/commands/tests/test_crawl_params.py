@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
-import datetime
 import logging
 
 from caravaggio_rest_api.tests import CaravaggioBaseTest
@@ -9,11 +8,10 @@ from davinci_crawling.example.bovespa.models import BovespaCompanyFile, \
 from davinci_crawling.management.commands.crawl import start_tasks_pool
 from davinci_crawling.management.commands.crawl_params import \
     crawl_command_to_task
-from django.conf import settings
 
 # Default crawler params, you may change any default value if you want
 # All the things written with None value should be overwritten inside the test
-from task.models import ON_DEMAND_TASK, Task, STATUS_IN_PROGRESS
+from davinci_crawling.task.models import Task, STATUS_IN_PROGRESS
 
 CRAWLER_PARAMS = {
     'from_date': None, 'to_date': None,

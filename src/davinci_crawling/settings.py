@@ -82,7 +82,7 @@ class Common(Configuration):
         'caravaggio_rest_api.logging',
         'caravaggio_rest_api.users',
         'davinci_crawling',
-        'task'
+        'davinci_crawling.task'
     ]
 
     MIDDLEWARE = [

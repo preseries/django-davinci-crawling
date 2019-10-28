@@ -21,7 +21,7 @@ from django.conf.urls import url, include
 
 from rest_framework.schemas import get_schema_view
 
-from task.api.urls import urlpatterns as task_urls
+from davinci_crawling.task.api.urls import urlpatterns as task_urls
 
 urlpatterns = [
     url(r'^api-schema/task/$',

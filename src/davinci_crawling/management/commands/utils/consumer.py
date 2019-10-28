@@ -7,12 +7,11 @@ from threading import Thread
 
 from davinci_crawling.management.commands.utils.utils import \
     update_task_status, get_crawler_by_name
-from davinci_crawling.utils import setup_cassandra_object_mapper, \
-    CrawlersRegistry
+from davinci_crawling.utils import setup_cassandra_object_mapper
 
 from multiprocessing import Queue
 
-from task.models import STATUS_IN_PROGRESS, STATUS_FAULTY, STATUS_FINISHED
+from davinci_crawling.task.models import STATUS_IN_PROGRESS, STATUS_FAULTY, STATUS_FINISHED
 
 _logger = logging.getLogger("davinci_crawling.queue")
 

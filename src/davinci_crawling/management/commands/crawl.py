@@ -11,11 +11,11 @@ import time
 from threading import Thread
 
 from davinci_crawling.management.commands.utils.utils import \
-    update_task_status, get_crawler_by_name
+    update_task_status
 from davinci_crawling.management.commands.utils.multiprocessing_producer import \
     MultiprocessingProducer
 from django.conf import settings
-from task.models import Task, STATUS_CREATED, STATUS_FAULTY, STATUS_QUEUED
+from davinci_crawling.task.models import Task, STATUS_CREATED, STATUS_FAULTY, STATUS_QUEUED
 from davinci_crawling.management.commands.utils.consumer import CrawlConsumer
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError, \

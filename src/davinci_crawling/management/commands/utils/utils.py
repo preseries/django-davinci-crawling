@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 from davinci_crawling.utils import CrawlersRegistry
-from task.models import Task
+from davinci_crawling.task.models import Task
 
 cached_crawlers = {}
 

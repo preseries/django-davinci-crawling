@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 import logging
-from queue import Queue
 
 from caravaggio_rest_api.tests import CaravaggioBaseTest
 from davinci_crawling.example.bovespa.crawlers import BovespaCrawler
@@ -13,8 +12,7 @@ from django.conf import settings
 
 # Default crawler params, you may change any default value if you want
 # All the things written with None value should be overwritten inside the test
-from task.models import ON_DEMAND_TASK, Task, STATUS_IN_PROGRESS, \
-    STATUS_FINISHED
+from davinci_crawling.task.models import ON_DEMAND_TASK, Task, STATUS_FINISHED
 
 CRAWLER_OPTIONS = {
     "chromium_bin_file":
