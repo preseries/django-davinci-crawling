@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
+"""
+This file has all the methods that are responsible for get the crawl params and
+actually craw the data.
+"""
 import json
 import sys
 import logging
@@ -10,7 +14,6 @@ from davinci_crawling.management.commands.utils.utils import \
     update_task_status, get_crawler_by_name
 from davinci_crawling.management.commands.utils.multiprocessing_producer import \
     MultiprocessingProducer
-from davinci_crawling.utils import CrawlersRegistry
 from django.conf import settings
 from task.models import Task, STATUS_CREATED, STATUS_FAULTY, STATUS_QUEUED
 from davinci_crawling.management.commands.utils.consumer import CrawlConsumer
@@ -26,10 +29,11 @@ _logger = logging.getLogger("davinci_crawling.commands")
 
 def _pool_tasks(interval, times_to_run):
     """
-    A while that runs forever and check for new tasks on the
-    cassandra DB.
+    A while that runs forever and check for new tasks on the cassandra DB,
+    every new Task on DB has a created state, so this method looks for all the
+    tasks that have this status.
     Args:
-        interval: the interval that we should pool cassandra;
+        interval: the interval that we should pool cassandra, on every pool;
         times_to_run: used on tests to determine that the threads will not run
         forever. [ONLY FOR TESTING]
     """

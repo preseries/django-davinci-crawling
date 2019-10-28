@@ -130,7 +130,7 @@ class Common(Configuration):
                                              "log/davinci_crawling-debug.log")
     LOGGING_DIR = "/".join(LOGGING_FILE.split("/")[:-1])
 
-    CRAWLER_OPTIONS_DEFAULTS = {
+    DAVINCI_CONF = {
         "default": {
             "verbosity": 1,
             "no_color": False,
