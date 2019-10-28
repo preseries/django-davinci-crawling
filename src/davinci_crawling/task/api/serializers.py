@@ -80,35 +80,6 @@ class TaskSearchSerializerV1(
         ]
 
 
-class TaskGEOSearchSerializerV1(
-        TaskSearchSerializerV1):
-    """
-    A Fast Searcher (Solr) version of the original Business Object API View
-    to do GEO Spatial searches
-    """
-    user = serializers.HiddenField(
-        default=dse_fields.CurrentUserNameDefault())
-    type = serializers.IntegerField(default=ON_DEMAND_TASK)
-    status = serializers.IntegerField(default=STATUS_CREATED)
-
-    params = fields.DictField(required=True, child=fields.CharField())
-    kind = fields.CharField(required=True)
-
-    class Meta(CustomHaystackSerializer.Meta):
-        model = Task
-        # The `index_classes` attribute is a list of which search indexes
-        # we want to include in the search.
-        index_classes = [TaskIndex]
-
-        fields = [
-            "task_id", "user",
-            "created_at", "updated_at",
-            "is_deleted", "status", "kind",
-            "params", "times_performed",
-            "type"
-        ]
-
-
 class TaskFacetSerializerV1(HaystackFacetSerializer):
     """
     A facet view to use facets on the API.
@@ -137,4 +108,3 @@ class TaskFacetSerializerV1(HaystackFacetSerializer):
 # Cache configuration
 cache_registry.register(TaskSerializerV1)
 cache_registry.register(TaskSearchSerializerV1)
-cache_registry.register(TaskGEOSearchSerializerV1)

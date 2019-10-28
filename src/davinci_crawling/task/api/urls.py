@@ -21,9 +21,7 @@ from django.conf.urls import url, include
 
 from davinci_crawling.task.api.views import \
     TaskViewSet, \
-    TaskSearchViewSet, \
-    TaskGEOSearchViewSet
-
+    TaskSearchViewSet
 from rest_framework import routers
 
 # API v1 Router. Provide an easy way of automatically determining the URL conf.
@@ -31,19 +29,15 @@ from rest_framework import routers
 api_TASK = routers.DefaultRouter()
 
 if settings.DSE_SUPPORT:
-    api_TASK.register(r'task/search',
+    api_TASK.register(r'search',
                       TaskSearchViewSet,
                       base_name="task-search")
 
-    api_TASK.register(r'task/search/facets',
+    api_TASK.register(r'search/facets',
                       TaskSearchViewSet,
                       base_name="task-search-facets")
 
-    api_TASK.register(r'task/geosearch',
-                      TaskGEOSearchViewSet,
-                      base_name="task-geosearch")
-
-api_TASK.register(r'davinci_crawling_task',
+api_TASK.register(r'task',
                   TaskViewSet,
                   base_name="task")
 
