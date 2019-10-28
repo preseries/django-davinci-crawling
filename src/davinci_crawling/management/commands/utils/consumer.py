@@ -3,7 +3,6 @@
 import logging
 import queue
 import time
-import traceback
 from threading import Thread
 
 from davinci_crawling.management.commands.utils.utils import \
@@ -44,7 +43,7 @@ class CrawlConsumer(object):
     def start(self):
         """
         Start all the consumers that we need and store them on the
-        self.consumers list.
+        consumers list.
         """
         for i in range(self.qty_workers):
             p = Thread(target=self._crawl_params)
@@ -73,7 +72,7 @@ class CrawlConsumer(object):
                       format(getattr(crawler, "crawl")))
         return crawler.crawl(task_id, crawler_param, options)
 
-    def close(self):
+    def join(self):
         """
         Close the consumers, and wait them to join.
         """
@@ -113,5 +112,6 @@ class CrawlConsumer(object):
                 if task_id:
                     update_task_status(task_id, STATUS_FAULTY)
 
+                # TODO add the error message to the db
                 _logger.error("Error while crawling params from queue", e)
             times_run += 1

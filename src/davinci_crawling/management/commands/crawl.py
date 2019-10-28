@@ -32,8 +32,8 @@ _logger = logging.getLogger("davinci_crawling.commands")
 def _pool_tasks(interval, times_to_run):
     """
     A while that runs forever and check for new tasks on the cassandra DB,
-    every new Task on DB has a created state, so this method looks for all the
-    tasks that have this status.
+    every new Task on DB has a 'created' state, so this method looks for all
+    the tasks that have this status.
     Args:
         interval: the interval that we should pool cassandra, on every pool;
         times_to_run: used on tests to determine that the threads will not run
@@ -41,9 +41,12 @@ def _pool_tasks(interval, times_to_run):
     """
     times_run = 0
     producer = MultiprocessingProducer()
+    # this while condition will only be checked on testing, otherwise this loop
+    # should run forever.
     while not times_to_run or times_run < times_to_run:
         _logger.debug("Calling pool tasks")
         all_tasks = Task.objects.filter(status=STATUS_CREATED).all()
+        _logger.debug("Found %d tasks to process", len(all_tasks))
         for task in all_tasks:
             try:
                 crawler_name = task.kind
@@ -52,10 +55,12 @@ def _pool_tasks(interval, times_to_run):
                 options["crawler"] = crawler_name
                 options["task_id"] = task.task_id
 
+                # get the fixed options on the settings that will be aggregated
+                # with the options sent on the table.
                 options.update(settings.DAVINCI_CONF.get("default", {}))
                 options.update(settings.DAVINCI_CONF.get(crawler_name, {}))
 
-                # fixed options
+                # fixed options, place here all the fixed options
                 options["current_execution_date"] = datetime.utcnow()
 
                 params = json.loads(task.params)
@@ -63,6 +68,7 @@ def _pool_tasks(interval, times_to_run):
                 producer.add_crawl_params(params, options)
                 update_task_status(task, STATUS_QUEUED)
             except Exception as e:
+                # TODO add the error message to the DB
                 update_task_status(task, STATUS_FAULTY)
                 _logger.error("Error while adding params to queue", e)
         time.sleep(interval)
@@ -70,9 +76,11 @@ def _pool_tasks(interval, times_to_run):
             times_run += 1
 
 
-def start_tasks_pool(workers_num, interval, times_to_run=None):
+def start_crawl(workers_num, interval, times_to_run=None):
     """
-    Starts tasks pool.
+    Run the necessary methods to start crawling data. This method will start a
+    tasks pool that will constantly get lines from DB and if anything is new
+    will send to a queue that will be read by a consumer.
     Args:
         workers_num: The quantity of workers to start.
         interval: Interval to wait between pool the tasks.
@@ -85,17 +93,16 @@ def start_tasks_pool(workers_num, interval, times_to_run=None):
     task_thread = Thread(target=_pool_tasks, args=(interval, times_to_run))
 
     try:
-        _logger.info("Starting crawling params")
         task_thread.start()
     except TimeoutError:
         _logger.error("Timeout error")
     finally:
         task_thread.join()
-        crawl_consumer.close()
+        crawl_consumer.join()
 
 
 class Command(BaseCommand):
-    help = 'Start a tasks pool that looks for tasks on the DB'
+    help = 'Start all the necessary methods to start crawling the database'
 
     def __init__(self):
         super().__init__()
@@ -147,7 +154,7 @@ class Command(BaseCommand):
         )
 
     def run_from_argv(self, argv):
-        _logger.info("Starting task pool")
+        _logger.info("Starting to crawl")
 
         parser = self._parser
         options, known_args = parser.parse_known_args(argv[2:])
@@ -179,4 +186,4 @@ class Command(BaseCommand):
         workers_num = options.get("workers_num")
         interval = options.get("interval")
 
-        start_tasks_pool(workers_num, interval)
+        start_crawl(workers_num, interval)

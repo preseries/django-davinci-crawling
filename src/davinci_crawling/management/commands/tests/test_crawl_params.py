@@ -5,15 +5,15 @@ import logging
 from caravaggio_rest_api.tests import CaravaggioBaseTest
 from davinci_crawling.example.bovespa.models import BovespaCompanyFile, \
     FILE_STATUS_PROCESSED
-from davinci_crawling.management.commands.crawl import start_tasks_pool
+from davinci_crawling.management.commands.crawl import start_crawl
 from davinci_crawling.management.commands.crawl_params import \
     crawl_command_to_task
-
-# Default crawler params, you may change any default value if you want
-# All the things written with None value should be overwritten inside the test
 from davinci_crawling.task.models import Task, STATUS_FINISHED
 from django.conf import settings
 
+
+# Default crawler params, you may change any default value if you want
+# All the things written with None value should be overwritten inside the test
 CRAWLER_OPTIONS = {
     "chromium_bin_file":
         "/Applications/Chromium.app/Contents/MacOS/Chromium",
@@ -33,12 +33,11 @@ WORKERS_NUM = 5
 _logger = logging.getLogger("davinci_crawling.testing")
 
 
-class TasksPoolTest(CaravaggioBaseTest):
+class TestCrawlParams(CaravaggioBaseTest):
     """
-    Test the producer consumer parallelism on the crawler's implementation.
-
-    This test guarantees that the que queue works and that the consumer is
-    parallel.
+    Test the crawl_params command that simply create tasks om the database.
+    This test also uses the crawl command to validate that the crawl operation
+    works after creating the tasks using the crawl_params command.
     """
 
     all_files_count = 0
@@ -54,7 +53,7 @@ class TasksPoolTest(CaravaggioBaseTest):
         CRAWLER_OPTIONS["to_date"] = "2011-12-31T00:00:00.000000Z"
 
         crawl_command_to_task(**CRAWLER_OPTIONS)
-        start_tasks_pool(workers_num=WORKERS_NUM, interval=1, times_to_run=20)
+        start_crawl(workers_num=WORKERS_NUM, interval=1, times_to_run=20)
 
         files = BovespaCompanyFile.objects.filter(
             status=FILE_STATUS_PROCESSED).all()

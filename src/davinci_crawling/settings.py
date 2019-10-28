@@ -130,6 +130,8 @@ class Common(Configuration):
                                              "log/davinci_crawling-debug.log")
     LOGGING_DIR = "/".join(LOGGING_FILE.split("/")[:-1])
 
+    # All the fixed settings that a crawler can have, every crawler should
+    # add their specific params here
     DAVINCI_CONF = {
         "default": {
             "verbosity": 1,

@@ -6,15 +6,16 @@ from caravaggio_rest_api.tests import CaravaggioBaseTest
 from davinci_crawling.example.bovespa.crawlers import BovespaCrawler
 from davinci_crawling.example.bovespa.models import BovespaCompanyFile, \
     FILE_STATUS_PROCESSED
-from davinci_crawling.management.commands.crawl import start_tasks_pool
+from davinci_crawling.management.commands.crawl import start_crawl
 from davinci_crawling.management.producer import Producer
 from django.conf import settings
 
-# Default crawler params, you may change any default value if you want
-# All the things written with None value should be overwritten inside the test
+
 from davinci_crawling.task.models import ON_DEMAND_TASK, Task, STATUS_FINISHED, \
     STATUS_CREATED
 
+# Default crawler params, you may change any default value if you want
+# All the things written with None value should be overwritten inside the test
 CRAWLER_OPTIONS = {
     "chromium_bin_file":
         "/Applications/Chromium.app/Contents/MacOS/Chromium",
@@ -35,9 +36,10 @@ _logger = logging.getLogger("davinci_crawling.testing")
 
 test_queue = []
 
+
 class TestProducer(Producer):
     """
-    Uses a multiprocessing queue to add params.
+    Custom producer for tests that simple add params to a list.
     """
 
     def add_crawl_params(self, param, options):
@@ -45,7 +47,7 @@ class TestProducer(Producer):
         test_queue.append([param, options])
 
 
-class TasksPoolTest(CaravaggioBaseTest):
+class TestCrawl(CaravaggioBaseTest):
     """
     Test the producer consumer parallelism on the crawler's implementation.
 
@@ -89,10 +91,16 @@ class TasksPoolTest(CaravaggioBaseTest):
             Task.create(**task)
 
     def test_pool(self):
+        """
+        Test the pooling DB method, this test will create some tasks on the DB
+        and then will start the crawl "command" when everything is done we
+        validate if we have all the files on DB and if the tasks ran in
+        parallel.
+        """
         self.create_task("bovespa", ["4170"], "2011-01-01T00:00:00.000000Z",
                          "2011-12-31T00:00:00.000000Z", ["V"])
 
-        start_tasks_pool(workers_num=WORKERS_NUM, interval=1, times_to_run=20)
+        start_crawl(workers_num=WORKERS_NUM, interval=1, times_to_run=20)
 
         files = BovespaCompanyFile.objects.filter(
             status=FILE_STATUS_PROCESSED).all()

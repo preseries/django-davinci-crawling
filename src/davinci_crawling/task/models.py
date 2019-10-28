@@ -136,6 +136,17 @@ def pre_save_task(
 
 
 def generate_key_encoded_map(json_map, key_encoded_map):
+    """
+    Gets a normal map and process it to be a KeyEncodedMap, as the
+    KeyEncodedMap only accepts strings on the values we need to parse all the
+    values to strings.
+    Args:
+        json_map: The original Map.
+        key_encoded_map: The key enconded map that will be filled with the new
+        data.
+
+    Returns: A string representation of the json map.
+    """
     if json_map and isinstance(json_map, dict):
         keys_to_remove = []
         for key, value in json_map.items():

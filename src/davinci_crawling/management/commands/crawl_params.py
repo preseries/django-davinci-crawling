@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
-
+"""
+This file has the logic of the crawl_params command, this command will discover
+the params needed by the crawler and then create a task on the Cassandra DB.
+"""
 import sys
 import logging
 
@@ -26,7 +29,8 @@ generated_params = []
 
 class CrawlParamsProducer(Producer):
     """
-    Uses a multiprocessing queue to add params.
+    Uses a local list to add the crawl_params, this is used to simplify the
+    logic for generating crawwl params.
     """
 
     def add_crawl_params(self, param, options):
@@ -36,7 +40,7 @@ class CrawlParamsProducer(Producer):
 
 def crawl_command_to_task(**options):
     """
-    Get the issued crawl command and transform it to a Task on the Cassandra DB
+    Get the issued crawl command and transformss it to a Task on the DB.
     Args:
         options: the options that the command received.
     """
@@ -59,7 +63,7 @@ def crawl_command_to_task(**options):
 
 
 class Command(BaseCommand):
-    help = 'Crawl data from source'
+    help = 'Mount the crawl params for the crawler and add them to the DB'
 
     def run_from_argv(self, argv):
         global crawler_clazz, crawler
