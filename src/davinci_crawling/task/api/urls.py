@@ -19,7 +19,7 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls import url, include
 
-from task.api.views import \
+from davinci_crawling.task.api.views import \
     TaskViewSet, \
     TaskSearchViewSet, \
     TaskGEOSearchViewSet

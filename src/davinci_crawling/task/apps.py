@@ -6,7 +6,7 @@ from django.apps import AppConfig
 
 
 class DaVinciCrawlerConfig(AppConfig):
-    name = 'task'
+    name = 'davinci_crawling.task'
     verbose_name = "Django DaVinci Crawler task"
 
     def ready(self):

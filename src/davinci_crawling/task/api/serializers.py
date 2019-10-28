@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*
 # Copyright (c) 2019 BuildGroup Data Services Inc.
-from datetime import datetime, timedelta
 
 from caravaggio_rest_api.drf_haystack.serializers import \
     BaseCachedSerializerMixin, CustomHaystackSerializer
@@ -13,8 +12,8 @@ from rest_framework_cache.registry import cache_registry
 from caravaggio_rest_api.drf_haystack import serializers as dse_serializers
 from caravaggio_rest_api import fields as dse_fields
 
-from task.models import Task, ON_DEMAND_TASK, STATUS_CREATED
-from task.search_indexes import TaskIndex
+from davinci_crawling.task.models import Task, ON_DEMAND_TASK, STATUS_CREATED
+from davinci_crawling.task.search_indexes import TaskIndex
 
 
 class TaskSerializerV1(

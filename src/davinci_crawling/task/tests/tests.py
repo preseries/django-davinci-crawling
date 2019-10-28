@@ -6,7 +6,7 @@ import logging
 import time
 
 from caravaggio_rest_api.utils import delete_all_records
-from task.models import Task
+from davinci_crawling.task.models import Task
 
 from rest_framework import status
 from django.urls import reverse
@@ -16,7 +16,7 @@ from caravaggio_rest_api.utils import default
 from caravaggio_rest_api.tests import CaravaggioBaseTest
 
 # Create your tests here.
-from task.api.serializers import \
+from davinci_crawling.task.api.serializers import \
     TaskSerializerV1
 
 CONTENTTYPE_JSON = "application/json"

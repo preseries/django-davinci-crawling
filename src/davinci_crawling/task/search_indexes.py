@@ -8,7 +8,7 @@ from haystack import indexes
 
 from caravaggio_rest_api.haystack.indexes import BaseSearchIndex
 
-from task import CRAWLER_NAME
+from davinci_crawling.task import CRAWLER_NAME
 from .models import Task
 
 _logger = logging.getLogger("davinci_crawler_{}.search_indexes".
