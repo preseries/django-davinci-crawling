@@ -12,7 +12,8 @@ from django.conf import settings
 
 # Default crawler params, you may change any default value if you want
 # All the things written with None value should be overwritten inside the test
-from davinci_crawling.task.models import ON_DEMAND_TASK, Task, STATUS_FINISHED
+from davinci_crawling.task.models import ON_DEMAND_TASK, Task, STATUS_FINISHED, \
+    STATUS_CREATED
 
 CRAWLER_OPTIONS = {
     "chromium_bin_file":
@@ -59,7 +60,8 @@ class TasksPoolTest(CaravaggioBaseTest):
         pass
 
     def create_task(self, kind, include_companies=None,
-                    from_date=None, to_date=None, crawling_initials=None):
+                    from_date=None, to_date=None, crawling_initials=None,
+                    status=STATUS_CREATED):
         crawler_options = CRAWLER_OPTIONS.copy()
         # includes only the Vale company
         crawler_options["include_companies"] = include_companies
@@ -80,7 +82,8 @@ class TasksPoolTest(CaravaggioBaseTest):
                 "params": param[0],
                 "kind": kind,
                 "user": "someuser",
-                "type": ON_DEMAND_TASK
+                "type": ON_DEMAND_TASK,
+                "status": status
             }
 
             Task.create(**task)

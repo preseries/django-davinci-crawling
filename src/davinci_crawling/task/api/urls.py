@@ -43,7 +43,7 @@ if settings.DSE_SUPPORT:
                       TaskGEOSearchViewSet,
                       base_name="task-geosearch")
 
-api_TASK.register(r'task',
+api_TASK.register(r'davinci_crawling_task',
                   TaskViewSet,
                   base_name="task")
 
