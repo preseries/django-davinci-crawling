@@ -2,7 +2,7 @@
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, date
 
 from django.utils import timezone
 import uuid
@@ -144,6 +144,10 @@ def generate_key_encoded_map(json_map, key_encoded_map):
                 continue
             if isinstance(value, datetime):
                 string_date = value.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+                key_encoded_map[key] = string_date
+                json_map[key] = string_date
+            if isinstance(value, date):
+                string_date = value.strftime("%Y-%m-%d")
                 key_encoded_map[key] = string_date
                 json_map[key] = string_date
             if isinstance(value, (list, dict)):

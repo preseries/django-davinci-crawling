@@ -101,6 +101,7 @@ class CrawlConsumer(object):
                 update_task_status(task_id, STATUS_IN_PROGRESS)
                 _logger.debug("Reading a queue value %s", crawl_param)
                 self._crawl(crawler_name, crawl_param, options)
+                update_task_status(task_id, STATUS_FINISHED)
             except queue.Empty:
                 # Means that the queue is empty and we need to count many times
                 # that the occurs to the close logic, we just start counting

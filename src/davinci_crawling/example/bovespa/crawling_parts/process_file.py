@@ -20,11 +20,11 @@ _logger = logging.getLogger(
 
 
 def process_file(
-        options, files_to_process, ccvm_code, file_type, fiscal_date, version):
+        options, files_to_process, ccvm, doc_type, fiscal_date, version):
 
     company_file = BovespaCompanyFile.objects.get(
-        ccvm=ccvm_code,
-        doc_type=file_type,
+        ccvm=ccvm,
+        doc_type=doc_type,
         fiscal_date=fiscal_date,
         version=version)
 

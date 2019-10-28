@@ -38,22 +38,23 @@ def _pool_tasks(interval, times_to_run):
         forever. [ONLY FOR TESTING]
     """
     times_run = 0
+    producer = MultiprocessingProducer()
     while not times_to_run or times_run < times_to_run:
         _logger.debug("Calling pool tasks")
         all_tasks = Task.objects.filter(status=STATUS_CREATED).all()
         for task in all_tasks:
             try:
                 crawler_name = task.kind
+                options = json.loads(task.options)
+                options = options.copy()
+                options["crawler"] = crawler_name
+                options["task_id"] = task.task_id
+                options.update(settings.DAVINCI_CONF["default"])
+                options.update(settings.DAVINCI_CONF[crawler_name])
+
                 params = json.loads(task.params)
-                params = params.copy()
-                params["crawler"] = crawler_name
-                params["task_id"] = task.task_id
-                params.update(settings.CRAWLER_OPTIONS_DEFAULTS["default"])
-                params.update(settings.CRAWLER_OPTIONS_DEFAULTS[crawler_name])
 
-                _crawler = get_crawler_by_name(crawler_name)
-
-                _crawler.crawl_params(MultiprocessingProducer(), **params)
+                producer.add_crawl_params(params, options)
                 update_task_status(task, STATUS_QUEUED)
             except Exception as e:
                 update_task_status(task, STATUS_FAULTY)

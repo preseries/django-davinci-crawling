@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 import logging
+from queue import Queue
 
 from caravaggio_rest_api.tests import CaravaggioBaseTest
+from davinci_crawling.example.bovespa.crawlers import BovespaCrawler
 from davinci_crawling.example.bovespa.models import BovespaCompanyFile, \
     FILE_STATUS_PROCESSED
 from davinci_crawling.management.commands.crawl import start_tasks_pool
+from davinci_crawling.management.producer import Producer
 from django.conf import settings
 
 # Default crawler params, you may change any default value if you want
 # All the things written with None value should be overwritten inside the test
-from task.models import ON_DEMAND_TASK, Task, STATUS_IN_PROGRESS
+from task.models import ON_DEMAND_TASK, Task, STATUS_IN_PROGRESS, \
+    STATUS_FINISHED
 
-CRAWLER_PARAMS = {
+CRAWLER_OPTIONS = {
     "chromium_bin_file":
         "/Applications/Chromium.app/Contents/MacOS/Chromium",
     "include_companies": None,
@@ -29,6 +33,17 @@ CRAWLER_PARAMS = {
 WORKERS_NUM = 5
 
 _logger = logging.getLogger("davinci_crawling.testing")
+
+test_queue = []
+
+class TestProducer(Producer):
+    """
+    Uses a multiprocessing queue to add params.
+    """
+
+    def add_crawl_params(self, param, options):
+        _logger.debug("Adding param %s to queue", param)
+        test_queue.append([param, options])
 
 
 class TasksPoolTest(CaravaggioBaseTest):
@@ -47,25 +62,30 @@ class TasksPoolTest(CaravaggioBaseTest):
 
     def create_task(self, kind, include_companies=None,
                     from_date=None, to_date=None, crawling_initials=None):
-        crawler_params = CRAWLER_PARAMS.copy()
+        crawler_options = CRAWLER_OPTIONS.copy()
         # includes only the Vale company
-        crawler_params["include_companies"] = include_companies
+        crawler_options["include_companies"] = include_companies
         # indicates the crawler to use
-        crawler_params["crawler"] = kind
+        crawler_options["crawler"] = kind
         # indicates the period that we should crawl the data
-        crawler_params["from_date"] = from_date
-        crawler_params["to_date"] = to_date
+        crawler_options["from_date"] = from_date
+        crawler_options["to_date"] = to_date
         # includes only companies that start with "V"
-        crawler_params["crawling_initials"] = crawling_initials
+        crawler_options["crawling_initials"] = crawling_initials
 
-        task = {
-            "params": crawler_params,
-            "kind": kind,
-            "user": "someuser",
-            "type": ON_DEMAND_TASK
-        }
+        bovespa_crawler = BovespaCrawler()
+        bovespa_crawler.crawl_params(TestProducer(), **crawler_options)
 
-        Task.create(**task)
+        for param in test_queue:
+            task = {
+                "options": param[1],
+                "params": param[0],
+                "kind": kind,
+                "user": "someuser",
+                "type": ON_DEMAND_TASK
+            }
+
+            Task.create(**task)
 
     def test_pool(self):
         self.create_task("bovespa", ["4170"], "2011-01-01T00:00:00.000000Z",
@@ -83,5 +103,5 @@ class TasksPoolTest(CaravaggioBaseTest):
         threads_count = len(set([x.thread_id for x in files]))
         assert threads_count == WORKERS_NUM
 
-        tasks = Task.objects.filter(status=STATUS_IN_PROGRESS).all()
-        self.assertEqual(len(tasks), 1)
+        tasks = Task.objects.filter(status=STATUS_FINISHED).all()
+        self.assertEqual(len(tasks), files_count)
