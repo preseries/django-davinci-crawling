@@ -19,9 +19,7 @@ try:
 except ImportError:
     from cassandra.cqlengine import columns, ValidationError
 
-from davinci_crawling.task import CRAWLER_NAME
-
-_logger = logging.getLogger("davinci_crawler_{}.models".format(CRAWLER_NAME))
+_logger = logging.getLogger("davinci_crawler.task.models")
 
 STATUS_CREATED = 0
 STATUS_QUEUED = 1

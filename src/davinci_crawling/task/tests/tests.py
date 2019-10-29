@@ -204,17 +204,11 @@ class GetAllTest(CaravaggioBaseTest):
             self.assertEqual(response.status_code,
                              status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def step8_delete_on_by_one(self):
+    def step8_delete_not_allowed(self):
         for resource in self.post_resources:
-            resource_id = resource["task_id"]
-            _logger.info("Delete Resource: {}".format(resource_id))
+            _logger.info("Delete Resource: {}".format(resource["task_id"]))
             path = "{0}{1}/".format(reverse("task-list"),
-                                    resource_id)
+                                    resource["task_id"])
             response = self.api_client.delete(path)
             self.assertEqual(response.status_code,
-                             status.HTTP_204_NO_CONTENT)
-
-            path = "{0}{1}/".format(reverse("task-list"), resource_id)
-            _logger.info("Path: {}".format(path))
-            response = self.api_client.get(path)
-            self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+                             status.HTTP_405_METHOD_NOT_ALLOWED)
