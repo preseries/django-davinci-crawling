@@ -25,16 +25,27 @@ class TaskSerializerV1(
     user = serializers.HiddenField(
         default=dse_fields.CurrentUserNameDefault())
 
-    params = fields.JSONField(required=True)
+    params = dse_fields.CassandraJSONFieldAsText(
+        required=True,
+        help_text='the set of params used to execute the crawler'
+                  ' command, this will be saved as Text.')
 
-    options = fields.JSONField(required=True)
+    options = dse_fields.CassandraJSONFieldAsText(
+        required=True,
+        help_text='the exactly same content as `options` but saved'
+                  ' on a way that we can search using solr '
+                  '(KeyEncodedMap).')
 
-    type = serializers.IntegerField(default=ON_DEMAND_TASK)
-    status = serializers.IntegerField(default=STATUS_CREATED)
-
-    params_map = fields.DictField(child=fields.CharField(), required=False)
-    options_map = fields.DictField(child=fields.CharField(), required=False)
-    kind = fields.CharField(required=True)
+    params_map = fields.DictField(
+        child=fields.CharField(), required=False,
+        help_text='the exactly same content as `params` but saved '
+                  'on a way that we can search using solr '
+                  '(KeyEncodedMap).')
+    options_map = fields.DictField(
+        child=fields.CharField(), required=False,
+        help_text='the exactly same content as `options` but saved'
+                  ' on a way that we can search using solr '
+                  '(KeyEncodedMap).')
 
     class Meta:
         model = Task
@@ -73,37 +84,20 @@ class TaskSerializerV1(
                     - 3 (Finished)
                     - 4 (Faulty)
                     - 5 (Unknown)
-                """
+                """,
+                "default": STATUS_CREATED
             },
             'kind': {
                 'help_text': 'the name of the crawler that will execute the '
                              'task.'
-            },
-            'params': {
-                'help_text': 'the set of params used to execute the crawler '
-                             'command, this will be saved as Text.'
-            },
-            'params_map': {
-                'help_text': 'the exactly same content as `params` but saved '
-                             'on a way that we can search using solr '
-                             '(KeyEncodedMap).'
-            },
-            'options': {
-                'help_text': 'the set of options that is used to guide the '
-                             'crawler during the execution, this will be saved'
-                             ' as text.'
-            },
-            'options_map': {
-                'help_text': 'the exactly same content as `options` but saved'
-                             ' on a way that we can search using solr '
-                             '(KeyEncodedMap).'
             },
             'times_performed': {
                 'help_text': 'keep track on how many times the task was run.'
             },
             'type': {
                 'help_text': 'the type of the task, could be OnDemand(1) or '
-                             'Batch(2)'
+                             'Batch(2)',
+                "default": ON_DEMAND_TASK
             },
         }
 
