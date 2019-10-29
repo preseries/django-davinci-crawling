@@ -11,7 +11,8 @@ from davinci_crawling.utils import setup_cassandra_object_mapper
 
 from multiprocessing import Queue
 
-from davinci_crawling.task.models import STATUS_IN_PROGRESS, STATUS_FAULTY, STATUS_FINISHED
+from davinci_crawling.task.models import STATUS_IN_PROGRESS, STATUS_FAULTY,\
+    STATUS_FINISHED
 
 _logger = logging.getLogger("davinci_crawling.queue")
 

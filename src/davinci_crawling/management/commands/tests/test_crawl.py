@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 import logging
-from datetime import date
 
 from caravaggio_rest_api.tests import CaravaggioBaseTest
-from caravaggio_rest_api.utils import delete_all_records
 from davinci_crawling.example.bovespa.crawlers import BovespaCrawler
 from davinci_crawling.example.bovespa.models import BovespaCompanyFile, \
     FILE_STATUS_PROCESSED
@@ -13,9 +11,9 @@ from davinci_crawling.management.producer import Producer
 from django.conf import settings
 
 
-from davinci_crawling.task.models import ON_DEMAND_TASK, Task, STATUS_FINISHED, \
-    STATUS_CREATED, STATUS_IN_PROGRESS, STATUS_QUEUED, STATUS_FAULTY, \
-    STATUS_UNKNOWN
+from davinci_crawling.task.models import ON_DEMAND_TASK, Task,\
+    STATUS_FINISHED, STATUS_CREATED, STATUS_IN_PROGRESS, STATUS_QUEUED,\
+    STATUS_FAULTY, STATUS_UNKNOWN
 
 # Default crawler params, you may change any default value if you want
 # All the things written with None value should be overwritten inside the test
@@ -129,7 +127,8 @@ class TestCrawl(CaravaggioBaseTest):
         all_status = [STATUS_QUEUED, STATUS_IN_PROGRESS, STATUS_FINISHED,
                       STATUS_FAULTY, STATUS_UNKNOWN]
         for status in all_status:
-            self.create_task("bovespa", ["4170"], "2011-01-01T00:00:00.000000Z",
+            self.create_task("bovespa", ["4170"],
+                             "2011-01-01T00:00:00.000000Z",
                              "2011-12-31T00:00:00.000000Z", ["V"],
                              status=status)
             start_crawl(workers_num=WORKERS_NUM, interval=1, times_to_run=5)

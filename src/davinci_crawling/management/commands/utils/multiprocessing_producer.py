@@ -2,7 +2,8 @@
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 import logging
 
-from davinci_crawling.management.commands.utils.consumer import multiprocess_queue
+from davinci_crawling.management.commands.utils.consumer \
+    import multiprocess_queue
 from davinci_crawling.management.producer import \
     Producer
 
