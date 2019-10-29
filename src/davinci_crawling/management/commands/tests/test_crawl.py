@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 import logging
+from datetime import date
 
 from caravaggio_rest_api.tests import CaravaggioBaseTest
+from caravaggio_rest_api.utils import delete_all_records
 from davinci_crawling.example.bovespa.crawlers import BovespaCrawler
 from davinci_crawling.example.bovespa.models import BovespaCompanyFile, \
     FILE_STATUS_PROCESSED
@@ -12,7 +14,8 @@ from django.conf import settings
 
 
 from davinci_crawling.task.models import ON_DEMAND_TASK, Task, STATUS_FINISHED, \
-    STATUS_CREATED
+    STATUS_CREATED, STATUS_IN_PROGRESS, STATUS_QUEUED, STATUS_FAULTY, \
+    STATUS_UNKNOWN
 
 # Default crawler params, you may change any default value if you want
 # All the things written with None value should be overwritten inside the test
@@ -63,7 +66,7 @@ class TestCrawl(CaravaggioBaseTest):
 
     def create_task(self, kind, include_companies=None,
                     from_date=None, to_date=None, crawling_initials=None,
-                    status=STATUS_CREATED):
+                    status=STATUS_CREATED, should_fail=False):
         crawler_options = CRAWLER_OPTIONS.copy()
         # includes only the Vale company
         crawler_options["include_companies"] = include_companies
@@ -88,6 +91,8 @@ class TestCrawl(CaravaggioBaseTest):
                 "status": status
             }
 
+            if should_fail:
+                task["kind"] = "something_else"
             Task.create(**task)
 
     def test_pool(self):
@@ -114,3 +119,48 @@ class TestCrawl(CaravaggioBaseTest):
 
         tasks = Task.objects.filter(status=STATUS_FINISHED).all()
         self.assertEqual(len(tasks), files_count)
+
+    def test_wrong_tasks(self):
+        """
+        Test the pooling DB method, when the task has a status different than
+        CREATED, the pool should not start to execute tasks with these
+        statuses.
+        """
+        all_status = [STATUS_QUEUED, STATUS_IN_PROGRESS, STATUS_FINISHED,
+                      STATUS_FAULTY, STATUS_UNKNOWN]
+        for status in all_status:
+            self.create_task("bovespa", ["4170"], "2011-01-01T00:00:00.000000Z",
+                             "2011-12-31T00:00:00.000000Z", ["V"],
+                             status=status)
+            start_crawl(workers_num=WORKERS_NUM, interval=1, times_to_run=5)
+
+            files = BovespaCompanyFile.objects.filter(
+                status=FILE_STATUS_PROCESSED).all()
+            # As this will not be processed we will not have any processed file
+            files_count = len(files)
+            self.assertEqual(files_count, 0)
+
+    def test_failing_tasks(self):
+        """
+        Test the pooling DB method, when the task has a status different than
+        CREATED, the pool should not start to execute tasks with these
+        statuses.
+        """
+        self.create_task("bovespa", ["4170"], "2011-01-01T00:00:00.000000Z",
+                         "2011-12-31T00:00:00.000000Z", ["V"],
+                         should_fail=True)
+
+        start_crawl(workers_num=WORKERS_NUM, interval=1, times_to_run=20)
+
+        files = BovespaCompanyFile.objects.filter(
+            status=FILE_STATUS_PROCESSED).all()
+        # With this options we always have 5 files, unless any file got deleted
+        # this assert should be 5
+        files_count = len(files)
+        self.assertEqual(files_count, 0)
+
+        tasks = Task.objects.filter(status=STATUS_FINISHED).all()
+        self.assertEqual(len(tasks), 0)
+
+        tasks = Task.objects.filter(status=STATUS_FAULTY).all()
+        self.assertEqual(len(tasks), 5)

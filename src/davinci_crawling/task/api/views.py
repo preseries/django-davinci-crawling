@@ -23,7 +23,7 @@ class TaskViewSet(CaravaggioCassandraModelViewSet):
     # permission_classes = (IsAuthenticated,)
 
     serializer_class = TaskSerializerV1
-    http_method_names = ['get', 'post', 'delete']
+    http_method_names = ['get', 'post']
 
 
 class TaskSearchViewSet(CaravaggioHaystackFacetSearchViewSet):

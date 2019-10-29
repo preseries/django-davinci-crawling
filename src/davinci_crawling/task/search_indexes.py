@@ -29,7 +29,7 @@ class TaskIndex(BaseSearchIndex, indexes.Indexable):
     is_deleted = indexes.BooleanField(
         model_attr="is_deleted", faceted=True)
 
-    status = indexes.CharField(
+    status = indexes.IntegerField(
         model_attr="status", faceted=True)
 
     kind = indexes.CharField(

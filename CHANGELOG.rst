@@ -10,7 +10,9 @@ New Features
 - Support for parallelism on crawl command using the producer/consumer pattern
     - The `crawl_params` calls a `produce.add_crawl_params` method to add a crawl param.
     - The `crawl` now is called by a consumer that runs in background.
-- Add the Sphinx documentation to the davinci crawling
+- Add the Sphinx documentation to the davinci crawling;
+- Add the task API to the DaVinci Crawling.
+- Add the crawl_params method that will create a batch task on the DaVinci Task.
 
 Improvements or Changes
 ***********************
@@ -30,6 +32,7 @@ Improvements or Changes
     - We need that to better deal with cassandra in different threads, with the process we weren't able to have a process inside a process
 - Add the field `thread_id` to the `BovespaCompanyFile` that stores the thread id that processes the file
 - Add the possibility to change the `LOGGING_FILE` on settings using an enviroment variable with the same name
+- Change the crawl command to pool tasks from the DB;
 
 Bug Fixing
 **********

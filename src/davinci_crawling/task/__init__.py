@@ -9,7 +9,7 @@ r"""
 """
 
 __title__ = 'Django DaVinci BGDS Task'
-__version__ = '0.1.0'
+__version__ = '0.1.0-SNAPSHOT'
 __author__ = 'Joao Medeiros'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2019 BuildGroup Data Services Inc.'
