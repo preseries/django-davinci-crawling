@@ -28,12 +28,15 @@ from rest_framework import routers
 
 api_TASK = routers.DefaultRouter()
 
+import pydevd_pycharm
+pydevd_pycharm.settrace('localhost', port=8787, stdoutToServer=True, stderrToServer=True)
+
 if settings.DSE_SUPPORT:
-    api_TASK.register(r'search',
+    api_TASK.register(r'task/search',
                       TaskSearchViewSet,
                       base_name="task-search")
 
-    api_TASK.register(r'search/facets',
+    api_TASK.register(r'task/search/facets',
                       TaskSearchViewSet,
                       base_name="task-search-facets")
 
