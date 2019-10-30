@@ -53,7 +53,7 @@ class TaskSerializerV1(
                   "created_at", "updated_at",
                   "is_deleted", "status", "kind",
                   "params", "times_performed",
-                  "type", "params_map", "options", "options_map")
+                  "type", "options")
         read_only_fields = ("user", "created_at", "updated_at",
                             "is_deleted", "status",
                             "times_performed", "type", "params_map",
@@ -128,8 +128,8 @@ class TaskSearchSerializerV1(
             "task_id", "user",
             "created_at", "updated_at",
             "is_deleted", "status", "kind",
-            "params", "times_performed",
-            "type"
+            "params_map", "options_map",
+            "times_performed", "type"
         ]
 
 
@@ -148,7 +148,7 @@ class TaskFacetSerializerV1(HaystackFacetSerializer):
         fields = ["task_id", "user",
                   "created_at", "updated_at",
                   "is_deleted", "status", "kind",
-                  "params", "times_performed",
+                  "times_performed",
                   "type"]
 
         field_options = {
