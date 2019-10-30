@@ -2,7 +2,7 @@
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 
 import logging
-import multiprocessing
+import threading
 
 from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.document import load_account_details
@@ -20,17 +20,18 @@ _logger = logging.getLogger(
 
 
 def process_file(
-        options, files_to_process, ccvm_code, file_type, fiscal_date, version):
+        options, files_to_process, ccvm, doc_type, fiscal_date, version):
 
     company_file = BovespaCompanyFile.objects.get(
-        ccvm=ccvm_code,
-        doc_type=file_type,
+        ccvm=ccvm,
+        doc_type=doc_type,
         fiscal_date=fiscal_date,
         version=version)
 
     load_account_details(options, files_to_process, company_file)
 
     # The data has been loaded into the database, we can set the flag
-    # of the company file to PROCESSED
+    # of the company file to PROCESSED, we also store the thread that made the
+    # job, this is used to validate the parallelism on tests.
     company_file.update(status=FILE_STATUS_PROCESSED,
-                        thread_id=multiprocessing.current_process().pid)
+                        thread_id=threading.currentThread().getName())

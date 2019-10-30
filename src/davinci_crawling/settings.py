@@ -82,6 +82,7 @@ class Common(Configuration):
         'caravaggio_rest_api.logging',
         'caravaggio_rest_api.users',
         'davinci_crawling',
+        'davinci_crawling.task'
     ]
 
     MIDDLEWARE = [
@@ -127,6 +128,27 @@ class Common(Configuration):
     # more details on how to customize your logging configuration.
     LOGGING_FILE = os.getenv("LOGGING_FILE", "/data/davinci_crawling/"
                                              "log/davinci_crawling-debug.log")
+    LOGGING_DIR = "/".join(LOGGING_FILE.split("/")[:-1])
+
+    # All the fixed settings that a crawler can have, every crawler should
+    # add their specific params here
+    DAVINCI_CONF = {
+        "default": {
+            "verbosity": 1,
+            "no_color": False,
+            "force_color": False,
+            "local_dir": "fs://%s/log/local" % LOGGING_DIR,
+            "cache_dir": "fs://%s/log/cache" % LOGGING_DIR,
+            "workers_num": 10,
+            'chromium_bin_file':
+                '/Applications/Chromium.app/Contents/MacOS/Chromium',
+            'io_gs_project': 'centering-badge-212119',
+        },
+        "bovespa": {
+            'companies_listing_update_elapsetime': 30,
+            'companies_files_update_elapsetime': 30
+        }
+    }
 
     LOGGING = {
         'version': 1,
@@ -184,6 +206,11 @@ class Common(Configuration):
             },
             'davinci_crawling': {
                 'handlers': ['console', 'debug_log', 'mail_admins'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+            'davinci_crawler_crawler_11': {
+                'handlers': ['console', 'mail_admins'],
                 'level': 'DEBUG',
                 'propagate': True,
             }
@@ -337,7 +364,7 @@ class Common(Configuration):
         # Put strings here, like "/home/html/static" or "C:/www/django/static".
         # Always use forward slashes, even on Windows.
         # Don't forget to use absolute paths, not relative paths.
-        # os.path.join(BASE_DIR + '/davinci_crawling/static'),
+        os.path.join(BASE_DIR + '/davinci_crawling/task/static'),
     )
 
     # List of finder classes that know how to find static files in
@@ -378,6 +405,7 @@ class Common(Configuration):
             # 'rest_framework.authentication.BasicAuthentication',
             'rest_framework.authentication.SessionAuthentication',
             'rest_framework.authentication.TokenAuthentication',
+            'caravaggio_rest_api.drf.authentication.TokenAuthSupportQueryString',
         ),
 
         # Use Django's standard `django.contrib.auth` permissions,
@@ -494,7 +522,6 @@ class Common(Configuration):
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
             },
             "KEY_PREFIX": "davinci_crawling"
-                          ""
         },
         'disk_cache': {
             'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
@@ -514,7 +541,11 @@ class Common(Configuration):
 
     # DRF Caching
     REST_FRAMEWORK_CACHE = {
-        "DEFAULT_CACHE_BACKEND": 'mem_cache',
+        # IMPORTANT: we need to use the default cache (REDIS) when we run
+        # in a distributed environment. That is, many instances of the app
+        # running separated. For instance: two or more balanced instances
+        # of the REST API
+        "DEFAULT_CACHE_BACKEND": 'default',
         "DEFAULT_CACHE_TIMEOUT": 86400,  # Default is 1 day
     }
 
