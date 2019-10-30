@@ -1,98 +1,165 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
-
+"""
+This file has all the methods that are responsible for get the crawl params and
+actually craw the data.
+"""
+import json
 import sys
 import logging
-from multiprocessing.pool import ThreadPool
+import time
+from datetime import datetime
+from threading import Thread
 
-from davinci_crawling.management.commands.consumer import CrawlConsumer
-from davinci_crawling.management.commands.multiprocessing_producer import \
-    MultiprocessingProducer
+from davinci_crawling.management.commands.utils.utils import \
+    update_task_status
+from davinci_crawling.management.commands.utils.multiprocessing_producer \
+    import MultiprocessingProducer
+from django.conf import settings
+from davinci_crawling.task.models import Task, STATUS_CREATED, STATUS_FAULTY,\
+    STATUS_QUEUED
+from davinci_crawling.management.commands.utils.consumer import CrawlConsumer
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError, \
     handle_default_options
-from django.core.management.base import SystemCheckError
+from django.core.management.base import SystemCheckError, CommandParser, \
+    DjangoHelpFormatter
 from django.db import connections
-
-from davinci_crawling.utils import \
-    CrawlersRegistry, setup_cassandra_object_mapper
 
 _logger = logging.getLogger("davinci_crawling.commands")
 
 
-crawler_clazz = None
-crawler = None
-
-
-def crawl_params(_crawler_clazz, **options):
+def _pool_tasks(interval, times_to_run):
     """
-    Calls the crawl_params inside the crawler, this function is only used to
-    facilitate the call by the Poll on the crawl command.
+    A while that runs forever and check for new tasks on the cassandra DB,
+    every new Task on DB has a 'created' state, so this method looks for all
+    the tasks that have this status.
     Args:
-        _crawler_clazz: The crawler class that should be used to generate the
-         params;
-        **options: The options that will be used to generate the params.
+        interval: the interval that we should pool cassandra, on every pool;
+        times_to_run: used on tests to determine that the threads will not run
+        forever. [ONLY FOR TESTING]
     """
-    # We need to setup the Cassandra Object Mapper to work on multiprocessing
-    # If we do not do that, the processes will be blocked when interacting
-    # with the object mapper module
-    setup_cassandra_object_mapper()
+    times_run = 0
+    producer = MultiprocessingProducer()
+    # this while condition will only be checked on testing, otherwise this loop
+    # should run forever.
+    while not times_to_run or times_run < times_to_run:
+        _logger.debug("Calling pool tasks")
+        all_tasks = Task.objects.filter(status=STATUS_CREATED).all()
+        _logger.debug("Found %d tasks to process", len(all_tasks))
+        for task in all_tasks:
+            try:
+                crawler_name = task.kind
+                options = json.loads(task.options)
+                options = options.copy()
+                options["crawler"] = crawler_name
+                options["task_id"] = task.task_id
 
-    _crawler = _crawler_clazz()
+                # get the fixed options on the settings that will be aggregated
+                # with the options sent on the table.
+                options.update(settings.DAVINCI_CONF.get("default", {}))
+                options.update(settings.DAVINCI_CONF.get(crawler_name, {}))
 
-    _crawler.crawl_params(MultiprocessingProducer(), **options)
+                # fixed options, place here all the fixed options
+                options["current_execution_date"] = datetime.utcnow()
+
+                params = json.loads(task.params)
+
+                producer.add_crawl_params(params, options)
+                update_task_status(task, STATUS_QUEUED)
+            except Exception as e:
+                # TODO add the error message to the DB
+                update_task_status(task, STATUS_FAULTY)
+                _logger.error("Error while adding params to queue", e)
+        time.sleep(interval)
+        if times_to_run:
+            times_run += 1
 
 
-def crawl_command(_crawler_clazz, **options):
+def start_crawl(workers_num, interval, times_to_run=None):
     """
-    Call the crawler to both crawl_params and crawl the data.
+    Run the necessary methods to start crawling data. This method will start a
+    tasks pool that will constantly get lines from DB and if anything is new
+    will send to a queue that will be read by a consumer.
     Args:
-        _crawler_clazz: The crawler class, as we can't pickle the crawler obj
-        we use the class to them create the object when necessary.
-        _crawler: the crawler implementation that will be used to process
-    the data.
-        options: the options that the command received.
+        workers_num: The quantity of workers to start.
+        interval: Interval to wait between pool the tasks.
+        times_to_run: used on tests to determine that the threads will not run
+        forever.
     """
-    workers_num = options.get("workers_num", 1)
-    _crawler = _crawler_clazz()
-    crawl_consumer = CrawlConsumer(_crawler, workers_num)
+    crawl_consumer = CrawlConsumer(workers_num, times_to_run)
     _logger.info("Starting a consumer of %d processes" % workers_num)
     crawl_consumer.start()
-    crawl_params_producer = ThreadPool(processes=1)
+    task_thread = Thread(target=_pool_tasks, args=(interval, times_to_run))
 
     try:
-        _logger.info("Starting crawling params")
-
-        crawl_params_producer.apply(crawl_params, (_crawler_clazz,), options)
+        task_thread.start()
     except TimeoutError:
         _logger.error("Timeout error")
     finally:
-        crawl_consumer.close()
-        crawl_params_producer.close()
-        crawl_params_producer.join()
-        crawl_params_producer.terminate()
+        task_thread.join()
+        crawl_consumer.join()
 
 
 class Command(BaseCommand):
-    help = 'Crawl data from source'
+    help = 'Start all the necessary methods to start crawling the database'
+
+    def __init__(self):
+        super().__init__()
+        self._parser = CommandParser(
+            description="Task Pool settings",
+            formatter_class=DjangoHelpFormatter,
+            missing_args_message=getattr(self, 'missing_args_message', None),
+            called_from_command_line=getattr(
+                self, '_called_from_command_line', None),
+        )
+
+        self._parser.add_argument(
+            '--workers-num',
+            required=False,
+            action='store',
+            dest='workers_num',
+            default=10,
+            type=int,
+            help="The number of workers (threads) to launch in parallel")
+        self._parser.add_argument(
+            '--interval',
+            required=False,
+            action='store',
+            dest='interval',
+            default=5,
+            type=int,
+            help="Interval to wait between pool the tasks")
+        self._parser.add_argument(
+            '--settings',
+            help=(
+                'The Python path to a settings module, e.g. '
+                '"myproject.settings.main". If this isn\'t provided, the '
+                'DJANGO_SETTINGS_MODULE environment variable will be used.'
+            ),
+        )
+        self._parser.add_argument(
+            '--pythonpath',
+            help='A directory to add to the Python path, e.g. '
+                 '"/home/djangoprojects/myproject".',
+        )
+        self._parser.add_argument(
+            '--no-color',
+            action='store_true', dest='no_color',
+            help="Don't colorize the command output.",
+        )
+        self._parser.add_argument(
+            '--force-color', action='store_true',
+            help='Force colorization of the command output.',
+        )
 
     def run_from_argv(self, argv):
-        global crawler_clazz, crawler
+        _logger.info("Starting to crawl")
 
-        crawler_name = argv[2]
-        _logger.info("Calling crawler: {}".format(crawler_name))
-
-        crawler_clazz = CrawlersRegistry().get_crawler(crawler_name)
-
-        crawler = crawler_clazz()
-
-        parser = crawler.get_parser()
-        options, known_args = \
-            parser.parse_known_args(argv[2:])
+        parser = self._parser
+        options, known_args = parser.parse_known_args(argv[2:])
 
         cmd_options = vars(options)
-        cmd_options["crawler"] = crawler.__crawler_name__
-        # Move positional args out of options to mimic legacy optparse
         args = cmd_options.pop('args', ())
         handle_default_options(options)
         try:
@@ -116,6 +183,7 @@ class Command(BaseCommand):
                 pass
 
     def handle(self, *args, **options):
-        global crawler_clazz
+        workers_num = options.get("workers_num")
+        interval = options.get("interval")
 
-        crawl_command(crawler_clazz, **options)
+        start_crawl(workers_num, interval)

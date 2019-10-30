@@ -82,6 +82,7 @@ class Common(Configuration):
         'caravaggio_rest_api.logging',
         'caravaggio_rest_api.users',
         'davinci_crawling',
+        'davinci_crawling.task'
     ]
 
     MIDDLEWARE = [
@@ -127,6 +128,27 @@ class Common(Configuration):
     # more details on how to customize your logging configuration.
     LOGGING_FILE = os.getenv("LOGGING_FILE", "/data/davinci_crawling/"
                                              "log/davinci_crawling-debug.log")
+    LOGGING_DIR = "/".join(LOGGING_FILE.split("/")[:-1])
+
+    # All the fixed settings that a crawler can have, every crawler should
+    # add their specific params here
+    DAVINCI_CONF = {
+        "default": {
+            "verbosity": 1,
+            "no_color": False,
+            "force_color": False,
+            "local_dir": "fs://%s/log/local" % LOGGING_DIR,
+            "cache_dir": "fs://%s/log/cache" % LOGGING_DIR,
+            "workers_num": 10,
+            'chromium_bin_file':
+                '/Applications/Chromium.app/Contents/MacOS/Chromium',
+            'io_gs_project': 'centering-badge-212119',
+        },
+        "bovespa": {
+            'companies_listing_update_elapsetime': 30,
+            'companies_files_update_elapsetime': 30
+        }
+    }
 
     LOGGING = {
         'version': 1,
@@ -184,6 +206,11 @@ class Common(Configuration):
             },
             'davinci_crawling': {
                 'handlers': ['console', 'debug_log', 'mail_admins'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+            'davinci_crawler_crawler_11': {
+                'handlers': ['console', 'mail_admins'],
                 'level': 'DEBUG',
                 'propagate': True,
             }
@@ -337,7 +364,7 @@ class Common(Configuration):
         # Put strings here, like "/home/html/static" or "C:/www/django/static".
         # Always use forward slashes, even on Windows.
         # Don't forget to use absolute paths, not relative paths.
-        # os.path.join(BASE_DIR + '/davinci_crawling/static'),
+        os.path.join(BASE_DIR + '/davinci_crawling/task/static'),
     )
 
     # List of finder classes that know how to find static files in

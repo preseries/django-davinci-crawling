@@ -261,5 +261,5 @@ class Crawler(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def crawl(self, crawling_params, options):
+    def crawl(self, task_id, crawling_params, options):
         raise NotImplementedError()

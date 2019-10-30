@@ -92,9 +92,9 @@ def extract_files_to_process(options, company_file):
 
 
 @Throttle(minutes=1, rate=50, max_tokens=50)
-def download_file(options, ccvm_code, doc_type, fiscal_date, version):
+def download_file(options, ccvm, doc_type, fiscal_date, version):
     company_file = BovespaCompanyFile.objects.get(
-        ccvm=ccvm_code,
+        ccvm=ccvm,
         doc_type=doc_type,
         fiscal_date=fiscal_date,
         version=version)

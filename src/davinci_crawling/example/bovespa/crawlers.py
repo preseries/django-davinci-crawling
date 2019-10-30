@@ -127,8 +127,13 @@ def get_not_processed_files(options, producer):
             format(paginator.get_loaded_docs(), paginator.get_hits()))
         paginator.next()
         for d in paginator.get_results():
-            producer.add_crawl_params((d.ccvm, d.doc_type, d.fiscal_date,
-                                       d.version), options)
+            params = {
+                "ccvm": d.ccvm,
+                "doc_type": d.doc_type,
+                "fiscal_date": d.fiscal_date,
+                "version": d.version
+            }
+            producer.add_crawl_params(params, options)
 
     # return [file for file in
     #        CaravaggioSearchQuerySet().models(BovespaCompanyFile).
@@ -304,7 +309,7 @@ class BovespaCrawler(Crawler):
                             BOVESPA_FILE_CTL,
                             checkpoint_data)
 
-    def crawl(self, crawling_params, options):
+    def crawl(self, task_id, crawling_params, options):
         _logger.info(
             "Processing company file [{}]".
             format(crawling_params))
@@ -314,11 +319,11 @@ class BovespaCrawler(Crawler):
         # It extract the files into a working folder and return the list of
         # files that can be processed
         local_file, working_local_file, files_to_process = \
-            download_file(options, *crawling_params)
+            download_file(options, **crawling_params)
 
         # Open the files and process the content to generate the
         # BovespaCompanyNumbers with all the financial data of the company
-        process_file(options, files_to_process, *crawling_params)
+        process_file(options, files_to_process, **crawling_params)
 
         # Remove cached files
         delete_all(options, local_file)
