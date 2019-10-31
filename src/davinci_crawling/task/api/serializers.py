@@ -36,17 +36,6 @@ class TaskSerializerV1(
                   ' on a way that we can search using solr '
                   '(KeyEncodedMap).')
 
-    params_map = fields.DictField(
-        child=fields.CharField(), required=False,
-        help_text='the exactly same content as `params` but saved '
-                  'on a way that we can search using solr '
-                  '(KeyEncodedMap).')
-    options_map = fields.DictField(
-        child=fields.CharField(), required=False,
-        help_text='the exactly same content as `options` but saved'
-                  ' on a way that we can search using solr '
-                  '(KeyEncodedMap).')
-
     class Meta:
         model = Task
         fields = ("task_id", "user",
