@@ -6,8 +6,8 @@ from django.apps import AppConfig
 
 
 class DaVinciCrawlerConfig(AppConfig):
-    name = 'davinci_crawling.task'
-    verbose_name = "Django DaVinci Crawler task"
+    name = 'davinci_crawling.example.bovespa'
+    verbose_name = "Django DaVinci Crawler Bovespa"
 
     def ready(self):
-        from davinci_crawling.task.api import serializers
+        from davinci_crawling.example.bovespa.api import serializers

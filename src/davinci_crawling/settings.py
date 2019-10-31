@@ -405,6 +405,7 @@ class Common(Configuration):
             # 'rest_framework.authentication.BasicAuthentication',
             'rest_framework.authentication.SessionAuthentication',
             'rest_framework.authentication.TokenAuthentication',
+            'caravaggio_rest_api.drf.authentication.TokenAuthSupportQueryString',
         ),
 
         # Use Django's standard `django.contrib.auth` permissions,
@@ -521,7 +522,6 @@ class Common(Configuration):
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
             },
             "KEY_PREFIX": "davinci_crawling"
-                          ""
         },
         'disk_cache': {
             'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
@@ -541,7 +541,11 @@ class Common(Configuration):
 
     # DRF Caching
     REST_FRAMEWORK_CACHE = {
-        "DEFAULT_CACHE_BACKEND": 'mem_cache',
+        # IMPORTANT: we need to use the default cache (REDIS) when we run
+        # in a distributed environment. That is, many instances of the app
+        # running separated. For instance: two or more balanced instances
+        # of the REST API
+        "DEFAULT_CACHE_BACKEND": 'default',
         "DEFAULT_CACHE_TIMEOUT": 86400,  # Default is 1 day
     }
 
