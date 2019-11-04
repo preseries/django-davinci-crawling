@@ -405,7 +405,8 @@ class Common(Configuration):
             # 'rest_framework.authentication.BasicAuthentication',
             'rest_framework.authentication.SessionAuthentication',
             'rest_framework.authentication.TokenAuthentication',
-            'caravaggio_rest_api.drf.authentication.TokenAuthSupportQueryString',
+            'caravaggio_rest_api.drf.authentication.'
+            'TokenAuthSupportQueryString',
         ),
 
         # Use Django's standard `django.contrib.auth` permissions,
