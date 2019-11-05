@@ -22,6 +22,8 @@ def update_task_status(task, status):
 
     task.update(**{"status": status})
 
+    return task
+
 
 def get_crawler_by_name(crawler_name):
     """

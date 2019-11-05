@@ -77,7 +77,8 @@ class Task(CustomDjangoCassandraModel):
     user = columns.Text()
 
     # When was created the entity and the last modification date
-    created_at = columns.DateTime(default=timezone.now)
+    created_at = columns.DateTime(default=timezone.now, primary_key=True,
+                                  clustering_order="DESC")
     updated_at = columns.DateTime(default=timezone.now)
 
     # Controls if the entity is active or has been deleted
