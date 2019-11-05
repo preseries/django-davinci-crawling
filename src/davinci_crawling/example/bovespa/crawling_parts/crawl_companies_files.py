@@ -22,7 +22,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.models import \
     BovespaCompany, BovespaCompanyFile, DOC_TYPES
-from davinci_crawling.crawling_throttle import Throttle
+from davinci_crawling.throttle.memory_throttle import MemoryThrottle
 from davinci_crawling.utils import setup_cassandra_object_mapper, \
     CrawlersRegistry
 
@@ -219,7 +219,7 @@ def extract_ENET_files_from_page(
     return files
 
 
-@Throttle(minutes=1, rate=50, max_tokens=50)
+@MemoryThrottle(crawler_name=BOVESPA_CRAWLER, minutes=1, rate=50, max_tokens=50)
 def obtain_company_files(
         ccvm, options, doc_type, from_date=None, to_date=None):
     """

@@ -19,7 +19,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.models import \
     BovespaCompany, SITUATION_CANCELLED, SITUATION_GRANTED
-from davinci_crawling.crawling_throttle import Throttle
+from davinci_crawling.throttle.memory_throttle import MemoryThrottle
 from davinci_crawling.utils import setup_cassandra_object_mapper, \
     CrawlersRegistry
 
@@ -39,7 +39,7 @@ _logger = logging.getLogger(
     format(BOVESPA_CRAWLER))
 
 
-@Throttle(minutes=1, rate=50, max_tokens=50)
+@MemoryThrottle(crawler_name=BOVESPA_CRAWLER, minutes=1, rate=50, max_tokens=50)
 def update_listed_companies(letter, options):
     """
     :param letter:
@@ -157,6 +157,10 @@ def crawl_listed_companies(options, workers_num=10):
         func_params = []
         companies_initials = options.get("crawling_initials",
                                          COMPANIES_LISTING_SEARCHER_LETTERS)
+
+        if not companies_initials:
+            companies_initials = COMPANIES_LISTING_SEARCHER_LETTERS
+
         for letter in companies_initials:
             func_params.append([letter, options])
 

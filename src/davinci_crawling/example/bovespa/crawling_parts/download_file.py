@@ -8,7 +8,7 @@ import ntpath
 from davinci_crawling.io import copy_file, get_extension, exists, delete_all, \
     extract_zip, listdir, mkdirs
 from davinci_crawling.net import fetch_file, fetch_tenaciously
-from davinci_crawling.crawling_throttle import Throttle
+from davinci_crawling.throttle.memory_throttle import MemoryThrottle
 
 from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.models import BovespaCompanyFile
@@ -91,7 +91,7 @@ def extract_files_to_process(options, company_file):
     return local_file, working_local_base_path, available_files
 
 
-@Throttle(minutes=1, rate=50, max_tokens=50)
+@MemoryThrottle(crawler_name=BOVESPA_CRAWLER, minutes=1, rate=50, max_tokens=50)
 def download_file(options, ccvm, doc_type, fiscal_date, version):
     company_file = BovespaCompanyFile.objects.get(
         ccvm=ccvm,
