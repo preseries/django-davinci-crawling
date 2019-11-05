@@ -39,7 +39,8 @@ _logger = logging.getLogger(
     format(BOVESPA_CRAWLER))
 
 
-@MemoryThrottle(crawler_name=BOVESPA_CRAWLER, minutes=1, rate=50, max_tokens=50)
+@MemoryThrottle(crawler_name=BOVESPA_CRAWLER, minutes=1, rate=50,
+                max_tokens=50)
 def update_listed_companies(letter, options):
     """
     :param letter:

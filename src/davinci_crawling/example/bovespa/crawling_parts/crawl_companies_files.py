@@ -219,7 +219,8 @@ def extract_ENET_files_from_page(
     return files
 
 
-@MemoryThrottle(crawler_name=BOVESPA_CRAWLER, minutes=1, rate=50, max_tokens=50)
+@MemoryThrottle(crawler_name=BOVESPA_CRAWLER, minutes=1, rate=50,
+                max_tokens=50)
 def obtain_company_files(
         ccvm, options, doc_type, from_date=None, to_date=None):
     """

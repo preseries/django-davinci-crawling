@@ -91,7 +91,8 @@ def extract_files_to_process(options, company_file):
     return local_file, working_local_base_path, available_files
 
 
-@MemoryThrottle(crawler_name=BOVESPA_CRAWLER, minutes=1, rate=50, max_tokens=50)
+@MemoryThrottle(crawler_name=BOVESPA_CRAWLER, minutes=1, rate=50,
+                max_tokens=50)
 def download_file(options, ccvm, doc_type, fiscal_date, version):
     company_file = BovespaCompanyFile.objects.get(
         ccvm=ccvm,
