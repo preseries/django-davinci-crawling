@@ -189,10 +189,12 @@ def fetch_file(url, options):
 
             params = cgi.parse_header(
                 response.headers.get('Content-Disposition', ''))[-1]
-            if 'filename' not in params:
-                raise ValueError('Could not find a filename')
+            if 'filename' in params:
+                filename = params['filename']
+            else:
+                filename = url.rpartition('/')[2]
 
-            filename = os.path.basename(params['filename'])
+            filename = os.path.basename(filename)
             abs_path = os.path.join(temp_path, filename)
 
             status = response.status_code
