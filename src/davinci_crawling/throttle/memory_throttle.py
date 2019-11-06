@@ -9,7 +9,7 @@ from functools import wraps
 from multiprocessing import Manager
 
 from davinci_crawling.throttle.throttle_implementation import \
-    ThrottleImplementation
+    Throttle
 
 manager = Manager()
 lock = manager.Lock()
@@ -18,7 +18,7 @@ _throttle_info = manager.dict()
 _logger = logging.getLogger("davinci_crawling")
 
 
-class MemoryThrottle(ThrottleImplementation):
+class MemoryThrottle(Throttle):
     """
     Decorator that prevents a function from being called more than once every
     time period.

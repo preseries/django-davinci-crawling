@@ -4,27 +4,22 @@
 import logging
 import re
 import traceback
-
 from multiprocessing.pool import ThreadPool as Pool
-
 from urllib.parse import urlencode
 
 import pytz
-from dateutil.parser import parse as date_parse
-
 from bs4 import BeautifulSoup
-
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-
+from dateutil.parser import parse as date_parse
 from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.models import \
     BovespaCompany, BovespaCompanyFile, DOC_TYPES
-from davinci_crawling.throttle.memory_throttle import MemoryThrottle
+from davinci_crawling.throttle.throttle_implementation import Throttle
 from davinci_crawling.utils import setup_cassandra_object_mapper, \
     CrawlersRegistry
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 try:
     from dse.cqlengine.query import LWTException
@@ -219,8 +214,7 @@ def extract_ENET_files_from_page(
     return files
 
 
-@MemoryThrottle(crawler_name=BOVESPA_CRAWLER, minutes=1, rate=50,
-                max_tokens=50)
+@Throttle(crawler_name=BOVESPA_CRAWLER, minutes=1, rate=50, max_tokens=50)
 def obtain_company_files(
         ccvm, options, doc_type, from_date=None, to_date=None):
     """

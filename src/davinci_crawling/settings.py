@@ -245,6 +245,9 @@ class Common(Configuration):
                                       "SimpleStrategy")
     CASSANDRA_DB_REPLICATION = os.getenv("CASSANDRA_DB_REPLICATION", 1)
 
+    THROTTLE_IMPLEMENTATION = "davinci_crawling.throttle.memory_throttle." \
+                              "MemoryThrottle"
+
     try:
         from dse.cqlengine import models
     except ImportError:

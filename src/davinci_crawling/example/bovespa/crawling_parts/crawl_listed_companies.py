@@ -1,27 +1,23 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 
+import itertools
 import logging
 import re
-import itertools
 import traceback
-
-from dateutil.parser import parse as date_parse
-
-from bs4 import BeautifulSoup
-
 from multiprocessing.pool import ThreadPool as Pool
 
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-
+from bs4 import BeautifulSoup
+from dateutil.parser import parse as date_parse
 from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.models import \
     BovespaCompany, SITUATION_CANCELLED, SITUATION_GRANTED
-from davinci_crawling.throttle.memory_throttle import MemoryThrottle
+from davinci_crawling.throttle.throttle_implementation import Throttle
 from davinci_crawling.utils import setup_cassandra_object_mapper, \
     CrawlersRegistry
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 ALPHABET_LIST = list(map(chr, range(65, 91)))
 NUMBERS_LIST = list(range(0, 10))
@@ -39,8 +35,7 @@ _logger = logging.getLogger(
     format(BOVESPA_CRAWLER))
 
 
-@MemoryThrottle(crawler_name=BOVESPA_CRAWLER, minutes=1, rate=50,
-                max_tokens=50)
+@Throttle(crawler_name=BOVESPA_CRAWLER, minutes=1, rate=50, max_tokens=50)
 def update_listed_companies(letter, options):
     """
     :param letter:
