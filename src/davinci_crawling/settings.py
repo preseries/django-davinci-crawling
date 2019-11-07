@@ -147,6 +147,10 @@ class Common(Configuration):
         "bovespa": {
             'companies_listing_update_elapsetime': 30,
             'companies_files_update_elapsetime': 30
+        },
+        "throttle": {
+            "implementation": "davinci_crawling.throttle.memory_throttle."
+                              "MemoryThrottle"
         }
     }
 
@@ -244,9 +248,6 @@ class Common(Configuration):
     CASSANDRA_DB_STRATEGY = os.getenv("CASSANDRA_DB_STRATEGY",
                                       "SimpleStrategy")
     CASSANDRA_DB_REPLICATION = os.getenv("CASSANDRA_DB_REPLICATION", 1)
-
-    THROTTLE_IMPLEMENTATION = "davinci_crawling.throttle.memory_throttle." \
-                              "MemoryThrottle"
 
     try:
         from dse.cqlengine import models

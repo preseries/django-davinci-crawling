@@ -13,7 +13,7 @@ from dateutil.parser import parse as date_parse
 from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.models import \
     BovespaCompany, BovespaCompanyFile, DOC_TYPES
-from davinci_crawling.throttle.throttle_implementation import Throttle
+from davinci_crawling.throttle.throttle import Throttle
 from davinci_crawling.utils import setup_cassandra_object_mapper, \
     CrawlersRegistry
 from selenium.common.exceptions import NoSuchElementException, TimeoutException

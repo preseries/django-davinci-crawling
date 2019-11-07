@@ -8,8 +8,8 @@ from datetime import timedelta
 from functools import wraps
 from multiprocessing import Manager
 
-from davinci_crawling.throttle.throttle_implementation import \
-    Throttle
+from davinci_crawling.throttle.throttle import \
+    ThrottleManager
 
 manager = Manager()
 lock = manager.Lock()
@@ -18,7 +18,7 @@ _throttle_info = manager.dict()
 _logger = logging.getLogger("davinci_crawling")
 
 
-class MemoryThrottle(Throttle):
+class MemoryThrottle(ThrottleManager):
     """
     Decorator that prevents a function from being called more than once every
     time period.
@@ -29,20 +29,11 @@ class MemoryThrottle(Throttle):
             pass
     """
 
-    def check_info(self, key):
-        _logger.debug("Checking tokens info for {0}".format(key))
-        info = _throttle_info.get(key, None)
-        if not info:
-            _logger.debug("Initialize tokens for {0}".format(key))
-            info = {"tokens": self.max_tokens,
-                    "updated_at": time.monotonic()}
-            _throttle_info[key] = info
-
     def wait_for_token(self, key):
         lock.acquire()
-        self.check_info(key)
+        self._check_info(key)
         while _throttle_info[key]["tokens"] <= 1:
-            self.add_new_tokens(key)
+            self._add_new_tokens(key)
             lock.release()
             _logger.debug("Function {} being throttle".format(key))
             time.sleep(5)
@@ -56,7 +47,16 @@ class MemoryThrottle(Throttle):
             key, _throttle_info[key]))
         lock.release()
 
-    def add_new_tokens(self, key):
+    def _check_info(self, key):
+        _logger.debug("Checking tokens info for {0}".format(key))
+        info = _throttle_info.get(key, None)
+        if not info:
+            _logger.debug("Initialize tokens for {0}".format(key))
+            info = {"tokens": self.max_tokens,
+                    "updated_at": time.monotonic()}
+            _throttle_info[key] = info
+
+    def _add_new_tokens(self, key):
         now = time.monotonic()
         time_since_update = \
             (now - _throttle_info[key]["updated_at"]) / \

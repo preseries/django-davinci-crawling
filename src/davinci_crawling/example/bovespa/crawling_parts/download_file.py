@@ -12,7 +12,7 @@ from davinci_crawling.example.bovespa.models import BovespaCompanyFile
 from davinci_crawling.io import copy_file, get_extension, exists, delete_all, \
     extract_zip, listdir, mkdirs
 from davinci_crawling.net import fetch_file, fetch_tenaciously
-from davinci_crawling.throttle.throttle_implementation import Throttle
+from davinci_crawling.throttle.throttle import Throttle
 
 try:
     from dse.cqlengine.query import LWTException
