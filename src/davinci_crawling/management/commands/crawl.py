@@ -57,8 +57,10 @@ def _pool_tasks(interval, times_to_run):
 
                 # get the fixed options on the settings that will be aggregated
                 # with the options sent on the table.
-                options.update(settings.DAVINCI_CONF.get("default", {}))
-                options.update(settings.DAVINCI_CONF.get(crawler_name, {}))
+                options.update(settings.DAVINCI_CONF["crawler-params"].get(
+                    "default", {}))
+                options.update(settings.DAVINCI_CONF["crawler-params"].get(
+                    crawler_name, {}))
 
                 # fixed options, place here all the fixed options
                 options["current_execution_date"] = datetime.utcnow()

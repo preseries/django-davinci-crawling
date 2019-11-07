@@ -17,7 +17,6 @@ from configurations import Configuration
 
 
 class Common(Configuration):
-
     CARAVAGGIO_API_TITLE = "DaVinci Crawling API"
     CARAVAGGIO_API_VERSION = "v1"
     CARAVAGGIO_API_DESCRIPTION = "API for DaVinci Crawling applications"
@@ -133,24 +132,33 @@ class Common(Configuration):
     # All the fixed settings that a crawler can have, every crawler should
     # add their specific params here
     DAVINCI_CONF = {
-        "default": {
-            "verbosity": 1,
-            "no_color": False,
-            "force_color": False,
-            "local_dir": "fs://%s/log/local" % LOGGING_DIR,
-            "cache_dir": "fs://%s/log/cache" % LOGGING_DIR,
-            "workers_num": 10,
-            'chromium_bin_file':
-                '/Applications/Chromium.app/Contents/MacOS/Chromium',
-            'io_gs_project': 'centering-badge-212119',
+        "crawler-params": {
+            "default": {
+                "verbosity": 1,
+                "no_color": False,
+                "force_color": False,
+                "local_dir": "fs://%s/log/local" % LOGGING_DIR,
+                "cache_dir": "fs://%s/log/cache" % LOGGING_DIR,
+                "workers_num": 10,
+                'chromium_bin_file':
+                    '/Applications/Chromium.app/Contents/MacOS/Chromium',
+                'io_gs_project': 'centering-badge-212119',
+            },
+            "bovespa": {
+                'companies_listing_update_elapsetime': 30,
+                'companies_files_update_elapsetime': 30
+            },
         },
-        "bovespa": {
-            'companies_listing_update_elapsetime': 30,
-            'companies_files_update_elapsetime': 30
-        },
-        "throttle": {
-            "implementation": "davinci_crawling.throttle.memory_throttle."
-                              "MemoryThrottle"
+        "architecture-params": {
+            "throttle": {
+                "implementation": "davinci_crawling.throttle.memory_throttle."
+                                  "MemoryThrottle"
+            },
+            "parallelism": {
+                "multiproc": {
+                    "default_num_workers": 10
+                }
+            }
         }
     }
 

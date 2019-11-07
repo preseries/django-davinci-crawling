@@ -41,10 +41,11 @@ class Throttle(object):
         global THROTTLE_MANAGER
         if not THROTTLE_MANAGER:
             if hasattr(settings, 'DAVINCI_CONF') and \
-                    "throttle" in settings.DAVINCI_CONF and \
-                    "implementation" in settings.DAVINCI_CONF["throttle"]:
-                throttle_implementation = settings.DAVINCI_CONF["throttle"][
-                    "implementation"]
+                    "throttle" in settings.DAVINCI_CONF["architecture-params"]\
+                    and "implementation" in settings.DAVINCI_CONF[
+                    "architecture-params"]["throttle"]:
+                throttle_implementation = settings.DAVINCI_CONF[
+                    "architecture-params"]["throttle"]["implementation"]
             else:
                 throttle_implementation = DEFAULT_THROTTLE_MANAGER
 
