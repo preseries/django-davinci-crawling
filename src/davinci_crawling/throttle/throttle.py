@@ -14,6 +14,7 @@ DEFAULT_THROTTLE_MANAGER = "davinci_crawling.throttle.memory_throttle." \
 
 THROTTLE_MANAGER = None
 
+
 class Throttle(object):
     """
     Decorator that prevents a function from being called more than once every
