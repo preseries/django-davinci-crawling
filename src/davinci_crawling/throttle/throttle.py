@@ -9,10 +9,8 @@ import importlib
 
 from django.conf import settings
 
-DEFAULT_THROTTLE_MANAGER = "davinci_crawling.throttle.memory_throttle." \
-                           "MemoryThrottle"
-
-THROTTLE_MANAGER = None
+DEFAULT_THROTTLE_MANAGER = \
+    "davinci_crawling.throttle.memory_throttle.MemoryThrottle"
 
 
 class Throttle(object):
@@ -25,21 +23,20 @@ class Throttle(object):
         def my_fun():
             pass
     """
-
-    implementation = None
+    manager = None
 
     def __init__(self, crawler_name, seconds=1, minutes=0, hours=0, rate=10,
-                 max_tokens=10):
+                 max_tokens=10, throttle_suffix_field=None):
         self.throttle_period = timedelta(
             seconds=seconds, minutes=minutes, hours=hours
         )
         self.rate = rate
         self.max_tokens = max_tokens
         self.crawler_name = crawler_name
+        self.suffix_field = throttle_suffix_field
 
     def get_throttle_manager(self):
-        global THROTTLE_MANAGER
-        if not THROTTLE_MANAGER:
+        if not self.manager:
             if hasattr(settings, 'DAVINCI_CONF') and \
                     "throttle" in settings.DAVINCI_CONF["architecture-params"]\
                     and "implementation" in settings.DAVINCI_CONF[
@@ -50,32 +47,34 @@ class Throttle(object):
                 throttle_implementation = DEFAULT_THROTTLE_MANAGER
 
             module_name = ".".join(throttle_implementation.split('.')[:-1])
-            class_name = throttle_implementation.split('.')[-1]
+            clazz_name = throttle_implementation.split('.')[-1]
 
             module = importlib.import_module(module_name)
-            THROTTLE_MANAGER = getattr(module, class_name)
+            manager_clazz = getattr(module, clazz_name)
 
-        if not self.implementation:
-            self.implementation = THROTTLE_MANAGER(
+            self.manager = manager_clazz(
                 self.crawler_name, seconds=self.throttle_period.seconds,
                 rate=self.rate, max_tokens=self.max_tokens)
-        return self.implementation
+
+        return self.manager
 
     def __call__(self, fn):
         @wraps(fn)
         def wrapper(*args, **kwargs):
-            throttle_suffix = kwargs.get("throttle_suffix")
+            throttle_suffix = None
+            if self.suffix_field:
+                throttle_suffix = kwargs.get(self.suffix_field)
 
-            implementation = self.get_throttle_manager()
+            manager = self.get_throttle_manager()
 
             if throttle_suffix:
-                throttle_key = "%s_%s_%s" % (implementation.crawler_name,
+                throttle_key = "%s_%s_%s" % (manager.crawler_name,
                                              fn.__name__,
                                              throttle_suffix)
             else:
-                throttle_key = "%s_%s" % (implementation.crawler_name,
+                throttle_key = "%s_%s" % (manager.crawler_name,
                                           fn.__name__)
-            implementation.wait_for_token(throttle_key)
+            manager.wait_for_token(throttle_key)
             return fn(*args, **kwargs)
 
         return wrapper
