@@ -3,6 +3,7 @@
 import logging
 import queue
 import time
+from datetime import datetime
 from threading import Thread
 
 from davinci_crawling.management.commands.utils.utils import \
@@ -100,6 +101,10 @@ class CrawlConsumer(object):
                 task_id = options.get("task_id")
                 update_task_status(task_id, STATUS_IN_PROGRESS)
                 _logger.debug("Reading a queue value %s", crawl_param)
+
+                if "current_execution_date" not in options:
+                    options["current_execution_date"] = datetime.utcnow()
+
                 self._crawl(crawler_name, task_id, crawl_param, options)
                 update_task_status(task_id, STATUS_FINISHED)
             except queue.Empty:

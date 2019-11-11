@@ -52,15 +52,20 @@ class CrawlersRegistry(object):
                 pass
 
     def get_crawler(self, name):
-        if not self.__crawlers:
-            self._discover_crawlers()
+        crawlers = self.get_all_crawlers()
 
-        crawler_clazz = self.__crawlers.get(name, None)
+        crawler_clazz = crawlers.get(name, None)
         if not crawler_clazz:
             raise LookupError(
                 "Unable to find the crawler with name {}".format(name))
 
         return crawler_clazz
+
+    def get_all_crawlers(self):
+        if not self.__crawlers:
+            self._discover_crawlers()
+
+        return self.__crawlers
 
 
 def setup_cassandra_object_mapper(alias="cassandra"):

@@ -13,6 +13,8 @@ New Features
 - Add the Sphinx documentation to the davinci crawling;
 - Add the task API to the DaVinci Crawling.
 - Add the crawl_params method that will create a batch task on the DaVinci Task.
+- Add a delete_json method to the net.py file to support delete requests.
+- Add a method to utils to get all registered crawlers.
 
 Improvements or Changes
 ***********************
@@ -33,6 +35,8 @@ Improvements or Changes
 - Add the field `thread_id` to the `BovespaCompanyFile` that stores the thread id that processes the file
 - Add the possibility to change the `LOGGING_FILE` on settings using an enviroment variable with the same name
 - Change the crawl command to pool tasks from the DB;
+- Improve the Throttle class to be extended;
+- Change the key used on throttle from `<function_name>` to `<crawler_name>_<function_name>_<throttle_suffix>`
 
 Bug Fixing
 **********

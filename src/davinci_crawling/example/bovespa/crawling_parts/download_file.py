@@ -2,18 +2,17 @@
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 
 import logging
-import re
 import ntpath
+import re
 
+from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
+from davinci_crawling.example.bovespa.io import \
+    _doc_base_path, _doc_local_base_path, _doc_local_working_base_path
+from davinci_crawling.example.bovespa.models import BovespaCompanyFile
 from davinci_crawling.io import copy_file, get_extension, exists, delete_all, \
     extract_zip, listdir, mkdirs
 from davinci_crawling.net import fetch_file, fetch_tenaciously
-from davinci_crawling.crawling_throttle import Throttle
-
-from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
-from davinci_crawling.example.bovespa.models import BovespaCompanyFile
-from davinci_crawling.example.bovespa.io import \
-    _doc_base_path, _doc_local_base_path, _doc_local_working_base_path
+from davinci_crawling.throttle.throttle import Throttle
 
 try:
     from dse.cqlengine.query import LWTException
@@ -91,7 +90,7 @@ def extract_files_to_process(options, company_file):
     return local_file, working_local_base_path, available_files
 
 
-@Throttle(minutes=1, rate=50, max_tokens=50)
+@Throttle(crawler_name=BOVESPA_CRAWLER, minutes=1, rate=50, max_tokens=50)
 def download_file(options, ccvm, doc_type, fiscal_date, version):
     company_file = BovespaCompanyFile.objects.get(
         ccvm=ccvm,

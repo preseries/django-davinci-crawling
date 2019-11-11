@@ -60,6 +60,29 @@ class File(object):
         self.response = response
 
 
+def delete_json(url, timeout=None):
+    """
+    Send a delete request to the given url.
+    Args:
+        url: the url where to call the delete request.
+        timeout: the timeout for the request, if it's none we will use the
+        `DEFAULT_TIMEOUT`
+
+    Returns:
+        the result of the request, object of the requests library
+    """
+    try:
+        timeout = timeout if timeout else DEFAULT_TIMEOUT
+
+        return requests.delete(
+            url=url,
+            headers={**APPLICATION_JSON, **USER_AGENT},
+            timeout=(timeout, timeout), verify=False)
+    except RequestException as ex:
+        logger.exception("Unable to send the POST. Cause: %s" % ex)
+        raise ex
+
+
 def post_json(url, json_obj, timeout=None):
     """
     Send and receive json by posting to the given URL.
