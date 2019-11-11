@@ -186,3 +186,14 @@ $ python manage.py crawl <MY_CRAWLER_NAME> \
     --cache-dir "gs://vanggogh2_harvest" \
     --local-dir "fs:///data/harvest/local"
 ```
+
+## For Development
+In order to maintain a clean code, it's strongly recommended to install the
+project pre-commit hook. Just execute the following commands in the root
+directory:
+
+```
+$ chmod +x pre-commit.sh
+
+$ ln -s ../../pre-commit.sh .git/hooks/pre-commit
+```
