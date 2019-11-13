@@ -14,6 +14,14 @@ Subpackages
 Submodules
 ----------
 
+davinci\_crawling.example.bovespa.apps module
+---------------------------------------------
+
+.. automodule:: davinci_crawling.example.bovespa.apps
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 davinci\_crawling.example.bovespa.crawlers module
 -------------------------------------------------
 

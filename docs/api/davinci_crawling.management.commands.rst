@@ -7,17 +7,10 @@ Subpackages
 .. toctree::
 
    davinci_crawling.management.commands.tests
+   davinci_crawling.management.commands.utils
 
 Submodules
 ----------
-
-davinci\_crawling.management.commands.consumer module
------------------------------------------------------
-
-.. automodule:: davinci_crawling.management.commands.consumer
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 davinci\_crawling.management.commands.crawl module
 --------------------------------------------------
@@ -27,10 +20,10 @@ davinci\_crawling.management.commands.crawl module
    :undoc-members:
    :show-inheritance:
 
-davinci\_crawling.management.commands.multiprocessing\_producer module
-----------------------------------------------------------------------
+davinci\_crawling.management.commands.crawl\_params module
+----------------------------------------------------------
 
-.. automodule:: davinci_crawling.management.commands.multiprocessing_producer
+.. automodule:: davinci_crawling.management.commands.crawl_params
    :members:
    :undoc-members:
    :show-inheritance:

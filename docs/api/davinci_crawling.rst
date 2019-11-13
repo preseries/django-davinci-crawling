@@ -10,6 +10,8 @@ Subpackages
    davinci_crawling.gcp
    davinci_crawling.management
    davinci_crawling.scheduler
+   davinci_crawling.task
+   davinci_crawling.throttle
 
 Submodules
 ----------
@@ -26,14 +28,6 @@ davinci\_crawling.crawler module
 --------------------------------
 
 .. automodule:: davinci_crawling.crawler
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-davinci\_crawling.crawling\_throttle module
--------------------------------------------
-
-.. automodule:: davinci_crawling.crawling_throttle
    :members:
    :undoc-members:
    :show-inheritance:
