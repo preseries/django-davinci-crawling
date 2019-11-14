@@ -18,8 +18,7 @@ from davinci_crawling.task.models import ON_DEMAND_TASK, Task,\
 # Default crawler params, you may change any default value if you want
 # All the things written with None value should be overwritten inside the test
 CRAWLER_OPTIONS = {
-    "chromium_bin_file":
-        "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    "chromium_bin_file": settings.CHROMIUM_BIN_FILE,
     "include_companies": None,
     "local_dir": "fs://%s/log/local" %
                  settings.TESTS_TMP_DIR,

@@ -129,6 +129,10 @@ class Common(Configuration):
                                              "log/davinci_crawling-debug.log")
     LOGGING_DIR = "/".join(LOGGING_FILE.split("/")[:-1])
 
+    CHROMIUM_BIN_FILE = os.getenv("CHROMIUM_BIN_FILE",
+                                  "/Applications/Chromium.app/Contents"
+                                  "/MacOS/Chromium")
+
     # All the fixed settings that a crawler can have, every crawler should
     # add their specific params here
     DAVINCI_CONF = {
@@ -140,8 +144,7 @@ class Common(Configuration):
                 "local_dir": "fs://%s/log/local" % LOGGING_DIR,
                 "cache_dir": "fs://%s/log/cache" % LOGGING_DIR,
                 "workers_num": 10,
-                'chromium_bin_file':
-                    '/Applications/Chromium.app/Contents/MacOS/Chromium',
+                'chromium_bin_file': CHROMIUM_BIN_FILE,
                 'io_gs_project': 'centering-badge-212119',
             },
             "bovespa": {

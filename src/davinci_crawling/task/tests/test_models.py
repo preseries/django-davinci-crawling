@@ -10,6 +10,7 @@ from caravaggio_rest_api.utils import delete_all_records
 from davinci_crawling.task.models import Task, STATUS_CREATED, ON_DEMAND_TASK
 
 from caravaggio_rest_api.tests import CaravaggioBaseTest
+from django.conf import settings
 
 CONTENTTYPE_JON = "application/json"
 
@@ -36,8 +37,7 @@ class ModelsTest(CaravaggioBaseTest):
 
         options = {
             "workers_num": "4",
-            "chromium_bin_file":
-                "/Applications/Chromium.app/Contents/MacOS/Chromium",
+            "chromium_bin_file": settings.CHROMIUM_BIN_FILE,
             "cached_dir": "gs://my_crawler_cache",
             "local_dir": "fs:///data/crawler_one/local",
             "included_companies": '["4170", "14249"]',
