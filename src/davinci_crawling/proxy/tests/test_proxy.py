@@ -12,6 +12,7 @@ from davinci_crawling.example.bovespa.models import BovespaCompanyFile, \
     FILE_STATUS_PROCESSED
 from davinci_crawling.management.commands.crawl import start_crawl
 from davinci_crawling.management.producer import Producer
+from davinci_crawling.net import fetch_file
 from davinci_crawling.proxy.proxy_mesh import ProxyMesh
 from django.conf import settings
 
@@ -73,7 +74,7 @@ class TestProxy(CaravaggioBaseTest):
         ratio = float(len(set(generated_ips))) / len(generated_ips)
         _logger.info("Ratio of new ips: %s", ratio)
 
-        self.assertTrue(ratio > 0.5)
+        self.assertTrue(ratio > 0.1)
 
     def test_changing_ips_many_proxies(self):
         """
@@ -94,4 +95,20 @@ class TestProxy(CaravaggioBaseTest):
         ratio = float(len(set(generated_ips))) / len(generated_ips)
         _logger.info("Ratio of new ips: %s", ratio)
 
-        self.assertTrue(ratio > 0.5)
+        self.assertTrue(ratio > 0.1)
+
+    def test_download(self):
+        """
+        Test download file using proxy.
+        """
+        generated_ips = []
+        for _ in range(10):
+            file = fetch_file("https://api.ipify.org/?file", {})
+            f = open(file.file, "r")
+            generated_ips.append(f.readline())
+
+        # get the ratio of different ips
+        ratio = float(len(set(generated_ips))) / len(generated_ips)
+        _logger.info("Ratio of new ips: %s", ratio)
+
+        self.assertTrue(ratio > 0.1)

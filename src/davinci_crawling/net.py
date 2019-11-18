@@ -9,6 +9,8 @@ import os
 import tempfile
 
 from time import sleep
+
+from davinci_crawling.proxy.proxy import ProxyManager
 from requests.exceptions import RequestException
 from bs4 import BeautifulSoup
 
@@ -234,8 +236,15 @@ def fetch_file(url, options):
         logger.info(
             "Download from [%s] and store into [%s]" % (url, temp_path))
         try:
+            proxy_address = ProxyManager().get_proxy_address()
+
+            if not proxy_address:
+                proxy_address = {}
+            else:
+                proxy_address = proxy_address["proxy"]
             response = requests.get(
-                url, stream=True, timeout=(1800, 1800), verify=False)
+                url, stream=True, timeout=(1800, 1800), verify=False,
+                proxies=proxy_address)
 
             params = cgi.parse_header(
                 response.headers.get('Content-Disposition', ''))[-1]
