@@ -133,6 +133,9 @@ class Common(Configuration):
                                   "/Applications/Chromium.app/Contents"
                                   "/MacOS/Chromium")
 
+    PROXY_MESH_USER = os.getenv("PROXY_MESH_USER")
+    PROXY_MESH_PASSWORD = os.getenv("PROXY_MESH_PASSWORD")
+
     # All the fixed settings that a crawler can have, every crawler should
     # add their specific params here
     DAVINCI_CONF = {
@@ -156,6 +159,16 @@ class Common(Configuration):
             "throttle": {
                 "implementation": "davinci_crawling.throttle.memory_throttle."
                                   "MemoryThrottle"
+            },
+            "proxy": {
+                "implementation":
+                    "davinci_crawling.proxy.proxy_mesh.ProxyMesh",
+                "proxy_mesh": {
+                    "authentication":
+                        "Basic aWFucmlja2V5OlZhcmlhYmxlZGF0YTEwMSE=",
+                    "authorized_proxies_url":
+                        "https://proxymesh.com/api/proxies/"
+                }
             },
             "parallelism": {
                 "multiproc": {

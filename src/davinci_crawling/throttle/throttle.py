@@ -7,6 +7,7 @@ from datetime import timedelta
 from functools import wraps
 import importlib
 
+from davinci_crawling.utils import get_class_from_name
 from django.conf import settings
 
 DEFAULT_THROTTLE_MANAGER = \
@@ -46,11 +47,7 @@ class Throttle(object):
             else:
                 throttle_implementation = DEFAULT_THROTTLE_MANAGER
 
-            module_name = ".".join(throttle_implementation.split('.')[:-1])
-            clazz_name = throttle_implementation.split('.')[-1]
-
-            module = importlib.import_module(module_name)
-            manager_clazz = getattr(module, clazz_name)
+            manager_clazz = get_class_from_name(throttle_implementation)
 
             self.manager = manager_clazz(
                 self.crawler_name, seconds=self.throttle_period.seconds,
