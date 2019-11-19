@@ -76,22 +76,28 @@ def delete_json(url, timeout=None):
     try:
         timeout = timeout if timeout else DEFAULT_TIMEOUT
 
+        proxy_address = get_proxy_address()
+
         return requests.delete(
             url=url,
             headers={**APPLICATION_JSON, **USER_AGENT},
-            timeout=(timeout, timeout), verify=False)
+            timeout=(timeout, timeout), verify=False, proxies=proxy_address)
     except RequestException as ex:
         logger.exception("Unable to send the POST. Cause: %s" % ex)
         raise ex
 
 
-def get_json(url, timeout=None, custom_header=None):
+def get_json(url, timeout=None, custom_header=None, use_proxy=True):
     """
     Send a delete request to the given url.
     Args:
         url: the url where to call the delete request.
         timeout: the timeout for the request, if it's none we will use the
         `DEFAULT_TIMEOUT`
+        custom_header: customize the header with additional headers
+        use_proxy: if true should use the proxy, this is used because before
+        getting the proxies we need to make a get request to the proxy mesh
+        api so we can't use proxy yet
 
     Returns:
         the result of the request, object of the requests library
@@ -103,10 +109,12 @@ def get_json(url, timeout=None, custom_header=None):
         if custom_header:
             header.update(custom_header)
 
+        proxy_address = get_proxy_address() if use_proxy else {}
+
         return requests.get(
             url=url,
             headers=header,
-            timeout=(timeout, timeout), verify=False)
+            timeout=(timeout, timeout), verify=False, proxies=proxy_address)
     except RequestException as ex:
         logger.exception("Unable to send the POST. Cause: %s" % ex)
         raise ex
@@ -123,10 +131,12 @@ def post_json(url, json_obj, timeout=None):
 
         timeout = timeout if timeout else DEFAULT_TIMEOUT
 
+        proxy_address = get_proxy_address()
+
         return requests.post(
             url=url, data=json_body,
             headers={**APPLICATION_JSON, **USER_AGENT},
-            timeout=(timeout, timeout), verify=False)
+            timeout=(timeout, timeout), verify=False, proxies=proxy_address)
     except RequestException as ex:
         logger.exception("Unable to send the POST. Cause: %s" % ex)
         raise ex
@@ -141,10 +151,12 @@ def post_form(url, json_obj, timeout=None):
     try:
         timeout = timeout if timeout else DEFAULT_TIMEOUT
 
+        proxy_address = get_proxy_address()
+
         return requests.post(
             url=url, data=json_obj,
             headers={**APPLICATION_FORM, **USER_AGENT},
-            timeout=(timeout, timeout), verify=False)
+            timeout=(timeout, timeout), verify=False, proxies=proxy_address)
     except RequestException as ex:
         logger.exception("Unable to send the POST. Cause: %s" % ex)
         raise ex
@@ -155,8 +167,10 @@ def fetch_page(url, timeout):
     Get a raw page fro the url
     """
     logger.info("Fetching page for %s" % url)
+    proxy_address = get_proxy_address()
     return requests.get(url, headers=USER_AGENT,
-                        timeout=(timeout, timeout), verify=False)
+                        timeout=(timeout, timeout), verify=False,
+                        proxies=proxy_address)
 
 
 def parse_json(s):
@@ -236,12 +250,7 @@ def fetch_file(url, options):
         logger.info(
             "Download from [%s] and store into [%s]" % (url, temp_path))
         try:
-            proxy_address = ProxyManager().get_proxy_address()
-
-            if not proxy_address:
-                proxy_address = {}
-            else:
-                proxy_address = proxy_address["proxy"]
+            proxy_address = get_proxy_address()
             response = requests.get(
                 url, stream=True, timeout=(1800, 1800), verify=False,
                 proxies=proxy_address)
@@ -274,3 +283,12 @@ def fetch_file(url, options):
         except Exception as ex:
             logger.exception("Failed to download %s" % url)
             raise DownloadException(url) from ex
+
+
+def get_proxy_address():
+    proxy_address = ProxyManager().get_proxy_address()
+    if not proxy_address:
+        proxy_address = {}
+    else:
+        proxy_address = proxy_address["proxy"]
+    return proxy_address

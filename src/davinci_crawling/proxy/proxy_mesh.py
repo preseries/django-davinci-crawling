@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
+import logging
 import random
 
 from davinci_crawling.net import get_json
@@ -12,6 +13,8 @@ PROXY_MESH_SETTINGS = settings.DAVINCI_CONF["architecture-params"]["proxy"][
     "proxy_mesh"]
 
 PROXY_TEMPLATE = "%s:%s@%s"
+
+_logger = logging.getLogger("davinci_crawling")
 
 
 class ProxyMesh(Proxy):
@@ -31,7 +34,7 @@ class ProxyMesh(Proxy):
                 "authorization": PROXY_MESH_SETTINGS["authentication"]
             }
             response = get_json(PROXY_MESH_SETTINGS["authorized_proxies_url"],
-                                custom_header=custom_header)
+                                custom_header=custom_header, use_proxy=False)
             response = response.json()
             proxies = []
 
@@ -60,4 +63,6 @@ class ProxyMesh(Proxy):
         if not proxies:
             return None
 
-        return random.choice(proxies)
+        proxy = random.choice(proxies)
+        _logger.debug("Using %s proxy", proxy["proxy"]["http"].split("@")[1])
+        return proxy

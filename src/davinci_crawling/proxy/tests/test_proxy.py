@@ -12,7 +12,8 @@ from davinci_crawling.example.bovespa.models import BovespaCompanyFile, \
     FILE_STATUS_PROCESSED
 from davinci_crawling.management.commands.crawl import start_crawl
 from davinci_crawling.management.producer import Producer
-from davinci_crawling.net import fetch_file
+from davinci_crawling.net import fetch_file, fetch_page, DEFAULT_TIMEOUT, \
+    get_json
 from davinci_crawling.proxy.proxy_mesh import ProxyMesh
 from django.conf import settings
 
@@ -106,6 +107,36 @@ class TestProxy(CaravaggioBaseTest):
             file = fetch_file("https://api.ipify.org/?file", {})
             f = open(file.file, "r")
             generated_ips.append(f.readline())
+
+        # get the ratio of different ips
+        ratio = float(len(set(generated_ips))) / len(generated_ips)
+        _logger.info("Ratio of new ips: %s", ratio)
+
+        self.assertTrue(ratio > 0.1)
+
+    def test_fetch_page(self):
+        """
+        Test fetch page using proxy.
+        """
+        generated_ips = []
+        for _ in range(10):
+            content = fetch_page("https://api.ipify.org/", DEFAULT_TIMEOUT)
+            generated_ips.append(content.text)
+
+        # get the ratio of different ips
+        ratio = float(len(set(generated_ips))) / len(generated_ips)
+        _logger.info("Ratio of new ips: %s", ratio)
+
+        self.assertTrue(ratio > 0.1)
+
+    def test_get_json(self):
+        """
+        Test get_json using proxy.
+        """
+        generated_ips = []
+        for _ in range(10):
+            content = get_json("https://api.ipify.org/")
+            generated_ips.append(content.text)
 
         # get the ratio of different ips
         ratio = float(len(set(generated_ips))) / len(generated_ips)
