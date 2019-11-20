@@ -4,8 +4,6 @@
 # https://quentin.pradet.me/blog/how-do-you-rate-limit-calls-with-aiohttp.html
 import logging
 import time
-from datetime import timedelta
-from functools import wraps
 from multiprocessing import Manager
 
 from davinci_crawling.throttle.throttle import \
