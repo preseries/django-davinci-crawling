@@ -1,25 +1,16 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 import asyncio
-import os
 import time
 from statistics import mean
 
-configuration = os.getenv('ENVIRONMENT', 'development').title()
-os.environ.setdefault(
-    "DJANGO_SETTINGS_MODULE",
-    "davinci_crawling.settings")
-os.environ.setdefault('DJANGO_CONFIGURATION', configuration)
-
-import configurations   # NOQA
-configurations.setup()
-
-from davinci_crawling.proxy.proxy import ProxyManager   # NOQA
+from davinci_crawling.proxy.proxy import ProxyManager
+from django.conf import settings
 
 PROXY_MANAGER = ProxyManager()
 
 
-async def check_time(host, port, proxy_order, times_run=5):
+async def _check_time(host, port, proxy_order, times_run=5):
     """
     Check connection time for a host and port
     Args:
@@ -48,7 +39,10 @@ async def check_time(host, port, proxy_order, times_run=5):
     return mean(results), proxy_order
 
 
-def assure_proxy_quality():
+async def assure_proxy_quality():
+    import pydevd_pycharm
+    pydevd_pycharm.settrace('host.docker.internal', port=8787,
+                            stdoutToServer=True, stderrToServer=True)
     proxies = PROXY_MANAGER.get_available_proxies()
     proxies_to_check = []
 
@@ -64,10 +58,12 @@ def assure_proxy_quality():
 
         proxies_to_check.append((host, port, i))
 
-    results = asyncio.get_event_loop().run_until_complete(asyncio.gather(
-        *[check_time(host, port, i) for host, port, i in proxies_to_check]))
+    results = await asyncio.gather(
+        *[_check_time(host, port, i) for host, port, i in proxies_to_check])
 
     results = sorted(results, key=lambda x: x[0], reverse=False)
+
+    print(results)
 
     for took_time, proxy_position in results:
         if took_time > 0:
@@ -76,4 +72,22 @@ def assure_proxy_quality():
     PROXY_MANAGER.set_to_use_proxies(proxies_by_speed)
 
 
-assure_proxy_quality()
+async def periodic_checker():
+    import pydevd_pycharm
+    pydevd_pycharm.settrace('host.docker.internal', port=8787,
+                            stdoutToServer=True, stderrToServer=True)
+    sleep = settings.DAVINCI_CONF["architecture-params"]["proxy"][
+        "quality-checker"]["sleep-between-tests"]
+    while True:
+        await assure_proxy_quality()
+        await asyncio.sleep(sleep)
+
+
+loop = asyncio.get_event_loop()
+
+try:
+    loop.run_in_executor(None, periodic_checker)
+except asyncio.CancelledError:
+    pass
+
+print("AQUI")

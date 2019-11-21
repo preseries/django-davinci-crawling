@@ -168,6 +168,9 @@ class Common(Configuration):
                         "Basic aWFucmlja2V5OlZhcmlhYmxlZGF0YTEwMSE=",
                     "authorized_proxies_url":
                         "https://proxymesh.com/api/proxies/"
+                },
+                "quality-checker": {
+                    "sleep-between-tests": 60
                 }
             },
             "parallelism": {
