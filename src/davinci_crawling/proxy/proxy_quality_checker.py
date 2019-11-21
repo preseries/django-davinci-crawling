@@ -14,7 +14,7 @@ os.environ.setdefault('DJANGO_CONFIGURATION', configuration)
 import configurations   # NOQA
 configurations.setup()
 
-from davinci_crawling.proxy.proxy import ProxyManager
+from davinci_crawling.proxy.proxy import ProxyManager   # NOQA
 
 PROXY_MANAGER = ProxyManager()
 
@@ -38,7 +38,7 @@ async def check_time(host, port, proxy_order, times_run=5):
             await asyncio.wait_for(
                 asyncio.open_connection(host=host, port=port), timeout=10
             )
-        except:
+        except Exception:
             # if returns an error we will disconsider this proxy with the
             # return -1
             return -1
@@ -74,5 +74,6 @@ def assure_proxy_quality():
             proxies_by_speed.append(proxies[proxy_position])
 
     PROXY_MANAGER.set_to_use_proxies(proxies_by_speed)
+
 
 assure_proxy_quality()
