@@ -20,9 +20,19 @@ _logger = logging.getLogger("davinci_crawling")
 class ProxyMesh(Proxy):
 
     available_proxies = None
+    to_use_proxies = None
+
+    def get_to_use_proxies(self):
+        if not self.to_use_proxies:
+            self.to_use_proxies = self.get_available_proxies()
+
+        return self.to_use_proxies
+
+    def set_to_use_proxies(self, proxies):
+        self.to_use_proxies = proxies
 
     @classmethod
-    def _get_available_proxies(cls):
+    def get_available_proxies(cls):
         """
         Proxy Mesh has a list of proxies to use, this method will acess proxy
         mesh api to get this list of ips.
@@ -58,7 +68,7 @@ class ProxyMesh(Proxy):
         """
         Just get the list of available proxies and random select a proxy.
         """
-        proxies = self._get_available_proxies()
+        proxies = self.get_to_use_proxies()
 
         if not proxies:
             return None

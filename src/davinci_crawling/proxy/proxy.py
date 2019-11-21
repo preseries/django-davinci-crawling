@@ -13,6 +13,17 @@ class Proxy(metaclass=ABCMeta):
     """
     The abstract class used to get new proxy addresses to be used on requests
     """
+    @abc.abstractmethod
+    def get_to_use_proxies(self):
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def set_to_use_proxies(self, proxies):
+        raise NotImplementedError()
+
+    @classmethod
+    def get_available_proxies(cls):
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def get_proxy_address(self):
@@ -50,3 +61,18 @@ class ProxyManager:
         proxy = self._get_proxy_implementation()
 
         return proxy.get_proxy_address()
+
+    def get_available_proxies(self):
+        proxy = self._get_proxy_implementation()
+
+        return proxy.get_available_proxies()
+
+    def get_to_use_proxies(self):
+        proxy = self._get_proxy_implementation()
+
+        return proxy.get_to_use_proxies()
+
+    def set_to_use_proxies(self, proxies):
+        proxy = self._get_proxy_implementation()
+
+        return proxy.set_to_use_proxies(proxies)

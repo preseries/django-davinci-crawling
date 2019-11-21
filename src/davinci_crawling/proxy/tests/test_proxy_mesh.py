@@ -36,14 +36,14 @@ class TestProxyMesh(CaravaggioBaseTest):
         Test if we can get the available proxies from the proxy mesh api.
         """
         proxy_mesh = ProxyMesh()
-        proxies = proxy_mesh._get_available_proxies()
+        proxies = proxy_mesh.get_to_use_proxies()
         self.assertTrue(len(proxies) > 0)
 
     def test_get_proxy_address(self):
         """
         Test the proxy address get.
         """
-        all_proxies = ProxyMesh._get_available_proxies()
+        all_proxies = ProxyMesh.get_to_use_proxies()
 
         received_proxies = set()
         for _ in range(50):
