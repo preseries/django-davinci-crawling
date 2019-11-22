@@ -14,6 +14,7 @@ from davinci_crawling.management.commands.crawl import start_crawl
 from davinci_crawling.management.producer import Producer
 from davinci_crawling.net import fetch_file, fetch_page, DEFAULT_TIMEOUT, \
     get_json
+from davinci_crawling.proxy.proxy import ProxyManager
 from davinci_crawling.proxy.proxy_mesh import ProxyMesh
 from django.conf import settings
 
@@ -143,3 +144,17 @@ class TestProxy(CaravaggioBaseTest):
         _logger.info("Ratio of new ips: %s", ratio)
 
         self.assertTrue(ratio > 0.1)
+
+    def test_quality_checker(self):
+        proxy_manager = ProxyManager()
+        worked = False
+        for _ in range(3):
+            try:
+                self.assertNotEquals(proxy_manager.get_available_proxies(),
+                                     proxy_manager.get_to_use_proxies())
+                worked = True
+                break
+            except AssertionError:
+                time.sleep(5)
+
+        self.assertTrue(worked)

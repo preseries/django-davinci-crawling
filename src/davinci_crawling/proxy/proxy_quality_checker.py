@@ -1,7 +1,15 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 import asyncio
+import atexit
+import logging
+import multiprocessing
+import signal
+import socket
+import sys
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 from statistics import mean
 
 from davinci_crawling.proxy.proxy import ProxyManager
@@ -9,8 +17,10 @@ from django.conf import settings
 
 PROXY_MANAGER = ProxyManager()
 
+_logger = logging.getLogger("davinci_crawling")
 
-async def _check_time(host, port, proxy_order, times_run=5):
+
+def _check_time(host, port, proxy_order, times_run=5):
     """
     Check connection time for a host and port
     Args:
@@ -26,9 +36,8 @@ async def _check_time(host, port, proxy_order, times_run=5):
     for _ in range(times_run):
         start_time = time.time() * 1000
         try:
-            await asyncio.wait_for(
-                asyncio.open_connection(host=host, port=port), timeout=10
-            )
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect((host, int(port)))
         except Exception:
             # if returns an error we will disconsider this proxy with the
             # return -1
@@ -39,10 +48,7 @@ async def _check_time(host, port, proxy_order, times_run=5):
     return mean(results), proxy_order
 
 
-async def assure_proxy_quality():
-    import pydevd_pycharm
-    pydevd_pycharm.settrace('host.docker.internal', port=8787,
-                            stdoutToServer=True, stderrToServer=True)
+def assure_proxy_quality(pool):
     proxies = PROXY_MANAGER.get_available_proxies()
     proxies_to_check = []
 
@@ -58,12 +64,8 @@ async def assure_proxy_quality():
 
         proxies_to_check.append((host, port, i))
 
-    results = await asyncio.gather(
-        *[_check_time(host, port, i) for host, port, i in proxies_to_check])
-
+    results = pool.starmap(_check_time, proxies_to_check)
     results = sorted(results, key=lambda x: x[0], reverse=False)
-
-    print(results)
 
     for took_time, proxy_position in results:
         if took_time > 0:
@@ -72,22 +74,25 @@ async def assure_proxy_quality():
     PROXY_MANAGER.set_to_use_proxies(proxies_by_speed)
 
 
-async def periodic_checker():
-    import pydevd_pycharm
-    pydevd_pycharm.settrace('host.docker.internal', port=8787,
-                            stdoutToServer=True, stderrToServer=True)
-    sleep = settings.DAVINCI_CONF["architecture-params"]["proxy"][
+def periodic_checker():
+    sleep_time = settings.DAVINCI_CONF["architecture-params"]["proxy"][
         "quality-checker"]["sleep-between-tests"]
-    while True:
-        await assure_proxy_quality()
-        await asyncio.sleep(sleep)
+    pool = multiprocessing.Pool(4)
+    while not event.isSet():
+        assure_proxy_quality(pool)
+        time.sleep(sleep_time)
 
 
-loop = asyncio.get_event_loop()
-
+event = threading.Event()
 try:
-    loop.run_in_executor(None, periodic_checker)
+    executor = ThreadPoolExecutor(max_workers=1)
+    future = executor.submit(periodic_checker)
 except asyncio.CancelledError:
     pass
 
-print("AQUI")
+
+def _end_thread():
+    _logger.debug("STOP")
+
+
+atexit.register(_end_thread)
