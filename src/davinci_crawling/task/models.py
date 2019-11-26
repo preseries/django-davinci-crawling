@@ -27,6 +27,7 @@ STATUS_IN_PROGRESS = 2
 STATUS_FINISHED = 3
 STATUS_FAULTY = 4
 STATUS_UNKNOWN = 5
+STATUS_MAINTENANCE = 6
 
 ALL_STATUS = [STATUS_CREATED, STATUS_QUEUED, STATUS_IN_PROGRESS,
               STATUS_IN_PROGRESS, STATUS_FINISHED, STATUS_FAULTY,
@@ -101,6 +102,8 @@ class Task(CustomDjangoCassandraModel):
 
     type = columns.SmallInt(default=ON_DEMAND_TASK)
 
+    more_info = columns.Text(required=False)
+
     class Meta:
         get_pk_field = "task_id"
 
@@ -126,6 +129,8 @@ def pre_save_task(
                                              instance.params_map)
     if params_string:
         instance.params = params_string
+
+    instance.created_at = instance.created_at.replace(microsecond=0)
 
     options_string = generate_key_encoded_map(instance.options,
                                               instance.options_map)

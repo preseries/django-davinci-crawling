@@ -443,7 +443,9 @@ class Common(Configuration):
 
         # https://www.django-rest-framework.org/api-guide/fields/#decimalfield
         # To use decimal as representation by default
-        'COERCE_DECIMAL_TO_STRING': False
+        'COERCE_DECIMAL_TO_STRING': False,
+        'EXCEPTION_HANDLER':
+            'caravaggio_rest_api.drf.exceptions.caravaggio_exception_handler'
     }
 
     ACCOUNT_USER_MODEL_USERNAME_FIELD = None
@@ -754,6 +756,8 @@ class Staging(Common):
         }
     }
 
+    THROTTLE_ENABLED = True
+
     # Security
     SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', "False") == "True"
     USE_X_FORWARDED_HOST = SECURE_SSL_REDIRECT
@@ -776,3 +780,4 @@ class Production(Staging):
     """
 
     LOGGING_FILE = "/var/log/davinci_crawling-debug.log"
+    THROTTLE_ENABLED = True

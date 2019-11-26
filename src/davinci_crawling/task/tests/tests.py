@@ -157,7 +157,7 @@ class GetAllTest(CaravaggioBaseTest):
         """"
         Will get all the faces for the existent resources
         """
-        path = "{0}facets/?kind=limit:2".\
+        path = "{0}facets/?facet.field.kind=limit:2".\
             format(reverse("task-search-list"))
         _logger.info("Path: {}".format(path))
         response = self.api_client.get(path)

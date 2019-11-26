@@ -88,6 +88,10 @@ class TaskSerializerV1(
                              'Batch(2)',
                 "default": ON_DEMAND_TASK
             },
+            'more_info': {
+                'help_text': 'more info about the task, for example, something'
+                             'about the maintenance state'
+            }
         }
 
 
