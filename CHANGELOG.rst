@@ -37,10 +37,13 @@ Improvements or Changes
 - Change the crawl command to pool tasks from the DB;
 - Improve the Throttle class to be extended;
 - Change the key used on throttle from `<function_name>` to `<crawler_name>_<function_name>_<throttle_suffix>`
+- Add maintenance status to the task;
+- Add a `more_info` field to the task;
 
 Bug Fixing
 **********
-- Fix a bug with the `include_companies` parameter that wasn't working with a list of companies
+- Fix a bug with the `include_companies` parameter that wasn't working with a list of companies;
+- Truncate milliseconds on created_at on task model because as this field is used as primary key the milliseconds cause errors on comparisons;
 
 Version 0.1.5
 =============
