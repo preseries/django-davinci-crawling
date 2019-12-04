@@ -267,7 +267,7 @@ class Crawler(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @staticmethod
-    def add_error_task(task_id, more_info=None):
+    def add_error_to_task(task_id, more_info=None):
         task = Task.objects.get(task_id=task_id)
 
         if not task:

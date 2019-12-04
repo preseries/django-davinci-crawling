@@ -51,7 +51,7 @@ class TestCrawl(CaravaggioBaseTest):
 
     def test_error_task(self):
         """
-        Test the add_error_task method.
+        Test the add_error_to_task method.
         """
         task = self.create_task("bovespa", ["4170"],
                                 "2011-01-01T00:00:00.000000Z",
@@ -61,7 +61,7 @@ class TestCrawl(CaravaggioBaseTest):
         task_id = task.task_id
 
         status_ = '{"status": 500}'
-        Crawler.add_error_task(task_id, more_info=status_)
+        Crawler.add_error_to_task(task_id, more_info=status_)
 
         task_error = Task.objects.get(task_id=task_id)
 
@@ -70,7 +70,7 @@ class TestCrawl(CaravaggioBaseTest):
 
     def test_maintenance_task(self):
         """
-        Test the add_error_task method.
+        Test the maintenance_notice_task method.
         """
         kind = str(time.time())
         task = self.create_task(kind, ["4170"], "2011-01-01T00:00:00.000000Z",
