@@ -7,6 +7,8 @@ from abc import ABCMeta
 import abc
 import logging
 
+from davinci_crawling.task.models import Task, STATUS_FAULTY, \
+    STATUS_MAINTENANCE
 from django.conf import settings
 
 from django.core.management import CommandParser
@@ -263,3 +265,31 @@ class Crawler(metaclass=ABCMeta):
     @abc.abstractmethod
     def crawl(self, task_id, crawling_params, options):
         raise NotImplementedError()
+
+    @staticmethod
+    def add_error_task(task_id, more_info=None):
+        task = Task.objects.get(task_id=task_id)
+
+        if not task:
+            raise Exception("Not found task with task id %s", task_id)
+
+        task.update(**{"status": STATUS_FAULTY, "more_info": more_info})
+
+    @staticmethod
+    def maintenance_notice_task(task_id, more_info=None):
+        task = Task.objects.get(task_id=task_id)
+
+        if not task:
+            raise Exception("Not found task with task id %s", task_id)
+
+        task_data = {
+            "status": STATUS_MAINTENANCE,
+            "kind": task.kind,
+            "options": task.options,
+            "params": task.params,
+            "type": task.type,
+            "user": task.user,
+            "more_info": more_info
+        }
+
+        Task.create(**task_data)
