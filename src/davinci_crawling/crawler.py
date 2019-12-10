@@ -267,7 +267,14 @@ class Crawler(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @staticmethod
-    def add_error_to_task(task_id, more_info=None):
+    def error(task_id, more_info=None):
+        """
+        Change the task (with the task_id) to the error status and also add
+        the more_info to the more_info of the task.
+        Args:
+            task_id: The task id to add the error
+            more_info: more information about the error
+        """
         task = Task.objects.get(task_id=task_id)
 
         if not task:
@@ -276,7 +283,18 @@ class Crawler(metaclass=ABCMeta):
         task.update(**{"status": STATUS_FAULTY, "more_info": more_info})
 
     @staticmethod
-    def maintenance_notice_task(task_id, more_info=None):
+    def maintenance_notice(task_id, more_info=None):
+        """
+        Create a new task on the DB with the status maintenance, that signals
+        that something is wrong with that task but we can continue processing
+        it.
+
+        This can be used for example to signal that the structure of some api
+        changed.
+        Args:
+            task_id: The task id to notice
+            more_info: more information about the maintenance notice
+        """
         task = Task.objects.get(task_id=task_id)
 
         if not task:
