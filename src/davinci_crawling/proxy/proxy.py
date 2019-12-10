@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 import abc
+import os
 from abc import ABCMeta
 
 from davinci_crawling.utils import get_class_from_name
@@ -56,6 +57,12 @@ class ProxyManager:
     manager = None
 
     @classmethod
+    def set_proxy_implementation(cls, class_name):
+        manager_clazz = get_class_from_name(class_name)
+
+        cls.manager = manager_clazz()
+
+    @classmethod
     def _get_proxy_implementation(cls):
         if not cls.manager:
             if hasattr(settings, 'DAVINCI_CONF') and \
@@ -65,11 +72,11 @@ class ProxyManager:
                 proxy_implementation = settings.DAVINCI_CONF[
                     "architecture-params"]["proxy"]["implementation"]
             else:
-                proxy_implementation = DEFAULT_PROXY_IMPLEMENTATION
+                proxy_implementation = os.getenv(
+                    'DEFAULT_PROXY_IMPLEMENTATION',
+                    DEFAULT_PROXY_IMPLEMENTATION)
 
-            manager_clazz = get_class_from_name(proxy_implementation)
-
-            cls.manager = manager_clazz()
+            cls.set_proxy_implementation(proxy_implementation)
 
         return cls.manager
 

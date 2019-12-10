@@ -4,24 +4,13 @@ import logging
 import re
 import time
 
-from bs4 import BeautifulSoup
 from caravaggio_rest_api.tests import CaravaggioBaseTest
 from davinci_crawling.crawler import Crawler
-from davinci_crawling.example.bovespa.crawlers import BovespaCrawler
-from davinci_crawling.example.bovespa.models import BovespaCompanyFile, \
-    FILE_STATUS_PROCESSED
-from davinci_crawling.management.commands.crawl import start_crawl
-from davinci_crawling.management.producer import Producer
 from davinci_crawling.net import fetch_file, fetch_page, DEFAULT_TIMEOUT, \
     get_json
 from davinci_crawling.proxy.proxy import ProxyManager
-from davinci_crawling.proxy.proxy_mesh import ProxyMesh
 from django.conf import settings
 
-
-from davinci_crawling.task.models import ON_DEMAND_TASK, Task,\
-    STATUS_FINISHED, STATUS_CREATED, STATUS_IN_PROGRESS, STATUS_QUEUED,\
-    STATUS_FAULTY, STATUS_UNKNOWN
 
 _logger = logging.getLogger("davinci_crawling.testing")
 
@@ -40,7 +29,8 @@ class TestProxy(CaravaggioBaseTest):
 
     @classmethod
     def setUpTestData(cls):
-        pass
+        ProxyManager.set_proxy_implementation(
+            "davinci_crawling.proxy.proxy_mesh.ProxyMesh")
 
     def _get_ip(self, driver):
         """

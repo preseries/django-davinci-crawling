@@ -161,8 +161,7 @@ class Common(Configuration):
                                   "MemoryThrottle"
             },
             "proxy": {
-                "implementation":
-                    "davinci_crawling.proxy.proxy_mesh.ProxyMesh",
+                # to change proxy usage add the implementation key
                 "proxy_mesh": {
                     "authentication":
                         "Basic aWFucmlja2V5OlZhcmlhYmxlZGF0YTEwMSE=",
