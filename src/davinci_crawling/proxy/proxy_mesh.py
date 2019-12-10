@@ -74,6 +74,9 @@ class ProxyMesh(Proxy):
         if not proxies:
             return None
 
-        proxy = random.choice(proxies)
+        quality_proxy_quantities = max(6, int(len(proxies) * 0.5))
+        quality_proxy_quantities = min(quality_proxy_quantities, len(proxies))
+
+        proxy = random.choice(proxies[0:quality_proxy_quantities])
         _logger.debug("Using %s proxy", proxy["proxy"]["http"].split("@")[1])
         return copy.deepcopy(proxy)
