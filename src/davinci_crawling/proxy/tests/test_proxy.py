@@ -29,7 +29,7 @@ class TestProxy(CaravaggioBaseTest):
 
     @classmethod
     def setUpTestData(cls):
-        ProxyManager.set_proxy_implementation(
+        ProxyManager.set_proxy_manager(
             "davinci_crawling.proxy.proxy_mesh.ProxyMesh")
 
     def _get_ip(self, driver):

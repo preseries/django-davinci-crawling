@@ -71,6 +71,7 @@ class Crawler(metaclass=ABCMeta):
             chrome_options.add_argument("--disable-features=NetworkService")
 
             proxy_address = cls.proxy_manager.get_proxy_address()
+            proxy_address = {"proxy": proxy_address}
 
             chrome_options.binary_location = chromium_file
 

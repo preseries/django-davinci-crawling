@@ -57,13 +57,13 @@ class ProxyManager:
     manager = None
 
     @classmethod
-    def set_proxy_implementation(cls, class_name):
+    def set_proxy_manager(cls, class_name):
         manager_clazz = get_class_from_name(class_name)
 
         cls.manager = manager_clazz()
 
     @classmethod
-    def _get_proxy_implementation(cls):
+    def _get_proxy_manager(cls):
         if not cls.manager:
             if hasattr(settings, 'DAVINCI_CONF') and \
                     "proxy" in settings.DAVINCI_CONF["architecture-params"]\
@@ -76,26 +76,26 @@ class ProxyManager:
                     'DEFAULT_PROXY_IMPLEMENTATION',
                     DEFAULT_PROXY_IMPLEMENTATION)
 
-            cls.set_proxy_implementation(proxy_implementation)
+            cls.set_proxy_manager(proxy_implementation)
 
         return cls.manager
 
     def get_proxy_address(self):
-        proxy = self._get_proxy_implementation()
+        proxy_manager = self._get_proxy_manager()
 
-        return proxy.get_proxy_address()
+        return proxy_manager.get_proxy_address()
 
     def get_available_proxies(self):
-        proxy = self._get_proxy_implementation()
+        proxy_manager = self._get_proxy_manager()
 
-        return proxy.get_available_proxies()
+        return proxy_manager.get_available_proxies()
 
     def get_to_use_proxies(self):
-        proxy = self._get_proxy_implementation()
+        proxy_manager = self._get_proxy_manager()
 
-        return proxy.get_to_use_proxies()
+        return proxy_manager.get_to_use_proxies()
 
     def set_to_use_proxies(self, proxies):
-        proxy = self._get_proxy_implementation()
+        proxy_manager = self._get_proxy_manager()
 
-        return proxy.set_to_use_proxies(proxies)
+        return proxy_manager.set_to_use_proxies(proxies)

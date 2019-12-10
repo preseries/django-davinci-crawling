@@ -48,7 +48,7 @@ class TestProxyMesh(CaravaggioBaseTest):
         received_proxies = set()
         for _ in range(50):
             proxy = ProxyMesh().get_proxy_address()
-            received_proxies.add(proxy["proxy"]["http"])
+            received_proxies.add(proxy["http"])
 
         # assert that we generated at least 50% of the possible values for
         # proxy

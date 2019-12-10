@@ -58,7 +58,7 @@ def assure_proxy_quality(pool):
     proxies_by_speed = []
 
     for i, proxy in enumerate(proxies):
-        proxy_address = proxy["proxy"]["http"]
+        proxy_address = proxy["http"]
         proxy_address = proxy_address.replace("http://", "")
 
         host = proxy_address.split("@")[-1]
@@ -94,10 +94,3 @@ try:
     future = executor.submit(periodic_checker)
 except asyncio.CancelledError:
     pass
-
-
-def _end_thread():
-    _logger.debug("STOP")
-
-
-atexit.register(_end_thread)

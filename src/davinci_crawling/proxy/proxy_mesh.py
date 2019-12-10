@@ -54,11 +54,9 @@ class ProxyMesh(Proxy):
                                            settings.PROXY_MESH_PASSWORD,
                                            proxy)
                 _proxy = {
-                    'proxy': {
-                        'http': 'http://' + _proxy,
-                        'https': 'https://' + _proxy,
-                        'no_proxy': 'localhost,127.0.0.1'   # excludes
-                    }
+                    'http': 'http://' + _proxy,
+                    'https': 'https://' + _proxy,
+                    'no_proxy': 'localhost,127.0.0.1'   # excludes
                 }
                 proxies.append(_proxy)
             cls.available_proxies = proxies
@@ -78,5 +76,5 @@ class ProxyMesh(Proxy):
         quality_proxy_quantities = min(quality_proxy_quantities, len(proxies))
 
         proxy = random.choice(proxies[0:quality_proxy_quantities])
-        _logger.debug("Using %s proxy", proxy["proxy"]["http"].split("@")[1])
+        _logger.debug("Using %s proxy", proxy["http"].split("@")[1])
         return copy.deepcopy(proxy)

@@ -290,5 +290,5 @@ def get_proxy_address():
     if not proxy_address:
         proxy_address = {}
     else:
-        proxy_address = proxy_address["proxy"]
+        proxy_address = proxy_address
     return proxy_address
