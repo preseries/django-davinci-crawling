@@ -6,7 +6,7 @@ from abc import ABCMeta
 from davinci_crawling.utils import get_class_from_name
 from django.conf import settings
 
-DEFAULT_PROXY_IMPLEMENTATION = "davinci_crawling.proxy.proxy_mesh.ProxyMesh"
+DEFAULT_PROXY_IMPLEMENTATION = "davinci_crawling.proxy.proxy.NoProxy"
 
 
 class Proxy(metaclass=ABCMeta):
@@ -28,6 +28,22 @@ class Proxy(metaclass=ABCMeta):
     @abc.abstractmethod
     def get_proxy_address(self):
         raise NotImplementedError()
+
+
+class NoProxy(Proxy):
+
+    def get_to_use_proxies(self):
+        return None
+
+    def set_to_use_proxies(self, proxies):
+        pass
+
+    @classmethod
+    def get_available_proxies(cls):
+        return None
+
+    def get_proxy_address(self):
+        return None
 
 
 class ProxyManager:

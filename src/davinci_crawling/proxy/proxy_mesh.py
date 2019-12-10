@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
+import copy
 import logging
 import random
 
@@ -75,4 +76,4 @@ class ProxyMesh(Proxy):
 
         proxy = random.choice(proxies)
         _logger.debug("Using %s proxy", proxy["proxy"]["http"].split("@")[1])
-        return proxy
+        return copy.deepcopy(proxy)

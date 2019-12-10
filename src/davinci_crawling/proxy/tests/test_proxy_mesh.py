@@ -43,7 +43,7 @@ class TestProxyMesh(CaravaggioBaseTest):
         """
         Test the proxy address get.
         """
-        all_proxies = ProxyMesh.get_to_use_proxies()
+        all_proxies = ProxyMesh.get_available_proxies()
 
         received_proxies = set()
         for _ in range(50):

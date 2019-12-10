@@ -55,6 +55,9 @@ class TestProxy(CaravaggioBaseTest):
 
         ip = re.search("((?:[0-9]{1,3}.){3}[0-9]{1,3})", driver.page_source)
 
+        if ip is None:
+            return None
+
         return ip.group(1)
 
     def test_changing_ips_single_proxy(self):
@@ -67,6 +70,9 @@ class TestProxy(CaravaggioBaseTest):
         generated_ips = []
         for _ in range(10):
             ip = self._get_ip(web_driver)
+
+            if not ip:
+                continue
 
             self.assertIsNotNone(ip)
 
@@ -88,8 +94,6 @@ class TestProxy(CaravaggioBaseTest):
         for _ in range(10):
             web_driver = Crawler.get_web_driver(**CHROME_OPTIONS)
             ip = self._get_ip(web_driver)
-
-            self.assertIsNotNone(ip)
 
             generated_ips.append(ip)
 

@@ -81,10 +81,15 @@ class Crawler(metaclass=ABCMeta):
                         Crawler.CHROME_DESIREDCAPABILITIES].items():
                     capabilities[key] = value
 
-            driver = webdriver.Chrome(
-                chrome_options=chrome_options,
-                desired_capabilities=capabilities,
-                seleniumwire_options=proxy_address)
+            if proxy_address:
+                driver = webdriver.Chrome(
+                    chrome_options=chrome_options,
+                    desired_capabilities=capabilities,
+                    seleniumwire_options=proxy_address)
+            else:
+                driver = webdriver.Chrome(
+                    chrome_options=chrome_options,
+                    desired_capabilities=capabilities)
 
             _logger.info("Using CHROMIUM as Dynamic Web Driver. Driver {}".
                          format(repr(driver)))

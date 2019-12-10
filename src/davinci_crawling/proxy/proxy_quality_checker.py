@@ -52,6 +52,9 @@ def assure_proxy_quality(pool):
     proxies = PROXY_MANAGER.get_available_proxies()
     proxies_to_check = []
 
+    if proxies is None:
+        return
+
     proxies_by_speed = []
 
     for i, proxy in enumerate(proxies):
@@ -69,7 +72,9 @@ def assure_proxy_quality(pool):
 
     for took_time, proxy_position in results:
         if took_time > 0:
-            proxies_by_speed.append(proxies[proxy_position])
+            _proxy = proxies[proxy_position]
+            if _proxy:
+                proxies_by_speed.append(_proxy)
 
     PROXY_MANAGER.set_to_use_proxies(proxies_by_speed)
 
