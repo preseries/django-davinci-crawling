@@ -168,8 +168,8 @@ class Common(Configuration):
                     "authorized_proxies_url":
                         "https://proxymesh.com/api/proxies/"
                 },
-                "quality-checker": {
-                    "sleep-between-tests": 60
+                "proxies-availability-checker": {
+                    "elapse-time-between-checks": 60
                 }
             },
             "parallelism": {

@@ -81,7 +81,7 @@ def assure_proxy_quality(pool):
 
 def periodic_checker():
     sleep_time = settings.DAVINCI_CONF["architecture-params"]["proxy"][
-        "quality-checker"]["sleep-between-tests"]
+        "proxies-availability-checker"]["elapse-time-between-checks"]
     pool = multiprocessing.Pool(4)
     while not event.isSet():
         assure_proxy_quality(pool)
