@@ -17,10 +17,6 @@ _throttle_info = manager.dict()
 
 _logger = logging.getLogger("davinci_crawling")
 
-PyRateLimit.init(redis_host=settings.REDIS_HOST_PRIMARY,
-                 redis_port=settings.REDIS_PORT_PRIMARY,
-                 redis_password=settings.REDIS_PASS_PRIMARY)
-
 
 class RedisThrottle(ThrottleManager):
     """
@@ -28,6 +24,15 @@ class RedisThrottle(ThrottleManager):
     we can proceed with the throttle, this way the throttle will be distributed
     instead of single machine as MemoryThrottle
     """
+
+    def __init__(self, crawler_name, seconds=1, minutes=0, hours=0, rate=10,
+                 max_tokens=10):
+        super().__init__(crawler_name, seconds, minutes, hours, rate,
+                         max_tokens)
+
+        PyRateLimit.init(redis_host=settings.REDIS_HOST_PRIMARY,
+                         redis_port=settings.REDIS_PORT_PRIMARY,
+                         redis_password=settings.REDIS_PASS_PRIMARY)
 
     def wait_for_token(self, key):
         pylimit = PyRateLimit(int(self.throttle_period.total_seconds()),
