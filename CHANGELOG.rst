@@ -15,6 +15,8 @@ New Features
 - Add the crawl_params method that will create a batch task on the DaVinci Task.
 - Add a delete_json method to the net.py file to support delete requests.
 - Add a method to utils to get all registered crawlers.
+- Add proxy mesh to chrome driver on selenium;
+- Add proxy mesh to fetch_file to download files;
 
 Improvements or Changes
 ***********************

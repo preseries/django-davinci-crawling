@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
+import os
 
 import django
 from _datetime import datetime
@@ -9,6 +10,7 @@ import logging
 
 from davinci_crawling.task.models import Task, STATUS_FAULTY, \
     STATUS_MAINTENANCE
+from davinci_crawling.proxy.proxy import ProxyManager
 from django.conf import settings
 
 from django.core.management import CommandParser
@@ -16,7 +18,7 @@ from django.core.management.base import DjangoHelpFormatter
 
 from davinci_crawling.time import mk_datetime
 
-from selenium import webdriver
+from seleniumwire import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
@@ -32,6 +34,8 @@ def get_configuration(crawler_name):
 class Crawler(metaclass=ABCMeta):
 
     CHROME_DESIREDCAPABILITIES = "chrome_desired_capabilities"
+
+    proxy_manager = ProxyManager()
 
     # The unique name of the crawler to be identified in the system
     __crawler_name__ = None
@@ -60,12 +64,17 @@ class Crawler(metaclass=ABCMeta):
 
         # Chromium folder
         chromium_file = options.get("chromium_bin_file", None)
+        path = os.path.dirname(os.path.abspath(__file__))
         if chromium_file:
             chrome_options = Options()
             chrome_options.add_argument("--headless")
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument("--disable-gpu")
             chrome_options.add_argument("--disable-features=NetworkService")
+
+            proxy_address = cls.proxy_manager.get_proxy_address()
+            proxy_address = {"proxy": proxy_address}
+
             chrome_options.binary_location = chromium_file
 
             capabilities = DesiredCapabilities.CHROME
@@ -75,9 +84,15 @@ class Crawler(metaclass=ABCMeta):
                         Crawler.CHROME_DESIREDCAPABILITIES].items():
                     capabilities[key] = value
 
-            driver = webdriver.Chrome(
-                chrome_options=chrome_options,
-                desired_capabilities=capabilities)
+            if proxy_address:
+                driver = webdriver.Chrome(
+                    chrome_options=chrome_options,
+                    desired_capabilities=capabilities,
+                    seleniumwire_options=proxy_address)
+            else:
+                driver = webdriver.Chrome(
+                    chrome_options=chrome_options,
+                    desired_capabilities=capabilities)
 
             _logger.info("Using CHROMIUM as Dynamic Web Driver. Driver {}".
                          format(repr(driver)))

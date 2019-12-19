@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
-
+import importlib
 import inspect
 import django
 
@@ -76,3 +76,11 @@ def setup_cassandra_object_mapper(alias="cassandra"):
 
     db = get_database(None, alias=alias)
     CassandraConnection("default", **db.settings_dict).register()
+
+
+def get_class_from_name(class_name):
+    module_name = ".".join(class_name.split('.')[:-1])
+    clazz_name = class_name.split('.')[-1]
+
+    module = importlib.import_module(module_name)
+    return getattr(module, clazz_name)
