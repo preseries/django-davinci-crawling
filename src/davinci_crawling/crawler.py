@@ -8,6 +8,8 @@ from abc import ABCMeta
 import abc
 import logging
 
+from davinci_crawling.task.models import Task, STATUS_FAULTY, \
+    STATUS_MAINTENANCE
 from davinci_crawling.proxy.proxy import ProxyManager
 from django.conf import settings
 
@@ -278,3 +280,49 @@ class Crawler(metaclass=ABCMeta):
     @abc.abstractmethod
     def crawl(self, task_id, crawling_params, options):
         raise NotImplementedError()
+
+    @staticmethod
+    def error(task_id, more_info=None):
+        """
+        Change the task (with the task_id) to the error status and also add
+        the more_info to the more_info of the task.
+        Args:
+            task_id: The task id to add the error
+            more_info: more information about the error
+        """
+        task = Task.objects.get(task_id=task_id)
+
+        if not task:
+            raise Exception("Not found task with task id %s", task_id)
+
+        task.update(**{"status": STATUS_FAULTY, "more_info": more_info})
+
+    @staticmethod
+    def maintenance_notice(task_id, more_info=None):
+        """
+        Create a new task on the DB with the status maintenance, that signals
+        that something is wrong with that task but we can continue processing
+        it.
+
+        This can be used for example to signal that the structure of some api
+        changed.
+        Args:
+            task_id: The task id to notice
+            more_info: more information about the maintenance notice
+        """
+        task = Task.objects.get(task_id=task_id)
+
+        if not task:
+            raise Exception("Not found task with task id %s", task_id)
+
+        task_data = {
+            "status": STATUS_MAINTENANCE,
+            "kind": task.kind,
+            "options": task.options,
+            "params": task.params,
+            "type": task.type,
+            "user": task.user,
+            "more_info": more_info
+        }
+
+        Task.create(**task_data)

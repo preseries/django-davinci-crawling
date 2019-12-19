@@ -16,17 +16,17 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+from caravaggio_rest_api.drf.routers import CaravaggioRouter
 from django.conf import settings
 from django.conf.urls import url, include
 
 from davinci_crawling.task.api.views import \
     TaskViewSet, \
     TaskSearchViewSet
-from rest_framework import routers
 
 # API v1 Router. Provide an easy way of automatically determining the URL conf.
 
-api_TASK = routers.DefaultRouter()
+api_TASK = CaravaggioRouter()
 
 if settings.DSE_SUPPORT:
     api_TASK.register(r'task/search',
