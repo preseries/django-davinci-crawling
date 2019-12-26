@@ -26,6 +26,12 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 _logger = logging.getLogger("davinci_crawling")
 
+CHROME_OPTIONS = Options()
+CHROME_OPTIONS.add_argument("--headless")
+CHROME_OPTIONS.add_argument("--no-sandbox")
+CHROME_OPTIONS.add_argument("--disable-gpu")
+CHROME_OPTIONS.add_argument("--disable-features=NetworkService")
+
 
 def get_configuration(crawler_name):
     return settings.DAVINCI_CRAWLERS[crawler_name] \
@@ -67,17 +73,11 @@ class Crawler(metaclass=ABCMeta):
         chromium_file = options.get("chromium_bin_file", None)
         path = os.path.dirname(os.path.abspath(__file__))
         if chromium_file:
-            chrome_options = Options()
-            chrome_options.add_argument("--headless")
-            chrome_options.add_argument("--no-sandbox")
-            chrome_options.add_argument("--disable-gpu")
-            chrome_options.add_argument("--disable-features=NetworkService")
-
             proxy_address = cls.proxy_manager.get_proxy_address()
             if proxy_address:
                 proxy_address = {"proxy": proxy_address}
 
-            chrome_options.binary_location = chromium_file
+            CHROME_OPTIONS.binary_location = chromium_file
 
             capabilities = DesiredCapabilities.CHROME
 
@@ -88,12 +88,12 @@ class Crawler(metaclass=ABCMeta):
 
             if proxy_address:
                 driver = wire_webdriver.Chrome(
-                    chrome_options=chrome_options,
+                    chrome_options=CHROME_OPTIONS,
                     desired_capabilities=capabilities,
                     seleniumwire_options=proxy_address)
             else:
-                driver = webdriver.Chrome(
-                    chrome_options=chrome_options,
+                driver = wire_webdriver.Chrome(
+                    chrome_options=CHROME_OPTIONS,
                     desired_capabilities=capabilities)
 
             _logger.info("Using CHROMIUM as Dynamic Web Driver. Driver {}".
