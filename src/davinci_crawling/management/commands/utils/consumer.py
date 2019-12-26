@@ -8,7 +8,6 @@ from threading import Thread
 
 from davinci_crawling.management.commands.utils.utils import \
     update_task_status, get_crawler_by_name
-from davinci_crawling.utils import setup_cassandra_object_mapper
 
 from multiprocessing import Queue
 
@@ -64,11 +63,6 @@ class CrawlConsumer(object):
         Returns:
             The result of the crawler call.
         """
-        # We need to setup the Cassandra Object Mapper to work on
-        # multiprocessing If we do not do that, the processes will be blocked
-        # when interacting with the object mapper module
-        setup_cassandra_object_mapper()
-
         crawler = get_crawler_by_name(crawler_name)
         _logger.debug("Calling crawl method: {0}".
                       format(getattr(crawler, "crawl")))

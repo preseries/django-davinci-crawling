@@ -13,8 +13,7 @@ from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.models import \
     BovespaCompany, SITUATION_CANCELLED, SITUATION_GRANTED
 from davinci_crawling.throttle.throttle import Throttle
-from davinci_crawling.utils import setup_cassandra_object_mapper, \
-    CrawlersRegistry
+from davinci_crawling.utils import CrawlersRegistry
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -42,11 +41,6 @@ def update_listed_companies(letter, options):
     :param driver:
     :return:
     """
-
-    # We need to setup the Cassandra Object Mapper to work on multiprocessing
-    # If we do not do that, the processes will be blocked when interacting
-    # with the object mapper module
-    setup_cassandra_object_mapper()
 
     driver = None
     try:
