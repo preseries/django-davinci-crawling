@@ -18,7 +18,8 @@ from django.core.management.base import DjangoHelpFormatter
 
 from davinci_crawling.time import mk_datetime
 
-from seleniumwire import webdriver
+from selenium import webdriver
+from seleniumwire import webdriver as wire_webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
@@ -73,7 +74,8 @@ class Crawler(metaclass=ABCMeta):
             chrome_options.add_argument("--disable-features=NetworkService")
 
             proxy_address = cls.proxy_manager.get_proxy_address()
-            proxy_address = {"proxy": proxy_address}
+            if proxy_address:
+                proxy_address = {"proxy": proxy_address}
 
             chrome_options.binary_location = chromium_file
 
@@ -85,7 +87,7 @@ class Crawler(metaclass=ABCMeta):
                     capabilities[key] = value
 
             if proxy_address:
-                driver = webdriver.Chrome(
+                driver = wire_webdriver.Chrome(
                     chrome_options=chrome_options,
                     desired_capabilities=capabilities,
                     seleniumwire_options=proxy_address)
