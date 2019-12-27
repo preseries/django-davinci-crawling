@@ -4,17 +4,17 @@ ARG ssh_prv_key
 ARG ssh_pub_key
 
 # DB connection information
-ENV DB_USER bgds
-ENV DB_PASSWORD bgds
-ENV DB_HOST postgres
+ENV DB_USER davinci
+ENV DB_PASSWORD davinci
+ENV DB_HOST postgres_backend
 ENV DB_PORT 5432
-ENV DB_NAME bgds
+ENV DB_NAME davinci
 
 # CASSANDRA connection information
 ENV CASSANDRA_DB_HOST host.docker.internal
 ENV CASSANDRA_DB_NAME davinci
-ENV CASSANDRA_DB_USER bgds
-ENV CASSANDRA_DB_PASSWORD bgds
+ENV CASSANDRA_DB_USER davinci
+ENV CASSANDRA_DB_PASSWORD davinci
 
 # SOLR connection information
 ENV HAYSTACK_URL="http://host.docker.internal:8983/solr"
@@ -56,7 +56,7 @@ RUN echo "$ssh_prv_key" > /root/.ssh/id_rsa && \
     chmod 600 /root/.ssh/id_rsa.pub
 
 # Install Chrome WebDriver
-RUN CHROMEDRIVER_VERSION=`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE` && \
+RUN CHROMEDRIVER_VERSION="78.0.3904.105" && \
     mkdir -p /opt/chromedriver-$CHROMEDRIVER_VERSION && \
     curl -sS -o /tmp/chromedriver_linux64.zip http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip && \
     unzip -qq /tmp/chromedriver_linux64.zip -d /opt/chromedriver-$CHROMEDRIVER_VERSION && \
@@ -80,4 +80,4 @@ VOLUME /davinci
 
 EXPOSE 8000
 
-CMD tail -f /dev/null
+CMD ["python", "manage.py", "runserver", "0:8000"]
