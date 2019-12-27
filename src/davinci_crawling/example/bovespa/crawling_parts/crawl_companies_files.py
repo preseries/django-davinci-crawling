@@ -14,8 +14,7 @@ from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.models import \
     BovespaCompany, BovespaCompanyFile, DOC_TYPES
 from davinci_crawling.throttle.throttle import Throttle
-from davinci_crawling.utils import setup_cassandra_object_mapper, \
-    CrawlersRegistry
+from davinci_crawling.utils import CrawlersRegistry
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -231,10 +230,6 @@ def obtain_company_files(
 
     Returns: the files that we downloaded from company.
     """
-    # We need to setup the Cassandra Object Mapper to work on multiprocessing
-    # If we do not do that, the processes will be blocked when interacting
-    # with the object mapper module
-    setup_cassandra_object_mapper()
 
     files = []
     driver = None

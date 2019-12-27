@@ -41,6 +41,7 @@ Improvements or Changes
 - Change the key used on throttle from `<function_name>` to `<crawler_name>_<function_name>_<throttle_suffix>`
 - Add maintenance status to the task;
 - Add a `more_info` field to the task;
+- Remove unnecessary usage of the setup_cassandra_object_mapper inside the bovespa crawler;
 
 Bug Fixing
 **********
