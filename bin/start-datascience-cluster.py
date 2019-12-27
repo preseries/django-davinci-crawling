@@ -137,7 +137,7 @@ if __name__ == '__main__':
 
             metadata = {
                 'JUPYTER_PORT': "8124",
-                #'dataproc_bucket': "team_%d" % args.team,
+                # 'dataproc_bucket': "team_%d" % args.team,
                 'JUPYTER_CONDA_PACKAGES': 'numpy:pandas:scikit-learn',
             }
 
@@ -175,7 +175,7 @@ if __name__ == '__main__':
           (cluster_name, args.project_name, args.zone))
 
     print("Start browser using SOCKS (Mac OS X): "
-          "[/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome "
+          "[/Applications/Google Chrome.app/Contents/MacOS/Google Chrome "
           "--proxy-server=\"socks5://localhost:8080\"  "
           "--host-resolver-rules=\"MAP * 0.0.0.0, EXCLUDE localhost\"  "
           "--user-data-dir=/tmp/%s]" % args.username)
@@ -187,7 +187,7 @@ if __name__ == '__main__':
           "--user-data-dir=/tmp/%s]" % args.username)
 
     print("Start browser using SOCKS (Windows): "
-          "[C:\Program Files (x86)\Google\Chrome\Application\chrome.exe "
+          "[C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe "
           "--proxy-server=\"socks5://localhost:8080\"  "
           "--host-resolver-rules=\"MAP * 0.0.0.0, EXCLUDE localhost\"  "
           "--user-data-dir=/tmp/%s]" % args.username)

@@ -269,7 +269,7 @@ def obtain_company_files(
         # Wait until the page is loaded
         try:
             conditions = [EC.presence_of_element_located(
-                    (By.XPATH, "//form[@name='AIR']/table/*"))]
+                (By.XPATH, "//form[@name='AIR']/table/*"))]
             wait_tenaciously(driver, 10, conditions, 3, 5)
         except TimeoutException:
             conditions = [EC.title_contains("CBLCNET -")]
