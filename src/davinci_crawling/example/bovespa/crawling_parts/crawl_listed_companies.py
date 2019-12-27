@@ -5,6 +5,8 @@ import itertools
 import logging
 import re
 import traceback
+
+from davinci_crawling.net import wait_tenaciously
 from multiprocessing.pool import ThreadPool as Pool
 
 from bs4 import BeautifulSoup
@@ -16,7 +18,6 @@ from davinci_crawling.throttle.throttle import Throttle
 from davinci_crawling.utils import CrawlersRegistry
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
 
 ALPHABET_LIST = list(map(chr, range(65, 91)))
 NUMBERS_LIST = list(range(0, 10))
@@ -60,15 +61,16 @@ def update_listed_companies(letter, options):
         #  presence of the table with id = "dlCiasCdCVM"
         driver.get(url)
         try:
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.ID, 'dlCiasCdCVM')))
+            conditions = [
+                EC.presence_of_element_located((By.ID, 'dlCiasCdCVM'))]
+            wait_tenaciously(driver, 10, conditions, 3, 5)
         except Exception as ex:
-            WebDriverWait(driver, 10).until(
+            conditions = [
                 EC.text_to_be_present_in_element(
                     (By.ID, 'lblMsg'),
                     "Nenhuma companhia foi encontrada com o critério de"
-                    " busca especificado."))
-
+                    " busca especificado.")]
+            wait_tenaciously(driver, 10, conditions, 3, 5)
             return companies
 
         bs = BeautifulSoup(driver.page_source, "html.parser")
