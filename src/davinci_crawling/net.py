@@ -17,6 +17,9 @@ from bs4 import BeautifulSoup
 from davinci_crawling.exceptions import DownloadException
 from davinci_crawling.io import copy_file
 
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.support.wait import WebDriverWait
+
 logger = logging.getLogger("davinci_crawling")
 
 APPLICATION_FORM = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -203,6 +206,35 @@ def fetch_html(url, timeout=None):
 
 def __constatly_true(status):
     return True
+
+
+def wait_tenaciously(driver, timeout, expected_conditions, n, s,
+                     error_callback=__constatly_true):
+    n -= 1
+    try:
+        # Wait until the page is loaded
+        WebDriverWait(driver, timeout=timeout).until(*expected_conditions)
+    except TimeoutException as ex:
+        logger.exception(
+            f"Exception thrown"
+            f" for {driver.current_url} - ({expected_conditions}): {ex}."
+            f" Max {n} attempts remaining")
+        __maybe_wait(
+            driver, timeout, expected_conditions, n, s, ex, error_callback)
+
+
+def __maybe_wait(driver, timeout, expected_conditions, n, s,
+                 exception, error_callback=None):
+    if error_callback and error_callback(driver, exception) and (n > 0):
+        logger.info("Sleeping for %s seconds before next retry." % s)
+        sleep(s)
+        return wait_tenaciously(
+            driver, timeout, expected_conditions, n, s,
+            error_callback=error_callback)
+
+    logger.info("No more tries (exhausted or "
+                "short-circuited by error callback")
+    raise exception
 
 
 def fetch_tenaciously(fetcher, url, n, s,
