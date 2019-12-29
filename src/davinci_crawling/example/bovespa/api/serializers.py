@@ -226,7 +226,7 @@ class BovespaAccountFacetSerializerV1(HaystackFacetSerializer):
             "ccvm", "period", "version", "number", "name",
             "financial_info_type", "balance_type", "comments",
             "created_at", "updated_at"]
-        
+
 
 # Cache configuration
 cache_registry.register(BovespaAccountSerializerV1)
