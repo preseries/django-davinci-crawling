@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
+import queue
+
 import logging
 
 from caravaggio_rest_api.tests import CaravaggioBaseTest
@@ -176,6 +178,14 @@ class TestCrawl(CaravaggioBaseTest):
                     initialize_consumer=False)
 
         tasks = Task.objects.filter(status=STATUS_QUEUED).all()
+        # With this options we always have 5 files, unless any file got deleted
+        # this assert should be 5
+        files_count = len(tasks)
+        self.assertEqual(files_count, 5)
+
+        start_crawl(workers_num=WORKERS_NUM, interval=1, times_to_run=2)
+
+        tasks = Task.objects.filter(status=STATUS_FINISHED).all()
         # With this options we always have 5 files, unless any file got deleted
         # this assert should be 5
         files_count = len(tasks)

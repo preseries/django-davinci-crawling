@@ -17,6 +17,7 @@ New Features
 - Add a method to utils to get all registered crawlers.
 - Add proxy mesh to chrome driver on selenium;
 - Add proxy mesh to fetch_file to download files;
+- Add persistent-queue to the crawl flow to avoid losing tasks if their state are QUEUED or RUNNING;
 
 Improvements or Changes
 ***********************
