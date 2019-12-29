@@ -69,7 +69,7 @@ class Task(CustomDjangoCassandraModel):
         type: the type of the task, could be OnDemand(1) or Batch(2)
     """
 
-    __table_name__ = "task"
+    __table_name__ = "davinci_task"
 
     # Force that all the values will reside in the seam node of the cluster
     task_id = columns.UUID(partition_key=True, default=uuid.uuid4)
