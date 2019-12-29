@@ -83,14 +83,14 @@ def periodic_checker():
     sleep_time = settings.DAVINCI_CONF["architecture-params"]["proxy"][
         "proxies-availability-checker"]["elapse-time-between-checks"]
     pool = multiprocessing.Pool(4)
-    while not event.isSet():
+    while True:
         assure_proxy_quality(pool)
         time.sleep(sleep_time)
 
 
-event = threading.Event()
 try:
-    executor = ThreadPoolExecutor(max_workers=1)
-    future = executor.submit(periodic_checker)
+    d = threading.Thread(name='periodic_checker', target=periodic_checker)
+    d.setDaemon(True)
+    d.start()
 except asyncio.CancelledError:
     pass

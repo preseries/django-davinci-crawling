@@ -48,6 +48,7 @@ Bug Fixing
 **********
 - Fix a bug with the `include_companies` parameter that wasn't working with a list of companies;
 - Truncate milliseconds on created_at on task model because as this field is used as primary key the milliseconds cause errors on comparisons;
+- Change proxy quality checker threads to daemon to let the program finish
 
 Version 0.1.5
 =============
