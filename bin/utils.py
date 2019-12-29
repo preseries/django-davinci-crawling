@@ -18,7 +18,7 @@ INSTANCES_TYPE = ["n1-standard-1", "n1-standard-2", "n1-standard-4",
                   "n1-highmem-16", "n1-highmem-32", "n1-highmem-64",
                   "n1-highmem-96",
                   "n1-highcpu-2", "n1-highcpu-4", "n1-highcpu-8",
-                  "n1-highcpu-16","n1-highcpu-32", "n1-highcpu-64",
+                  "n1-highcpu-16", "n1-highcpu-32", "n1-highcpu-64",
                   "n1-highcpu-96"]
 
 INSTANCE_RESOURCES = {
