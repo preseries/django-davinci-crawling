@@ -30,6 +30,12 @@ from django.db import connections
 _logger = logging.getLogger("davinci_crawling.commands")
 
 
+def _add_default_options(options_obj, default_values):
+    for key, value in default_values.items():
+        if key not in options_obj or options_obj[key] is None:
+            options_obj[key] = value
+
+
 def _pool_tasks(interval, times_to_run):
     """
     A while that runs forever and check for new tasks on the cassandra DB,
@@ -58,10 +64,12 @@ def _pool_tasks(interval, times_to_run):
 
                 # get the fixed options on the settings that will be aggregated
                 # with the options sent on the table.
-                options.update(settings.DAVINCI_CONF["crawler-params"].get(
-                    "default", {}))
-                options.update(settings.DAVINCI_CONF["crawler-params"].get(
-                    crawler_name, {}))
+                default_settings = settings.DAVINCI_CONF["crawler-params"].get(
+                    "default", {})
+                crawler_settings = settings.DAVINCI_CONF["crawler-params"].get(
+                    crawler_name, {})
+                _add_default_options(options, default_settings)
+                _add_default_options(options, crawler_settings)
 
                 # fixed options, place here all the fixed options
                 options["current_execution_date"] = datetime.utcnow()
