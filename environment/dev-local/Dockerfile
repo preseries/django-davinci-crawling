@@ -12,8 +12,10 @@ RUN mkdir /davinci
 
 ADD . /davinci/
 
+RUN pip install Cython django-haystack
+
 RUN cd /davinci \
-    && pip install . \
+    && python setup.py develop \
     && pip install django_caravaggio_rest_api[spatial] \
     && pip install -r requirements.txt || echo "ignore error" \
     && pip install -r requirements_tests.txt || echo "ignore error"
