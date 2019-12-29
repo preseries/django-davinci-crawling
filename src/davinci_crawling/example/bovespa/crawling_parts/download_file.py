@@ -4,6 +4,7 @@
 import logging
 import ntpath
 import re
+import os
 
 from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.io import \
@@ -108,26 +109,36 @@ def download_file(options, ccvm, doc_type, fiscal_date, version):
             not company_file.file_url or \
             not exists(options, company_file.file_url):
 
-        fetch_file_params = {
-            "base_path": local_base_path
-        }
-        fetch_file_params.update(options)
+        # Check if there is a file in the cached path
+        files = listdir(options, cache_base_path)
+        if len(files) == 0:
+            fetch_file_params = {
+                "base_path": local_base_path
+            }
+            fetch_file_params.update(options)
 
-        file = fetch_tenaciously(
-            fetcher=fetch_file,
-            url=company_file.source_url,
-            n=10,
-            s=10,
-            data=fetch_file_params)
+            file = fetch_tenaciously(
+                fetcher=fetch_file,
+                url=company_file.source_url,
+                n=10,
+                s=10,
+                data=fetch_file_params)
 
-        file_url = "{0}/{1}".format(cache_base_path, file.filename)
+            file_url = "{0}/{1}".format(cache_base_path, file.filename)
 
-        # Let's cache the file into our permanent storage
-        copy_file(options, file.file, file_url)
+            # Let's cache the file into our permanent storage
+            copy_file(options, file.file, file_url)
 
-        company_file.update(
-            file_url=file_url,
-            file_name=file.filename,
-            file_extension=get_extension(file.file))
+            company_file.update(
+                file_url=file_url,
+                file_name=file.filename,
+                file_extension=get_extension(file.file))
+        else:
+            file_url = files[0]
+            file_name = os.path.split(file_url)[1]
+            company_file.update(
+                file_url=file_url,
+                file_name=file_name,
+                file_extension=get_extension(file_name))
 
     return extract_files_to_process(options, company_file)

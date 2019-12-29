@@ -187,7 +187,7 @@ if __name__ == '__main__':
           "--user-data-dir=/tmp/%s]" % args.username)
 
     print("Start browser using SOCKS (Windows): "
-          "[C:/Program Files (x86)/Google/Chrome/Application/chrome.exe "
+          "[C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe "
           "--proxy-server=\"socks5://localhost:8080\"  "
           "--host-resolver-rules=\"MAP * 0.0.0.0, EXCLUDE localhost\"  "
           "--user-data-dir=/tmp/%s]" % args.username)

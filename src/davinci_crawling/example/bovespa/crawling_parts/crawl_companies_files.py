@@ -4,6 +4,8 @@
 import logging
 import re
 import traceback
+
+from davinci_crawling.net import wait_tenaciously
 from multiprocessing.pool import ThreadPool as Pool
 from urllib.parse import urlencode
 
@@ -18,7 +20,6 @@ from davinci_crawling.utils import CrawlersRegistry
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
 
 try:
     from dse.cqlengine.query import LWTException
@@ -204,10 +205,9 @@ def extract_ENET_files_from_page(
             element.click()
 
             # Wait until the page is loaded
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located(
-                    (By.XPATH, "//form[@name='AIR']/table/*")))
-
+            conditions = [EC.presence_of_element_located(
+                (By.XPATH, "//form[@name='AIR']/table/*"))]
+            wait_tenaciously(driver, 10, conditions, 3, 5)
             bs = BeautifulSoup(driver.page_source, "html.parser")
 
     return files
@@ -247,12 +247,13 @@ def obtain_company_files(
         # We control that the page is loaded looking for an element with
         # id = "AIR" in the page
         driver.get(url)
+
         try:
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.NAME, 'AIR')))
+            conditions = [EC.presence_of_element_located((By.NAME, 'AIR'))]
+            wait_tenaciously(driver, 10, conditions, 3, 5)
         except TimeoutException:
-            WebDriverWait(driver, 10).until(
-                EC.title_contains("CBLCNET -"))
+            conditions = [EC.title_contains("CBLCNET -")]
+            wait_tenaciously(driver, 10, conditions, 3, 5)
             _logger.warning(
                 "There is no documents page for company {ccvm} "
                 "and {doc_type}. Showing 'Error de Aplicacao'".
@@ -267,12 +268,12 @@ def obtain_company_files(
 
         # Wait until the page is loaded
         try:
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located(
-                    (By.XPATH, "//form[@name='AIR']/table/*")))
+            conditions = [EC.presence_of_element_located(
+                (By.XPATH, "//form[@name='AIR']/table/*"))]
+            wait_tenaciously(driver, 10, conditions, 3, 5)
         except TimeoutException:
-            WebDriverWait(driver, 10).until(
-                EC.title_contains("CBLCNET -"))
+            conditions = [EC.title_contains("CBLCNET -")]
+            wait_tenaciously(driver, 10, conditions, 3, 5)
             _logger.warning(
                 "There is no documents page for company {ccvm} "
                 "and {doc_type}. Showing 'Error de Aplicacao'".

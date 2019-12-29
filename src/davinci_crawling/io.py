@@ -273,6 +273,12 @@ def listdir(options, source_folder):
     if backend == "fs":
         for the_file in os.listdir(clean_source_folder):
             files_ref.append(os.path.join(clean_source_folder, the_file))
+    elif backend == "gs":
+        storage_client = get_gs_client(options)
+        bucket_name = get_gs_bucket_name(options)
+        dest_file = get_gs_path(source_folder)
+        for blob in storage_client.list_blobs(bucket_name, prefix=dest_file):
+            files_ref.append(f"gs://{bucket_name}/{blob.name}")
 
     return files_ref
 
