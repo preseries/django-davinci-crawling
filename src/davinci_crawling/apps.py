@@ -9,6 +9,6 @@ class DaVinciCrawlingConfig(AppConfig):
     verbose_name = "Django DaVinci Crawling Framework"
 
     def ready(self):
-        pass
+        from davinci_crawling.proxy import proxy_quality_checker
         # Add System checks
         # from .checks import pagination_system_check  # NOQA

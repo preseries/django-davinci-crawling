@@ -32,7 +32,9 @@ class BovespaCompanySerializerV1(
         fields = ("ccvm",
                   "created_at", "cnpj", "updated_at",
                   "company_name", "situation", "company_type",
+                  "is_deleted", "deleted_reason",
                   "granted_date", "canceled_date")
+
         read_only_fields = ("created_at", "updated_at")
 
 
@@ -57,8 +59,12 @@ class BovespaCompanySearchSerializerV1(
             "entity_type", "ccvm",
             "created_at", "cnpj", "updated_at",
             "company_name", "situation", "company_type",
-            "granted_date", "canceled_date"
+            "granted_date", "canceled_date",
             "score"]
+
+        search_fields = [
+            "text"
+        ]
 
 
 class BovespaCompanyFacetSerializerV1(HaystackFacetSerializer):
@@ -73,36 +79,8 @@ class BovespaCompanyFacetSerializerV1(HaystackFacetSerializer):
         index_classes = [BovespaCompany]
         fields = ["created_at", "updated_at",
                   "situation", "company_type",
-                  "granted_date", "canceled_date"]
-
-        field_options = {
-            "company_type": {},
-            "situation": {},
-            "created_at": {
-                "start_date": datetime.utcnow() - timedelta(days=5 * 365),
-                "end_date": datetime.utcnow(),
-                "gap_by": "month",
-                "gap_amount": 1
-            },
-            "updated_at": {
-                "start_date": datetime.utcnow() - timedelta(days=5 * 365),
-                "end_date": datetime.utcnow(),
-                "gap_by": "month",
-                "gap_amount": 1
-            },
-            "granted_date": {
-                "start_date": parse_date("1980-01-01"),
-                "end_date": datetime.utcnow(),
-                "gap_by": "year",
-                "gap_amount": 1
-            },
-            "canceled_date": {
-                "start_date": parse_date("1980-01-01"),
-                "end_date": datetime.utcnow(),
-                "gap_by": "year",
-                "gap_amount": 1
-            }
-        }
+                  "granted_date", "canceled_date",
+                  "ccvm", "cnpj"]
 
 
 # Cache configuration
@@ -155,8 +133,12 @@ class BovespaCompanyFileSearchSerializerV1(
             "fiscal_date_y", "fiscal_date_yd", "fiscal_date_q",
             "fiscal_date_m", "fiscal_date_md", "fiscal_date_w",
             "fiscal_date_wd", "fiscal_date_yq", "fiscal_date_ym",
-            "source_url", "file_url", "file_name", "file_extension"
+            "source_url", "file_url", "file_name", "file_extension",
             "score"]
+
+        search_fields = [
+            "text"
+        ]
 
 
 class BovespaCompanyFileFacetSerializerV1(HaystackFacetSerializer):
@@ -171,56 +153,13 @@ class BovespaCompanyFileFacetSerializerV1(HaystackFacetSerializer):
         index_classes = [BovespaCompany]
         fields = [
             "ccvm", "doc_type", "fiscal_date", "version", "status",
-            "created_at", "updated_at",
+            "created_at", "updated_at", "protocol",
             "delivery_date", "delivery_type",
             "company_name", "company_cnpj",
             "fiscal_date_y", "fiscal_date_yd", "fiscal_date_q",
             "fiscal_date_m", "fiscal_date_md", "fiscal_date_w",
             "fiscal_date_wd", "fiscal_date_yq", "fiscal_date_ym",
             "file_extension"]
-
-        field_options = {
-            "ccvm": {},
-            "doc_type": {},
-            "version": {},
-            "status": {},
-            "company_name": {},
-            "company_cnpj": {},
-            "fiscal_date_y": {},
-            "fiscal_date_yd": {},
-            "fiscal_date_q": {},
-            "fiscal_date_m": {},
-            "fiscal_date_md": {},
-            "fiscal_date_w": {},
-            "fiscal_date_wd": {},
-            "fiscal_date_yq": {},
-            "fiscal_date_ym": {},
-            "file_extension": {},
-            "created_at": {
-                "start_date": datetime.utcnow() - timedelta(days=5 * 365),
-                "end_date": datetime.utcnow(),
-                "gap_by": "month",
-                "gap_amount": 1
-            },
-            "updated_at": {
-                "start_date": datetime.utcnow() - timedelta(days=5 * 365),
-                "end_date": datetime.utcnow(),
-                "gap_by": "month",
-                "gap_amount": 1
-            },
-            "delivery_date": {
-                "start_date": parse_date("2000-01-01"),
-                "end_date": datetime.utcnow(),
-                "gap_by": "year",
-                "gap_amount": 1
-            },
-            "fiscal_date": {
-                "start_date": parse_date("2000-01-01"),
-                "end_date": datetime.utcnow(),
-                "gap_by": "year",
-                "gap_amount": 1
-            }
-        }
 
 
 # Cache configuration
@@ -268,6 +207,10 @@ class BovespaAccountSearchSerializerV1(
             "created_at", "updated_at",
             "score"]
 
+        search_fields = [
+            "text"
+        ]
+
 
 class BovespaAccountFacetSerializerV1(HaystackFacetSerializer):
 
@@ -283,34 +226,6 @@ class BovespaAccountFacetSerializerV1(HaystackFacetSerializer):
             "ccvm", "period", "version", "number", "name",
             "financial_info_type", "balance_type", "comments",
             "created_at", "updated_at"]
-
-        field_options = {
-            "ccvm": {},
-            "version": {},
-            "number": {},
-            "name": {},
-            "financial_info_type": {},
-            "balance_type": {},
-            "comments": {},
-            "created_at": {
-                "start_date": datetime.utcnow() - timedelta(days=5 * 365),
-                "end_date": datetime.utcnow(),
-                "gap_by": "month",
-                "gap_amount": 1
-            },
-            "updated_at": {
-                "start_date": datetime.utcnow() - timedelta(days=5 * 365),
-                "end_date": datetime.utcnow(),
-                "gap_by": "month",
-                "gap_amount": 1
-            },
-            "period": {
-                "start_date": parse_date("2000-01-01"),
-                "end_date": datetime.utcnow(),
-                "gap_by": "year",
-                "gap_amount": 1
-            },
-        }
 
 
 # Cache configuration

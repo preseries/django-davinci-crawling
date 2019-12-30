@@ -17,6 +17,9 @@ New Features
 - Add a method to utils to get all registered crawlers.
 - Add distributed throttle implementation using Redis;
 - Add pylimit to the requirements;
+- Add proxy mesh to chrome driver on selenium;
+- Add proxy mesh to fetch_file to download files;
+- Add persistent-queue to the crawl flow to avoid losing tasks if their state are QUEUED or RUNNING;
 
 Improvements or Changes
 ***********************
@@ -39,10 +42,15 @@ Improvements or Changes
 - Change the crawl command to pool tasks from the DB;
 - Improve the Throttle class to be extended;
 - Change the key used on throttle from `<function_name>` to `<crawler_name>_<function_name>_<throttle_suffix>`
+- Add maintenance status to the task;
+- Add a `more_info` field to the task;
+- Remove unnecessary usage of the setup_cassandra_object_mapper inside the bovespa crawler;
 
 Bug Fixing
 **********
-- Fix a bug with the `include_companies` parameter that wasn't working with a list of companies
+- Fix a bug with the `include_companies` parameter that wasn't working with a list of companies;
+- Truncate milliseconds on created_at on task model because as this field is used as primary key the milliseconds cause errors on comparisons;
+- Change proxy quality checker threads to daemon to let the program finish
 
 Version 0.1.5
 =============

@@ -46,8 +46,11 @@ class BovespaCompanyIndex(BaseSearchIndex, indexes.Indexable):
     situation = indexes.CharField(
         model_attr="situation", faceted=True)
 
-    situation_date = indexes.DateField(
-        model_attr="situation_date")
+    granted_date = indexes.DateField(
+        model_attr="granted_date")
+
+    canceled_date = indexes.DateField(
+        model_attr="canceled_date")
 
     class Meta:
 

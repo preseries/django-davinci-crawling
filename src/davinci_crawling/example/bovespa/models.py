@@ -118,31 +118,31 @@ class BovespaCompanyFile(CustomDjangoCassandraModel):
     company_cnpj = columns.Text(required=True)
 
     # The Fiscal Period decomposed into year, quarter, month
-    # The year of the balance sheet
+    # The year of the financial report
     # Ex. 2015
     fiscal_date_y = columns.SmallInt()
 
-    # The day of the year of the balance sheet
-    # Ex. 2015
+    # The day of the year of the financial report
+    # Ex. 205
     fiscal_date_yd = columns.SmallInt()
 
-    # The quarter of the balance sheet
+    # The quarter of the financial report
     # Ex. 1
     fiscal_date_q = columns.SmallInt()
 
-    # The month of the balance sheet
+    # The month of the financial report
     # Ex. 1
     fiscal_date_m = columns.SmallInt()
 
-    # The day of the month of the balance sheet
+    # The day of the month of the financial report
     # Ex. 1
     fiscal_date_md = columns.SmallInt()
 
-    # The week of the year
+    # The week of the year of financial report
     # Ex. 1
     fiscal_date_w = columns.SmallInt()
 
-    # The day of the week of the year
+    # The day of the week of the year of the financial report
     # Ex. 1
     fiscal_date_wd = columns.SmallInt()
 

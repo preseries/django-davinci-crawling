@@ -81,7 +81,7 @@ def create_gs_folder(options, path):
     return blob.path
 
 
-def upload_gs_file(options, source_file, dest_file):
+def upload_gs_file(options, source_file, dest_file, chunk_size=None):
     storage_client = get_gs_client(options)
 
     bucket_name = get_gs_bucket_name(options)
@@ -92,7 +92,7 @@ def upload_gs_file(options, source_file, dest_file):
     _logger.debug(("Upload file [%s] into [gs://%s/%s]" %
                    (source_file, bucket.name, dest_file)))
 
-    blob = bucket.blob(dest_file)
+    blob = bucket.blob(dest_file, chunk_size=chunk_size)
     blob.upload_from_filename(source_file)
 
     return blob.path
@@ -192,7 +192,6 @@ def get_extension(file):
 
 
 def mkdirs(options, dest_file):
-
     backend = get_backend(dest_file)
 
     if backend == "fs":
@@ -205,7 +204,6 @@ def mkdirs(options, dest_file):
 
 
 def get_backend_and_path(options, file, raise_exceptions=False):
-
     try:
         backend = get_backend(file)
     except Exception as ex:
@@ -275,12 +273,17 @@ def listdir(options, source_folder):
     if backend == "fs":
         for the_file in os.listdir(clean_source_folder):
             files_ref.append(os.path.join(clean_source_folder, the_file))
+    elif backend == "gs":
+        storage_client = get_gs_client(options)
+        bucket_name = get_gs_bucket_name(options)
+        dest_file = get_gs_path(source_folder)
+        for blob in storage_client.list_blobs(bucket_name, prefix=dest_file):
+            files_ref.append(f"gs://{bucket_name}/{blob.name}")
 
     return files_ref
 
 
 def exists(options, dest_file):
-
     backend = get_backend(dest_file)
 
     if backend == "fs":
@@ -337,7 +340,7 @@ def delete_all(options, path):
                         "Clean version: [{1}]".format(path, clean_path))
 
 
-def copy_file(options, source_file, dest_file):
+def copy_file(options, source_file, dest_file, chunk_size=None):
     with tempfile.TemporaryDirectory() as temp_path:
         # If the backend if FS in source_file we have the reference to the
         # local FS file
@@ -362,7 +365,8 @@ def copy_file(options, source_file, dest_file):
         elif dest_backend == "gs":
             # In GS the paths are created automatically when we
             # copy/upload the file
-            upload_gs_file(options, source_file, dest_file)
+            upload_gs_file(options, source_file, dest_file,
+                           chunk_size=chunk_size)
 
             return dest_file
 
@@ -374,7 +378,6 @@ def get_control_dir(options):
 def put_control_timestamp(
         config, control_file_name="crawl-timestamp.txt",
         custom_timestamp=datetime.datetime.utcnow().isoformat()):
-
     control_dir = get_control_dir(config)
 
     backend = get_backend(control_dir)
@@ -387,7 +390,6 @@ def put_control_timestamp(
 
 def get_control_timestamp(options,
                           control_file_name="crawl-timestamp.txt"):
-
     control_dir = get_control_dir(options)
 
     backend = get_backend(control_dir)
@@ -401,9 +403,8 @@ def get_control_timestamp(options,
 
 
 def get_checkpoint_data(source, key, default=None):
-
     try:
-        return Checkpoint.objects.filter(source=source, key=key).get().\
+        return Checkpoint.objects.filter(source=source, key=key).get(). \
             get_data()
     except DoesNotExist:
         return default

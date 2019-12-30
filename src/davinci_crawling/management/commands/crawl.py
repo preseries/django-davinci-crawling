@@ -8,6 +8,7 @@ import json
 import sys
 import logging
 import time
+import traceback
 from datetime import datetime
 from threading import Thread
 
@@ -27,6 +28,12 @@ from django.core.management.base import SystemCheckError, CommandParser, \
 from django.db import connections
 
 _logger = logging.getLogger("davinci_crawling.commands")
+
+
+def _add_default_options(options_obj, default_values):
+    for key, value in default_values.items():
+        if key not in options_obj or options_obj[key] is None:
+            options_obj[key] = value
 
 
 def _pool_tasks(interval, times_to_run):
@@ -57,10 +64,12 @@ def _pool_tasks(interval, times_to_run):
 
                 # get the fixed options on the settings that will be aggregated
                 # with the options sent on the table.
-                options.update(settings.DAVINCI_CONF["crawler-params"].get(
-                    "default", {}))
-                options.update(settings.DAVINCI_CONF["crawler-params"].get(
-                    crawler_name, {}))
+                default_settings = settings.DAVINCI_CONF["crawler-params"].get(
+                    "default", {})
+                crawler_settings = settings.DAVINCI_CONF["crawler-params"].get(
+                    crawler_name, {})
+                _add_default_options(options, default_settings)
+                _add_default_options(options, crawler_settings)
 
                 # fixed options, place here all the fixed options
                 options["current_execution_date"] = datetime.utcnow()
@@ -70,15 +79,16 @@ def _pool_tasks(interval, times_to_run):
                 producer.add_crawl_params(params, options)
                 update_task_status(task, STATUS_QUEUED)
             except Exception as e:
-                # TODO add the error message to the DB
-                update_task_status(task, STATUS_FAULTY)
+                update_task_status(task, STATUS_FAULTY,
+                                   more_info=traceback.format_exc())
                 _logger.error("Error while adding params to queue", e)
         time.sleep(interval)
         if times_to_run:
             times_run += 1
 
 
-def start_crawl(workers_num, interval, times_to_run=None):
+def start_crawl(workers_num, interval, times_to_run=None,
+                initialize_consumer=True):
     """
     Run the necessary methods to start crawling data. This method will start a
     tasks pool that will constantly get lines from DB and if anything is new
@@ -88,10 +98,14 @@ def start_crawl(workers_num, interval, times_to_run=None):
         interval: Interval to wait between pool the tasks.
         times_to_run: used on tests to determine that the threads will not run
         forever.
+        initialize_consumer: if true the consumer will be initialized, if not
+        the consumer will not start and only the tasks will be queued
     """
-    crawl_consumer = CrawlConsumer(workers_num, times_to_run)
-    _logger.info("Starting a consumer of %d processes" % workers_num)
-    crawl_consumer.start()
+    crawl_consumer = None
+    if initialize_consumer:
+        crawl_consumer = CrawlConsumer(workers_num, times_to_run)
+        _logger.info("Starting a consumer of %d processes" % workers_num)
+        crawl_consumer.start()
     task_thread = Thread(target=_pool_tasks, args=(interval, times_to_run))
 
     try:
@@ -100,7 +114,8 @@ def start_crawl(workers_num, interval, times_to_run=None):
         _logger.error("Timeout error")
     finally:
         task_thread.join()
-        crawl_consumer.join()
+        if crawl_consumer:
+            crawl_consumer.join()
 
 
 class Command(BaseCommand):

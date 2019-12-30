@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
+import os
 
 import django
 from _datetime import datetime
@@ -7,6 +8,9 @@ from abc import ABCMeta
 import abc
 import logging
 
+from davinci_crawling.task.models import Task, STATUS_FAULTY, \
+    STATUS_MAINTENANCE
+from davinci_crawling.proxy.proxy import ProxyManager
 from django.conf import settings
 
 from django.core.management import CommandParser
@@ -15,11 +19,18 @@ from django.core.management.base import DjangoHelpFormatter
 from davinci_crawling.time import mk_datetime
 
 from selenium import webdriver
+from seleniumwire import webdriver as wire_webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 _logger = logging.getLogger("davinci_crawling")
+
+CHROME_OPTIONS = Options()
+CHROME_OPTIONS.add_argument("--headless")
+CHROME_OPTIONS.add_argument("--no-sandbox")
+CHROME_OPTIONS.add_argument("--disable-gpu")
+CHROME_OPTIONS.add_argument("--disable-features=NetworkService")
 
 
 def get_configuration(crawler_name):
@@ -30,6 +41,8 @@ def get_configuration(crawler_name):
 class Crawler(metaclass=ABCMeta):
 
     CHROME_DESIREDCAPABILITIES = "chrome_desired_capabilities"
+
+    proxy_manager = ProxyManager()
 
     # The unique name of the crawler to be identified in the system
     __crawler_name__ = None
@@ -58,13 +71,13 @@ class Crawler(metaclass=ABCMeta):
 
         # Chromium folder
         chromium_file = options.get("chromium_bin_file", None)
+        path = os.path.dirname(os.path.abspath(__file__))
         if chromium_file:
-            chrome_options = Options()
-            chrome_options.add_argument("--headless")
-            chrome_options.add_argument("--no-sandbox")
-            chrome_options.add_argument("--disable-gpu")
-            chrome_options.add_argument("--disable-features=NetworkService")
-            chrome_options.binary_location = chromium_file
+            proxy_address = cls.proxy_manager.get_proxy_address()
+            if proxy_address:
+                proxy_address = {"proxy": proxy_address}
+
+            CHROME_OPTIONS.binary_location = chromium_file
 
             capabilities = DesiredCapabilities.CHROME
 
@@ -73,9 +86,15 @@ class Crawler(metaclass=ABCMeta):
                         Crawler.CHROME_DESIREDCAPABILITIES].items():
                     capabilities[key] = value
 
-            driver = webdriver.Chrome(
-                chrome_options=chrome_options,
-                desired_capabilities=capabilities)
+            if proxy_address:
+                driver = wire_webdriver.Chrome(
+                    chrome_options=CHROME_OPTIONS,
+                    desired_capabilities=capabilities,
+                    seleniumwire_options=proxy_address)
+            else:
+                driver = wire_webdriver.Chrome(
+                    chrome_options=CHROME_OPTIONS,
+                    desired_capabilities=capabilities)
 
             _logger.info("Using CHROMIUM as Dynamic Web Driver. Driver {}".
                          format(repr(driver)))
@@ -263,3 +282,49 @@ class Crawler(metaclass=ABCMeta):
     @abc.abstractmethod
     def crawl(self, task_id, crawling_params, options):
         raise NotImplementedError()
+
+    @staticmethod
+    def error(task_id, more_info=None):
+        """
+        Change the task (with the task_id) to the error status and also add
+        the more_info to the more_info of the task.
+        Args:
+            task_id: The task id to add the error
+            more_info: more information about the error
+        """
+        task = Task.objects.get(task_id=task_id)
+
+        if not task:
+            raise Exception("Not found task with task id %s", task_id)
+
+        task.update(**{"status": STATUS_FAULTY, "more_info": more_info})
+
+    @staticmethod
+    def maintenance_notice(task_id, more_info=None):
+        """
+        Create a new task on the DB with the status maintenance, that signals
+        that something is wrong with that task but we can continue processing
+        it.
+
+        This can be used for example to signal that the structure of some api
+        changed.
+        Args:
+            task_id: The task id to notice
+            more_info: more information about the maintenance notice
+        """
+        task = Task.objects.get(task_id=task_id)
+
+        if not task:
+            raise Exception("Not found task with task id %s", task_id)
+
+        task_data = {
+            "status": STATUS_MAINTENANCE,
+            "kind": task.kind,
+            "options": task.options,
+            "params": task.params,
+            "type": task.type,
+            "user": task.user,
+            "more_info": more_info
+        }
+
+        Task.create(**task_data)
