@@ -10,12 +10,23 @@ from django.conf import settings
 
 AUTHORIZED_PROXIES_URL = "https://proxymesh.com/api/proxies/"
 
-PROXY_MESH_SETTINGS = settings.DAVINCI_CONF["architecture-params"]["proxy"][
-    "proxy_mesh"]
-
 PROXY_TEMPLATE = "%s:%s@%s"
 
 _logger = logging.getLogger("davinci_crawling")
+
+
+def get_proxy_mesh_settings():
+    if hasattr(settings, 'DAVINCI_CONF') and \
+            "proxy" in settings.DAVINCI_CONF["architecture-params"] \
+            and "proxy_mesh" in settings.DAVINCI_CONF["architecture-params"][
+                "proxy"]:
+        return settings.DAVINCI_CONF[
+            "architecture-params"]["proxy"]["proxy_mesh"]
+    else:
+        return None
+
+
+PROXY_MESH_SETTINGS = get_proxy_mesh_settings()
 
 
 class ProxyMesh(Proxy):
@@ -40,7 +51,7 @@ class ProxyMesh(Proxy):
         Returns:
 
         """
-        if not cls.available_proxies:
+        if not cls.available_proxies and PROXY_MESH_SETTINGS:
             custom_header = {
                 "authorization": PROXY_MESH_SETTINGS["authentication"]
             }
