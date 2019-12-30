@@ -45,6 +45,7 @@ Improvements or Changes
 - Add maintenance status to the task;
 - Add a `more_info` field to the task;
 - Remove unnecessary usage of the setup_cassandra_object_mapper inside the bovespa crawler;
+- Change table name from harvest_checkpoint to davinci_checkpoint;
 
 Bug Fixing
 **********
