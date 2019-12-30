@@ -303,7 +303,7 @@ def obtain_company_files(
             _logger.debug("Closing the Selenium Driver for company "
                           "[{ccvm} - {doc_type}]".
                           format(ccvm=ccvm, doc_type=doc_type))
-            driver.quit()
+            driver.close()
 
 
 def crawl_companies_files(
