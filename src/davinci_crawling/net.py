@@ -208,8 +208,12 @@ def __constatly_true(status):
     return True
 
 
+def __constatly_wait_true(driver, status):
+    return True
+
+
 def wait_tenaciously(driver, timeout, expected_conditions, n, s,
-                     error_callback=__constatly_true):
+                     error_callback=__constatly_wait_true):
     n -= 1
     try:
         # Wait until the page is loaded
