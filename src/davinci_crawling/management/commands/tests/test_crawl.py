@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
+import queue
+
 import logging
 
 from caravaggio_rest_api.tests import CaravaggioBaseTest
@@ -162,3 +164,29 @@ class TestCrawl(CaravaggioBaseTest):
 
         tasks = Task.objects.filter(status=STATUS_FAULTY).all()
         self.assertEqual(len(tasks), 5)
+
+    def test_persistent_queue(self):
+        """
+        Test the persistent queue, first we just add the tasks to queue and
+        then we start the pool again to retrieve the tasks from the file of the
+        persistent queue.
+        """
+        self.create_task("bovespa", ["4170"], "2011-01-01T00:00:00.000000Z",
+                         "2011-12-31T00:00:00.000000Z", ["V"])
+
+        start_crawl(workers_num=WORKERS_NUM, interval=1, times_to_run=2,
+                    initialize_consumer=False)
+
+        tasks = Task.objects.filter(status=STATUS_QUEUED).all()
+        # With this options we always have 5 files, unless any file got deleted
+        # this assert should be 5
+        files_count = len(tasks)
+        self.assertEqual(files_count, 5)
+
+        start_crawl(workers_num=WORKERS_NUM, interval=1, times_to_run=2)
+
+        tasks = Task.objects.filter(status=STATUS_FINISHED).all()
+        # With this options we always have 5 files, unless any file got deleted
+        # this assert should be 5
+        files_count = len(tasks)
+        self.assertEqual(files_count, 5)
