@@ -9,6 +9,7 @@ import re
 import shutil
 import tempfile
 import zipfile
+from time import sleep
 
 from spitslurp import spit, slurp
 
@@ -16,6 +17,8 @@ try:
     from dse.cqlengine.query import DoesNotExist
 except ImportError:
     from cassandra.cqlengine.query import DoesNotExist
+
+from requests.exceptions import ReadTimeout, Timeout
 
 from google.cloud import storage
 # Imports the Google Cloud client libraries
@@ -37,7 +40,7 @@ def get_backend(path):
         return re.match(BACKEND_RE, path)[1]
     except TypeError:
         msg = "Invalid backend: {}".format(path)
-        _logger.exception(msg)
+        _logger.warning(msg)
         raise Exception(msg)
 
 
@@ -81,7 +84,7 @@ def create_gs_folder(options, path):
     return blob.path
 
 
-def upload_gs_file(options, source_file, dest_file, chunk_size=None):
+def upload_gs_file(options, source_file, dest_file, chunk_size=None, n=3, s=5):
     storage_client = get_gs_client(options)
 
     bucket_name = get_gs_bucket_name(options)
@@ -93,9 +96,19 @@ def upload_gs_file(options, source_file, dest_file, chunk_size=None):
                    (source_file, bucket.name, dest_file)))
 
     blob = bucket.blob(dest_file, chunk_size=chunk_size)
-    blob.upload_from_filename(source_file)
 
-    return blob.path
+    while n > 0:
+        try:
+            blob.upload_from_filename(source_file)
+            return blob.path
+        except (Timeout, ReadTimeout) as ex:
+            _logger.exception("Error uploading file to GS.")
+            _logger.warning(f"Trying {n} times more in {s} seconds.")
+            n -= 1
+            sleep(s)
+            pass
+
+    return None
 
 
 def download_gs_file(options, source_file, dest_file):
@@ -208,12 +221,15 @@ def get_backend_and_path(options, file, raise_exceptions=False):
         backend = get_backend(file)
     except Exception as ex:
         if not raise_exceptions:
+            _logger.warning("Unable to determine the backend"
+                            " of the folder, USING FS:// by default.")
+
             # Using FS by default
             backend = "fs"
+            file = f"fs://{file}"
             pass
         else:
-            _logger.exception("Unable to determine the backend"
-                              " of the folder. Using FS by default.")
+            _logger.error("Unable to determine the backend of the folder")
             raise ex
 
     if backend == "fs":
