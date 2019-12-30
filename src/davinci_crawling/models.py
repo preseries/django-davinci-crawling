@@ -18,7 +18,7 @@ from caravaggio_rest_api.utils import default
 
 class Checkpoint(CustomDjangoCassandraModel):
 
-    __table_name__ = "harvest_checkpoint"
+    __table_name__ = "davinci_checkpoint"
 
     source = columns.Text(partition_key=True)
 
