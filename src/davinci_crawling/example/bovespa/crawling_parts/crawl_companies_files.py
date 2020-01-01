@@ -16,7 +16,8 @@ from bs4 import BeautifulSoup
 from dateutil.parser import parse as date_parse
 from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.models import \
-    BovespaCompany, BovespaCompanyFile, DOC_TYPES, FILE_STATUS_NOT_PROCESSED
+    BovespaCompany, BovespaCompanyFile, DOC_TYPES, \
+    FILE_STATUS_NOT_PROCESSED, FILE_STATUS_ERROR
 from davinci_crawling.throttle.throttle import Throttle
 from davinci_crawling.utils import CrawlersRegistry
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
@@ -211,27 +212,32 @@ def extract_ENET_files_from_page(
                     # We only create the company files if the file is not
                     # already present in the system
                     try:
+                        task_params = {
+                            "ccvm": ccvm,
+                            "doc_type": doc_type,
+                            "fiscal_date": fiscal_date,
+                            "version": version
+                        }
+
                         try:
-                            BovespaCompanyFile.objects.get(
+                            file = BovespaCompanyFile.objects.get(
                                 ccvm=ccvm,
                                 doc_type=doc_type,
                                 fiscal_date=fiscal_date,
                                 version=version)
+                            # Reactivate the task and change the file status
+                            if file.status == FILE_STATUS_ERROR:
+                                file.update(status=FILE_STATUS_NOT_PROCESSED)
+                                producer.add_crawl_params(
+                                    task_params, options)
                         except BovespaCompanyFile.DoesNotExist:
                             BovespaCompanyFile. \
                                 create(**company_file_data)
-
-                            params = {
-                                "ccvm": ccvm,
-                                "doc_type": doc_type,
-                                "fiscal_date": fiscal_date,
-                                "version": version
-                            }
-                            producer.add_crawl_params(params, options)
+                            producer.add_crawl_params(task_params, options)
                     except LWTException as e:
                         _logger.warning(
-                            "The company file [{ccvm} - '{name}' - {doc_type} - "
-                            "{fiscal_date:%Y-%m-%d} - {version}]"
+                            "The company file [{ccvm} - '{name}' - {doc_type}"
+                            " - {fiscal_date:%Y-%m-%d} - {version}]"
                             " cannot be created. The file already exists.".
                             format(ccvm=ccvm,
                                    name=company_name,
