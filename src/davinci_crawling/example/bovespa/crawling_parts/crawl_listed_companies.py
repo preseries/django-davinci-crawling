@@ -63,15 +63,21 @@ def update_listed_companies(letter, options):
         try:
             conditions = [
                 EC.presence_of_element_located((By.ID, 'dlCiasCdCVM'))]
-            wait_tenaciously(driver, 10, conditions, 3, 5)
+            wait_tenaciously(driver, 10, conditions, 10, 5)
         except Exception as ex:
-            conditions = [
-                EC.text_to_be_present_in_element(
-                    (By.ID, 'lblMsg'),
-                    "Nenhuma companhia foi encontrada com o critério de"
-                    " busca especificado.")]
-            wait_tenaciously(driver, 10, conditions, 3, 5)
-            return companies
+            try:
+                conditions = [
+                    EC.text_to_be_present_in_element(
+                        (By.ID, 'lblMsg'),
+                        "Nenhuma companhia foi encontrada com o critério de"
+                        " busca especificado.")]
+                wait_tenaciously(driver, 10, conditions, 10, 5)
+                return companies
+            except Exception as ex2:
+                _logger.warning("Problems getting companies for letter [{0}].".
+                                format(letter))
+
+                return companies
 
         bs = BeautifulSoup(driver.page_source, "html.parser")
 
@@ -156,17 +162,16 @@ def crawl_listed_companies(options, workers_num=10):
         for letter in companies_initials:
             func_params.append([letter, options])
 
-        call_results = pool.starmap(
+        pool.starmap(
             update_listed_companies, func_params)
 
         # Merge all the responses into one only list
-        companies += list(
-            itertools.chain.from_iterable(call_results))
+        # companies += list(
+        #    itertools.chain.from_iterable(call_results))
 
         return companies
     except TimeoutError:
-        print("Timeout error")
-        traceback.print_exc()
+        _logger.exception("Timeout error")
         raise
     finally:
         pool.close()

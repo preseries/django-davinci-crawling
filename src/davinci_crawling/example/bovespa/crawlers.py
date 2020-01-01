@@ -28,6 +28,8 @@ BOVESPA_FILE_CTL = BOVESPA_CRAWLER
 LAST_EXECUTION_DATE_CTL_FIELD = "last_execution_date"
 LAST_UPDATE_COMPANIES_LISTING_CTL_FIELD = "last_update_companies_listing"
 LAST_UPDATE_COMPANIES_FILES_CTL_FIELD = "last_update_companies_files"
+PROCESSED_COMPANIES_FILES_CTL_FIELD = "processed_companies_files"
+COMPANIES_FILES_WITH_ERRORS_CTL_FIELD = "companies_files_w_errors"
 
 _logger = logging.getLogger("davinci_crawler_{}".format(BOVESPA_CRAWLER))
 
@@ -171,15 +173,35 @@ def process_companies_files(
         include_companies = options.get("include_companies", None)
 
         # Get the list of files to be processed
-        crawl_companies_files(
+        company_files, company_files_w_errors = crawl_companies_files(
             options,
+            producer,
             workers_num=workers_num,
             include_companies=include_companies,
-            from_date=from_date, to_date=to_date)
+            from_date=from_date,
+            to_date=to_date)
+
+        processed_files = []
+        if company_files and len(company_files) > 0:
+            if PROCESSED_COMPANIES_FILES_CTL_FIELD in checkpoint_data:
+                processed_files = checkpoint_data[
+                    PROCESSED_COMPANIES_FILES_CTL_FIELD]
+            processed_files.extend(company_files)
+        checkpoint_data[PROCESSED_COMPANIES_FILES_CTL_FIELD] = \
+            processed_files
+
+        files_with_errors = []
+        if company_files_w_errors and len(company_files_w_errors) > 0:
+            if COMPANIES_FILES_WITH_ERRORS_CTL_FIELD in checkpoint_data:
+                files_with_errors = checkpoint_data[
+                    COMPANIES_FILES_WITH_ERRORS_CTL_FIELD]
+            files_with_errors.extend(company_files_w_errors)
+        checkpoint_data[COMPANIES_FILES_WITH_ERRORS_CTL_FIELD] = \
+            files_with_errors
 
     # Let's find all the company files without file_url (not downloaded
     # and processed yet) or not processed (status)
-    get_not_processed_files(options, producer)
+    # get_not_processed_files(options, producer)
 
 
 class BovespaCrawler(Crawler):
