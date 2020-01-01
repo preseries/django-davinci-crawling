@@ -63,7 +63,7 @@ def update_listed_companies(letter, options):
         try:
             conditions = [
                 EC.presence_of_element_located((By.ID, 'dlCiasCdCVM'))]
-            wait_tenaciously(driver, 10, conditions, 10, 5)
+            wait_tenaciously(driver, 10, conditions, 3, 5)
         except Exception as ex:
             try:
                 conditions = [
@@ -71,11 +71,11 @@ def update_listed_companies(letter, options):
                         (By.ID, 'lblMsg'),
                         "Nenhuma companhia foi encontrada com o critério de"
                         " busca especificado.")]
-                wait_tenaciously(driver, 10, conditions, 10, 5)
+                wait_tenaciously(driver, 10, conditions, 3, 5)
                 return companies
             except Exception as ex2:
-                _logger.warning("Problems getting companies for letter [{0}].".
-                                format(letter))
+                _logger.exception(
+                   f"Problems getting companies for letter [{letter}].")
 
                 return companies
 

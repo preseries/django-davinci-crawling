@@ -213,16 +213,18 @@ def __constatly_wait_true(driver, status):
 
 
 def wait_tenaciously(driver, timeout, expected_conditions, n, s,
-                     error_callback=__constatly_wait_true):
+                     error_callback=__constatly_wait_true,
+                     show_exception=False):
     n -= 1
     try:
         # Wait until the page is loaded
         WebDriverWait(driver, timeout=timeout).until(*expected_conditions)
     except TimeoutException as ex:
-        logger.exception(
-            f"Exception thrown"
-            f" for {driver.current_url} - ({expected_conditions}): {ex}."
-            f" Max {n} attempts remaining")
+        if show_exception:
+            logger.exception(
+                f"Exception thrown"
+                f" for {driver.current_url} - ({expected_conditions}): {ex}."
+                f" Max {n} attempts remaining")
         __maybe_wait(
             driver, timeout, expected_conditions, n, s, ex, error_callback)
 
@@ -230,14 +232,15 @@ def wait_tenaciously(driver, timeout, expected_conditions, n, s,
 def __maybe_wait(driver, timeout, expected_conditions, n, s,
                  exception, error_callback=None):
     if error_callback and error_callback(driver, exception) and (n > 0):
-        logger.info("Sleeping for %s seconds before next retry." % s)
+        logger.info(f"Sleeping for {s} seconds before next retry."
+                    f" URL: {driver.current_url}")
         sleep(s)
         return wait_tenaciously(
             driver, timeout, expected_conditions, n, s,
             error_callback=error_callback)
 
-    logger.info("No more tries (exhausted or "
-                "short-circuited by error callback")
+    logger.info(f"No more tries (exhausted or short-circuited by"
+                f" error callback. URL: {driver.current_url}")
     raise exception
 
 

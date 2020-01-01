@@ -327,13 +327,13 @@ def obtain_company_files(
                 try:
                     conditions = [EC.title_contains("CBLCNET -")]
                     wait_tenaciously(driver, 10, conditions, 10, 5)
-                    _logger.warning(
+                    _logger.debug(
                         "There is no documents page for company {ccvm} "
                         "and {doc_type}. Showing 'Error de Aplicacao'".
                         format(ccvm=ccvm, doc_type=doc_type))
-                    return ccvm, None
+                    return ccvm, []
                 except TimeoutException:
-                    _logger.warning(
+                    _logger.exception(
                         "There is no documents page for company {ccvm} "
                         "and {doc_type}. Showing 'Error de Aplicacao'".
                         format(ccvm=ccvm, doc_type=doc_type))
@@ -354,8 +354,9 @@ def obtain_company_files(
             try:
                 conditions = [EC.title_contains("CBLCNET -")]
                 wait_tenaciously(driver, 10, conditions, 10, 5)
+                return ccvm, []
             except Exception:
-                _logger.warning(
+                _logger.exception(
                     "There is no documents page for company {ccvm} "
                     "and {doc_type}. Showing 'Error de Aplicacao'".
                     format(ccvm=ccvm, doc_type=doc_type))
