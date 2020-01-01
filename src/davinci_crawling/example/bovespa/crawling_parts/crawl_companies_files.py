@@ -153,12 +153,16 @@ def extract_ENET_files_from_page(
             re.search(RE_LAST_FILE_IN_PAGE, str(bs))[2])
         _logger.debug("Last file in page: {0}".format(last_file_in_page))
 
+        import pydevd_pycharm
+        pydevd_pycharm.settrace('host.docker.internal', port=8787,
+                                stdoutToServer=True, stderrToServer=True)
+
         # Obtain the table elements that contains information about the
         # financial statements of the company we are interested in
         # ITR or DFP
         all_tables = [tag.findParent("table") for tag in
                       bs.find_all(
-                          text=re.compile("{} - ENET".format(doc_type)))
+                          text=re.compile("{} - ENET.*".format(doc_type)))
                       if tag.findParent("table")]
 
         # For each table we extract the files information of all the files
@@ -208,11 +212,11 @@ def extract_ENET_files_from_page(
                     # already present in the system
                     try:
                         try:
-                            BovespaCompanyFile.get(
+                            BovespaCompanyFile.objects.get(
                                 ccvm=ccvm,
                                 doc_type=doc_type,
                                 fiscal_date=fiscal_date,
-                                version= version)
+                                version=version)
                         except BovespaCompanyFile.DoesNotExist:
                             BovespaCompanyFile. \
                                 create(**company_file_data)
