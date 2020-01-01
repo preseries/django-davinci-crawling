@@ -339,6 +339,26 @@ def obtain_company_files(
                         format(ccvm=ccvm, doc_type=doc_type))
                     return ccvm, None
 
+        # We check if there is doc_type between the available type of
+        # financial reports provided by the company.
+        result = driver.find_elements_by_xpath(
+            "//form[@name='AIR']/table/*//a")
+        if len(result) > 0:
+            available_doc_types = [link.text.lower() for link in result
+                                   if link.text]
+            if doc_type.lower() not in available_doc_types:
+                _logger.debug(
+                    "The OPEN company {ccvm} does not have financial"
+                    " reports of {doc_type} type".
+                    format(ccvm=ccvm, doc_type=doc_type))
+                return ccvm, []
+        else:
+            _logger.debug(
+                "The OPEN company {ccvm} does not have presented"
+                " any financial report".
+                format(ccvm=ccvm, doc_type=doc_type))
+            return ccvm, []
+
         # Once the page is ready, we can select the doc_type from the list
         # of documentation available and navigate to the results page
         # Select ITR files and Click
