@@ -82,7 +82,9 @@ def get_sector(available_files, company_file):
             doc_type=company_file.doc_type.lower())])
 
     sector = int(
-        data["Documento"]["CompanhiaAberta"]["CodigoSetorAtividadeEmpresa"])
+        data["Documento"][
+            "CompanhiaAberta"][
+            "CodigoSetorAtividadeEmpresa"])
 
     return sector
 
