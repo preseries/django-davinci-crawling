@@ -14,7 +14,8 @@ from solrq import Q, Range, ANY, Value
 from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.crawling_parts.process_file import \
     process_file
-from .models import BovespaCompanyFile, FILE_STATUS_NOT_PROCESSED
+from .models import \
+    BovespaCompanyFile, FILE_STATUS_NOT_PROCESSED, FILE_STATUS_ERROR
 
 from davinci_crawling.crawler import Crawler
 from davinci_crawling.io import \
@@ -336,19 +337,27 @@ class BovespaCrawler(Crawler):
             "Processing company file [{}]".
             format(crawling_params))
 
-        # Download the files from the source and save them into the local and
-        # permanent storage for further processing.
-        # It extract the files into a working folder and return the list of
-        # files that can be processed
-        local_file, working_local_file, files_to_process = \
-            download_file(options, **crawling_params)
+        try:
+            # Download the files from the source and save them into the local and
+            # permanent storage for further processing.
+            # It extract the files into a working folder and return the list of
+            # files that can be processed
+            local_file, working_local_file, files_to_process = \
+                download_file(options, **crawling_params)
 
-        # Open the files and process the content to generate the
-        # BovespaCompanyNumbers with all the financial data of the company
-        process_file(options, files_to_process, **crawling_params)
+            # Open the files and process the content to generate the
+            # BovespaCompanyNumbers with all the financial data of the company
+            process_file(options, files_to_process, **crawling_params)
 
-        # Remove cached files
-        delete_all(options, local_file)
-        delete_all(options, working_local_file)
+            # Remove cached files
+            delete_all(options, local_file)
+            delete_all(options, working_local_file)
+        except Exception as ex:
+            _logger.exception(f"Unable to process crawling task {task_id}"
+                              f" with params {crawling_params}")
+            BovespaCompanyFile.if_exists(
+                **crawling_params).update(
+                status=FILE_STATUS_ERROR)
+            raise
 
         return "Processing company file [{}]".format(crawling_params)
