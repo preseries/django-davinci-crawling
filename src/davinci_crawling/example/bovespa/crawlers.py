@@ -338,8 +338,8 @@ class BovespaCrawler(Crawler):
             format(crawling_params))
 
         try:
-            # Download the files from the source and save them into the local and
-            # permanent storage for further processing.
+            # Download the files from the source and save them into the local
+            # and permanent storage for further processing.
             # It extract the files into a working folder and return the list of
             # files that can be processed
             local_file, working_local_file, files_to_process = \
@@ -352,12 +352,15 @@ class BovespaCrawler(Crawler):
             # Remove cached files
             delete_all(options, local_file)
             delete_all(options, working_local_file)
-        except Exception as ex:
+        except Exception:
             _logger.exception(f"Unable to process crawling task {task_id}"
                               f" with params {crawling_params}")
-            BovespaCompanyFile.if_exists(
-                **crawling_params).update(
-                status=FILE_STATUS_ERROR)
+
+            # Signal the error in the BovespaCompanyFile
+            BovespaCompanyFile.objects(**crawling_params).\
+                if_exists().\
+                update(status=FILE_STATUS_ERROR)
+
             raise
 
         return "Processing company file [{}]".format(crawling_params)
