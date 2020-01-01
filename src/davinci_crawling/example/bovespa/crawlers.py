@@ -357,8 +357,8 @@ class BovespaCrawler(Crawler):
                               f" with params {crawling_params}")
 
             # Signal the error in the BovespaCompanyFile
-            BovespaCompanyFile.objects(**crawling_params).\
-                if_exists().\
+            BovespaCompanyFile.objects(**crawling_params). \
+                if_exists(). \
                 update(status=FILE_STATUS_ERROR)
 
             raise

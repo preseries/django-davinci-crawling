@@ -154,10 +154,6 @@ def extract_ENET_files_from_page(
             re.search(RE_LAST_FILE_IN_PAGE, str(bs))[2])
         _logger.debug("Last file in page: {0}".format(last_file_in_page))
 
-        import pydevd_pycharm
-        pydevd_pycharm.settrace('host.docker.internal', port=8787,
-                                stdoutToServer=True, stderrToServer=True)
-
         # Obtain the table elements that contains information about the
         # financial statements of the company we are interested in
         # ITR or DFP
