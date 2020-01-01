@@ -285,6 +285,9 @@ class BovespaAccount(CustomDjangoCassandraModel):
     # The account name. Ex. "Receita de Venda de Bens e/ou Serviços"
     name = columns.Text(max_length=200, required=True)
 
+    # Company sector
+    sector = columns.Integer(default=0, required=True)
+
     # The amount of the account
     amount = Decimal(required=True, max_digits=20, decimal_places=2)
 

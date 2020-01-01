@@ -66,7 +66,28 @@ def get_scales(available_files, company_file):
     return money_scale, quant_scale
 
 
-def get_cap_composition_accounts(available_files, company_file):
+def get_sector(available_files, company_file):
+    """
+    Obtain the Sector Code from the Document.xml file
+
+    Where to find the values:
+        xmldoc.child("Documento").child_value(
+            "CompanhiaAberta/CodigoSetorAtividadeEmpresa")
+
+    :param available_files: list of available files per name
+    :return: the code of the sector of the company
+    """
+    data = convert_xml_into_json(
+        available_files[FILE_DOCUMENT.format(
+            doc_type=company_file.doc_type.lower())])
+
+    sector = int(
+        data["Documento"]["CompanhiaAberta"]["CodigoSetorAtividadeEmpresa"])
+
+    return sector
+
+
+def get_cap_composition_accounts(sector, available_files, company_file):
     money_scale, quant_scale = get_scales(available_files, company_file)
 
     data = convert_xml_into_json(
@@ -83,7 +104,8 @@ def get_cap_composition_accounts(available_files, company_file):
             "balance_type": DFP_BALANCE_IF,
             "financial_info_type": DFP_FINANCIAL_INFO_DURATION,
             "number": acc_number,
-            "name": acc_name
+            "name": acc_name,
+            "sector": sector
         }
 
         equity = data["ArrayOfComposicaoCapitalSocialDemonstracaoFinanceira"][
@@ -102,7 +124,7 @@ def get_cap_composition_accounts(available_files, company_file):
     return accounts
 
 
-def get_financial_info_accounts(available_files, company_file):
+def get_financial_info_accounts(sector, available_files, company_file):
     accounts = []
 
     money_scale, quant_scale = get_scales(available_files, company_file)
@@ -126,6 +148,7 @@ def get_financial_info_accounts(available_files, company_file):
                         "$"]) - 1],
                 "number": str(account_info["PlanoConta"]["NumeroConta"]["$"]),
                 "name": str(account_info["DescricaoConta1"]["$"]),
+                "sector": sector
             }
         except KeyError as ex:
             _logger.exception(
@@ -223,7 +246,10 @@ def get_financial_info_accounts(available_files, company_file):
 
 def load_account_details(options, available_files, company_file):
 
-    accounts = get_cap_composition_accounts(available_files, company_file)
-    accounts.extend(get_financial_info_accounts(available_files, company_file))
+    sector = get_sector(available_files, company_file)
+    accounts = get_cap_composition_accounts(
+        sector, available_files, company_file)
+    accounts.extend(get_financial_info_accounts(
+        sector, available_files, company_file))
 
     return accounts
