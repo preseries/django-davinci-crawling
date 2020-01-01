@@ -182,14 +182,14 @@ def process_companies_files(
             from_date=from_date,
             to_date=to_date)
 
-        processed_files = []
-        if company_files and len(company_files) > 0:
-            if PROCESSED_COMPANIES_FILES_CTL_FIELD in checkpoint_data:
-                processed_files = checkpoint_data[
-                    PROCESSED_COMPANIES_FILES_CTL_FIELD]
-            processed_files.extend(company_files)
-        checkpoint_data[PROCESSED_COMPANIES_FILES_CTL_FIELD] = \
-            processed_files
+        # processed_files = []
+        # if company_files and len(company_files) > 0:
+        #     if PROCESSED_COMPANIES_FILES_CTL_FIELD in checkpoint_data:
+        #         processed_files = checkpoint_data[
+        #             PROCESSED_COMPANIES_FILES_CTL_FIELD]
+        #     processed_files.extend(company_files)
+        # checkpoint_data[PROCESSED_COMPANIES_FILES_CTL_FIELD] = \
+        #     processed_files
 
         files_with_errors = []
         if company_files_w_errors and len(company_files_w_errors) > 0:
