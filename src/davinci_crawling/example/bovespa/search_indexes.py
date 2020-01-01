@@ -211,6 +211,10 @@ class BovespaAccountIndex(BaseSearchIndex, indexes.Indexable):
     name = indexes.CharField(
         model_attr="name", faceted=True)
 
+    # The company sector code
+    sector = indexes.IntegerField(
+        model_attr="sector", faceted=True)
+
     amount = indexes.DecimalField(
         model_attr="amount")
 
