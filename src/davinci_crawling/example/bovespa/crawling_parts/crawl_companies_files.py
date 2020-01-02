@@ -179,8 +179,8 @@ def extract_ENET_files_from_page(
                     # We look for newer delivery files
                     if from_date is not None and \
                             (compare_dates(
-                                delivery_date, from_date) <= 0 or compare_dates(
-                                delivery_date, to_date) >= 0):
+                                delivery_date, from_date) <= 0 or
+                             compare_dates(delivery_date, to_date) >= 0):
                         continue
 
                     version = re.search(RE_VERSION, str(table))[1]
@@ -270,7 +270,7 @@ def extract_ENET_files_from_page(
                     _logger.warning(
                         "There is no documents page for company {ccvm} "
                         "and {doc_type}. Showing 'Error de Aplicacao'".
-                            format(ccvm=ccvm, doc_type=doc_type))
+                        format(ccvm=ccvm, doc_type=doc_type))
                     raise
             bs = BeautifulSoup(driver.page_source, "html.parser")
 

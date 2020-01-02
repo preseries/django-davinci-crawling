@@ -1,26 +1,24 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 import asyncio
-import atexit
-import logging
 import multiprocessing
-import signal
-import socket
-import sys
+
+import logging
+import requests
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor
-from statistics import mean
-
 from davinci_crawling.proxy.proxy import ProxyManager
 from django.conf import settings
+from statistics import mean
 
 PROXY_MANAGER = ProxyManager()
 
 _logger = logging.getLogger("davinci_crawling")
 
+URL_TO_TEST = "https://www.google.com"
 
-def _check_time(host, port, proxy_order, times_run=5):
+
+def _check_time(proxy_address, proxy_order, times_run=3):
     """
     Check connection time for a host and port
     Args:
@@ -32,16 +30,20 @@ def _check_time(host, port, proxy_order, times_run=5):
     Returns:
         the average time of all calls defined by times_run argument
     """
+    def get_url(url, _proxy_address, timeout=10):
+        requests.get(
+            url=url,
+            timeout=(timeout, timeout), verify=False, proxies=_proxy_address)
+
     results = []
     for _ in range(times_run):
         start_time = time.time() * 1000
         try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.connect((host, int(port)))
+            get_url(URL_TO_TEST, proxy_address)
         except Exception:
             # if returns an error we will disconsider this proxy with the
             # return -1
-            return -1
+            return -1, -1
 
         results.append(time.time() * 1000 - start_time)
 
@@ -58,14 +60,7 @@ def assure_proxy_quality(pool):
     proxies_by_speed = []
 
     for i, proxy in enumerate(proxies):
-        proxy_address = proxy["http"]
-        proxy_address = proxy_address.replace("http://", "")
-
-        host = proxy_address.split("@")[-1]
-        host = host.split(":")[0]
-        port = proxy_address.split(":")[-1]
-
-        proxies_to_check.append((host, port, i))
+        proxies_to_check.append((proxy, i))
 
     results = pool.starmap(_check_time, proxies_to_check)
     results = sorted(results, key=lambda x: x[0], reverse=False)
