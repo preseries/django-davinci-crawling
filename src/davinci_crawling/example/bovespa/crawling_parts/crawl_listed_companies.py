@@ -75,7 +75,7 @@ def update_listed_companies(letter, options):
                 return companies
             except Exception as ex2:
                 _logger.exception(
-                   f"Problems getting companies for letter [{letter}].")
+                    f"Problems getting companies for letter [{letter}].")
 
                 return companies
 

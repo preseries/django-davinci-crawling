@@ -68,8 +68,9 @@ def _pool_tasks(interval, times_to_run):
                     "default", {})
                 crawler_settings = settings.DAVINCI_CONF["crawler-params"].get(
                     crawler_name, {})
-                _add_default_options(options, default_settings)
+
                 _add_default_options(options, crawler_settings)
+                _add_default_options(options, default_settings)
 
                 # fixed options, place here all the fixed options
                 options["current_execution_date"] = datetime.utcnow()

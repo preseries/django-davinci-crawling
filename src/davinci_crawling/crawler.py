@@ -42,6 +42,13 @@ class Crawler(metaclass=ABCMeta):
 
     CHROME_DESIREDCAPABILITIES = "chrome_desired_capabilities"
 
+    defaults_parser = {
+        "verbosity": 1,
+        "cache_dir": "fs:///data/harvest/permanent",
+        "local_dir": "fs:///data/harvest/volatile",
+        "workers_num": 10
+    }
+
     proxy_manager = ProxyManager()
 
     # The unique name of the crawler to be identified in the system
@@ -55,6 +62,16 @@ class Crawler(metaclass=ABCMeta):
                 "The crawler {} must specify "
                 "class Meta attribute '__crawler_name__'".
                 format(self.__class__))
+
+        if hasattr(settings, "DAVINCI_CONF") and "crawler-params" in \
+                settings.DAVINCI_CONF:
+            crawler_params = settings.DAVINCI_CONF["crawler-params"]
+            if "default" in crawler_params:
+                self.defaults_parser.update(crawler_params["default"])
+
+            if self.__crawler_name__ in crawler_params:
+                self.defaults_parser.update(crawler_params[
+                                            self.__crawler_name__])
 
         self.__prepare_parser()
 
@@ -143,7 +160,7 @@ class Crawler(metaclass=ABCMeta):
             '--verbosity',
             action='store',
             dest='verbosity',
-            default=1,
+            default=self.defaults_parser.get("verbosity", None),
             type=int, choices=[0, 1, 2, 3],
             help='Verbosity level; 0=minimal output, 1=normal output, '
                  '2=verbose output, 3=very verbose output',
@@ -184,7 +201,7 @@ class Crawler(metaclass=ABCMeta):
             required=False,
             action='store',
             dest='cache_dir',
-            default="fs:///data/harvest/permanent",
+            default=self.defaults_parser.get("cache_dir", None),
             type=str,
             help="The path where we will leave the files."
                  " Ex. fs:///data/harvest/permanent"
@@ -196,7 +213,7 @@ class Crawler(metaclass=ABCMeta):
             required=False,
             action='store',
             dest='local_dir',
-            default="fs///data/harvest/volatile",
+            default=self.defaults_parser.get("local_dir", None),
             type=str,
             help="The path where we will leave the files."
                  " Ex. fs///data/harvest/volatile")
@@ -207,7 +224,7 @@ class Crawler(metaclass=ABCMeta):
             required=False,
             action='store',
             dest='workers_num',
-            default=10,
+            default=self.defaults_parser.get("workers_num", None),
             type=int,
             help="The number of workers (threads) to launch in parallel")
 
@@ -217,7 +234,7 @@ class Crawler(metaclass=ABCMeta):
             required=False,
             action='store',
             dest='phantomjs_path',
-            default=None,
+            default=self.defaults_parser.get("phantomjs_path", None),
             type=str,
             help="Absolute path to the bin directory of the PhantomJS library."
                  "Ex. '/phantomjs-2.1.1-macosx/bin/phantomjs'")
@@ -228,7 +245,7 @@ class Crawler(metaclass=ABCMeta):
             required=False,
             action='store',
             dest='chromium_bin_file',
-            default=None,
+            default=self.defaults_parser.get("chromium_bin_file", None),
             type=str,
             help="Absolute path to the Chromium bin file."
                  "Ex. '/Applications/Chromium.app/Contents/MacOS/Chromium'")
@@ -239,7 +256,7 @@ class Crawler(metaclass=ABCMeta):
             required=False,
             action='store',
             dest='io_gs_project',
-            default=None,
+            default=self.defaults_parser.get("io_gs_project", None),
             type=str,
             help="If we are using Google Storage to persist the files, we "
                  " could need to inform about the project of the bucket."
