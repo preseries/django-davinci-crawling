@@ -143,7 +143,7 @@ def update_listed_companies(letter, options):
         if driver:
             _logger.debug(
                 "Closing the Selenium Driver for letter {}".format(letter))
-            driver.close()
+            driver.quit()
 
 
 def crawl_listed_companies(options, workers_num=10):
