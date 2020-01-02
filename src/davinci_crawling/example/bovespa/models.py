@@ -28,7 +28,9 @@ DOC_TYPES = [DOC_TYPE_ITR, DOC_TYPE_DFP]
 
 FILE_STATUS_NOT_PROCESSED = "not_processed"
 FILE_STATUS_PROCESSED = "processed"
-FILE_STATUSES = [FILE_STATUS_NOT_PROCESSED, FILE_STATUS_PROCESSED]
+FILE_STATUS_ERROR = "error"
+FILE_STATUSES = [
+    FILE_STATUS_NOT_PROCESSED, FILE_STATUS_PROCESSED, FILE_STATUS_ERROR]
 
 _logger = logging.getLogger("davinci_crawler_{}.models".
                             format(BOVESPA_CRAWLER))
@@ -284,6 +286,9 @@ class BovespaAccount(CustomDjangoCassandraModel):
 
     # The account name. Ex. "Receita de Venda de Bens e/ou Serviços"
     name = columns.Text(max_length=200, required=True)
+
+    # Company sector
+    sector = columns.Integer(default=0, required=True)
 
     # The amount of the account
     amount = Decimal(required=True, max_digits=20, decimal_places=2)

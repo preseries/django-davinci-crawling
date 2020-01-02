@@ -24,18 +24,25 @@ _logger = logging.getLogger("davinci_crawling.commands")
 crawler_clazz = None
 crawler = None
 
-generated_params = []
-
 
 class CrawlParamsProducer(Producer):
     """
     Uses a local list to add the crawl_params, this is used to simplify the
-    logic for generating crawwl params.
+    logic for generating crawl params.
     """
 
     def add_crawl_params(self, param, options):
         _logger.debug("Adding param %s to queue", param)
-        generated_params.append([param, options])
+
+        crawler_name = options.get("crawler")
+        data = {
+            "user": "batchuser",
+            "kind": crawler_name,
+            "params": param,
+            "options": options,
+            "type": BATCH_TASK
+        }
+        Task.create(**data)
 
 
 def crawl_command_to_task(**options):
@@ -50,16 +57,6 @@ def crawl_command_to_task(**options):
     _crawler = _crawler_clazz()
 
     _crawler.crawl_params(CrawlParamsProducer(), **options)
-
-    for param_options in generated_params:
-        data = {
-            "user": "batchuser",
-            "kind": crawler_name,
-            "params": param_options[0],
-            "options": param_options[1],
-            "type": BATCH_TASK
-        }
-        Task.create(**data)
 
 
 class Command(BaseCommand):

@@ -14,7 +14,8 @@ from solrq import Q, Range, ANY, Value
 from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.crawling_parts.process_file import \
     process_file
-from .models import BovespaCompanyFile, FILE_STATUS_NOT_PROCESSED
+from .models import \
+    BovespaCompanyFile, FILE_STATUS_NOT_PROCESSED, FILE_STATUS_ERROR
 
 from davinci_crawling.crawler import Crawler
 from davinci_crawling.io import \
@@ -28,6 +29,8 @@ BOVESPA_FILE_CTL = BOVESPA_CRAWLER
 LAST_EXECUTION_DATE_CTL_FIELD = "last_execution_date"
 LAST_UPDATE_COMPANIES_LISTING_CTL_FIELD = "last_update_companies_listing"
 LAST_UPDATE_COMPANIES_FILES_CTL_FIELD = "last_update_companies_files"
+PROCESSED_COMPANIES_FILES_CTL_FIELD = "processed_companies_files"
+COMPANIES_FILES_WITH_ERRORS_CTL_FIELD = "companies_files_w_errors"
 
 _logger = logging.getLogger("davinci_crawler_{}".format(BOVESPA_CRAWLER))
 
@@ -171,15 +174,35 @@ def process_companies_files(
         include_companies = options.get("include_companies", None)
 
         # Get the list of files to be processed
-        crawl_companies_files(
+        company_files, company_files_w_errors = crawl_companies_files(
             options,
+            producer,
             workers_num=workers_num,
             include_companies=include_companies,
-            from_date=from_date, to_date=to_date)
+            from_date=from_date,
+            to_date=to_date)
+
+        # processed_files = []
+        # if company_files and len(company_files) > 0:
+        #     if PROCESSED_COMPANIES_FILES_CTL_FIELD in checkpoint_data:
+        #         processed_files = checkpoint_data[
+        #             PROCESSED_COMPANIES_FILES_CTL_FIELD]
+        #     processed_files.extend(company_files)
+        # checkpoint_data[PROCESSED_COMPANIES_FILES_CTL_FIELD] = \
+        #     processed_files
+
+        files_with_errors = []
+        if company_files_w_errors and len(company_files_w_errors) > 0:
+            if COMPANIES_FILES_WITH_ERRORS_CTL_FIELD in checkpoint_data:
+                files_with_errors = checkpoint_data[
+                    COMPANIES_FILES_WITH_ERRORS_CTL_FIELD]
+            files_with_errors.extend(company_files_w_errors)
+        checkpoint_data[COMPANIES_FILES_WITH_ERRORS_CTL_FIELD] = \
+            files_with_errors
 
     # Let's find all the company files without file_url (not downloaded
     # and processed yet) or not processed (status)
-    get_not_processed_files(options, producer)
+    # get_not_processed_files(options, producer)
 
 
 class BovespaCrawler(Crawler):
@@ -314,19 +337,30 @@ class BovespaCrawler(Crawler):
             "Processing company file [{}]".
             format(crawling_params))
 
-        # Download the files from the source and save them into the local and
-        # permanent storage for further processing.
-        # It extract the files into a working folder and return the list of
-        # files that can be processed
-        local_file, working_local_file, files_to_process = \
-            download_file(options, **crawling_params)
+        try:
+            # Download the files from the source and save them into the local
+            # and permanent storage for further processing.
+            # It extract the files into a working folder and return the list of
+            # files that can be processed
+            local_file, working_local_file, files_to_process = \
+                download_file(options, **crawling_params)
 
-        # Open the files and process the content to generate the
-        # BovespaCompanyNumbers with all the financial data of the company
-        process_file(options, files_to_process, **crawling_params)
+            # Open the files and process the content to generate the
+            # BovespaCompanyNumbers with all the financial data of the company
+            process_file(options, files_to_process, **crawling_params)
 
-        # Remove cached files
-        delete_all(options, local_file)
-        delete_all(options, working_local_file)
+            # Remove cached files
+            delete_all(options, local_file)
+            delete_all(options, working_local_file)
+        except Exception:
+            _logger.exception(f"Unable to process crawling task {task_id}"
+                              f" with params {crawling_params}")
+
+            # Signal the error in the BovespaCompanyFile
+            BovespaCompanyFile.objects(**crawling_params). \
+                if_exists(). \
+                update(status=FILE_STATUS_ERROR)
+
+            raise
 
         return "Processing company file [{}]".format(crawling_params)

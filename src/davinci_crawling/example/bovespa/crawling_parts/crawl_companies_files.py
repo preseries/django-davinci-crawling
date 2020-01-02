@@ -5,6 +5,8 @@ import logging
 import re
 import traceback
 
+from caravaggio_rest_api.haystack.backends.utils import \
+    CaravaggioSearchPaginator
 from davinci_crawling.net import wait_tenaciously
 from multiprocessing.pool import ThreadPool as Pool
 from urllib.parse import urlencode
@@ -14,12 +16,15 @@ from bs4 import BeautifulSoup
 from dateutil.parser import parse as date_parse
 from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 from davinci_crawling.example.bovespa.models import \
-    BovespaCompany, BovespaCompanyFile, DOC_TYPES
+    BovespaCompany, BovespaCompanyFile, DOC_TYPES, \
+    FILE_STATUS_NOT_PROCESSED, FILE_STATUS_ERROR
 from davinci_crawling.throttle.throttle import Throttle
 from davinci_crawling.utils import CrawlersRegistry
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import WebDriverException
+from solrq import Range, ANY, Q
 
 try:
     from dse.cqlengine.query import LWTException
@@ -81,7 +86,32 @@ def compare_dates(date_a, date_b):
         return 0
 
 
+def has_files_to_be_processed(ccvm):
+    filter = ~Q(file_url=Range(ANY, ANY)) | Q(status=FILE_STATUS_NOT_PROCESSED)
+    filter = Q(ccvm=ccvm) & (filter)
+
+    _logger.debug("Loading from database the files to be crawled...")
+    paginator = CaravaggioSearchPaginator(
+        query_string=str(filter),
+        limit=1, max_limit=1).\
+        models(BovespaCompanyFile).\
+        select("ccvm", "doc_type", "fiscal_date", "version")
+
+    if paginator.has_next():
+        paginator.next()
+        if paginator.get_hits() > 0:
+            _logger.debug(
+                "Company {0} HAS {1} FILES PENDING to be processed...".
+                format(ccvm, paginator.get_hits()))
+            return True
+
+    _logger.debug(
+        "Company {0} has not files pending to be processed...".format(ccvm))
+    return False
+
+
 def extract_ENET_files_from_page(
+        producer, options,
         ccvm, driver, bs, doc_type, from_date=None, to_date=None):
     """
     Extract all the files to download from the listing HTML page
@@ -129,72 +159,95 @@ def extract_ENET_files_from_page(
         # ITR or DFP
         all_tables = [tag.findParent("table") for tag in
                       bs.find_all(
-                          text=re.compile("{} - ENET".format(doc_type)))
+                          text=re.compile("{} - ENET.*".format(doc_type)))
                       if tag.findParent("table")]
 
         # For each table we extract the files information of all the files
         # that belongs to a fiscal period after the from_date argument.
-        for table in all_tables:
-            link_tag = table.find('a', href=re.compile(RE_DOWNLOAD_FILE))
-            if link_tag:
-                fiscal_date = re.search(RE_FISCAL_DATE, str(table))[1]
-                fiscal_date = date_parse(fiscal_date)
+        if len(all_tables) > 0:
+            for table in all_tables:
+                link_tag = table.find('a', href=re.compile(RE_DOWNLOAD_FILE))
+                if link_tag:
+                    fiscal_date = re.search(RE_FISCAL_DATE, str(table))[1]
+                    fiscal_date = date_parse(fiscal_date)
 
-                delivery_date = re.search(RE_DELIVERY_DATE, str(table))[1]
-                delivery_date = date_parse(delivery_date)
+                    delivery_date = re.search(RE_DELIVERY_DATE, str(table))[1]
+                    delivery_date = date_parse(delivery_date)
 
-                # We only continue processing files from the HTML page
-                # if are newer (deliver after) than the from_date argument.
-                # We look for newer delivery files
-                if from_date is not None and \
-                        (compare_dates(
-                            delivery_date, from_date) <= 0 or compare_dates(
-                            delivery_date, to_date) >= 0):
-                    continue
+                    # We only continue processing files from the HTML page
+                    # if are newer (deliver after) than the from_date argument.
+                    # We look for newer delivery files
+                    if from_date is not None and \
+                            (compare_dates(
+                                delivery_date, from_date) <= 0 or compare_dates(
+                                delivery_date, to_date) >= 0):
+                        continue
 
-                version = re.search(RE_VERSION, str(table))[1]
+                    version = re.search(RE_VERSION, str(table))[1]
 
-                delivery_type = re.search(RE_DELIVERY_TYPE, str(table))[1]
+                    delivery_type = re.search(RE_DELIVERY_TYPE, str(table))[1]
 
-                protocol = re.match(
-                    RE_DOWNLOAD_FILE, link_tag.attrs['href'])[1]
+                    protocol = re.match(
+                        RE_DOWNLOAD_FILE, link_tag.attrs['href'])[1]
 
-                source_url = DOWNLOAD_URL.format(protocol=protocol)
+                    source_url = DOWNLOAD_URL.format(protocol=protocol)
 
-                company_file_data = {
-                    "ccvm": ccvm,
-                    "doc_type": doc_type,
-                    "fiscal_date": fiscal_date,
-                    "version": version,
-                    "company_name": company_name,
-                    "company_cnpj": company_cnpj,
-                    "delivery_date": delivery_date,
-                    "delivery_type": delivery_type,
-                    "protocol": protocol,
-                    "source_url": source_url
-                }
+                    company_file_data = {
+                        "ccvm": ccvm,
+                        "doc_type": doc_type,
+                        "fiscal_date": fiscal_date,
+                        "version": version,
+                        "company_name": company_name,
+                        "company_cnpj": company_cnpj,
+                        "delivery_date": delivery_date,
+                        "delivery_type": delivery_type,
+                        "protocol": protocol,
+                        "source_url": source_url
+                    }
 
-                # We only create the company files if the file is not
-                # already present in the system
-                try:
-                    BovespaCompanyFile. \
-                        if_not_exists().\
-                        create(**company_file_data)
-                except LWTException as e:
-                    _logger.warning(
-                        "The company file [{ccvm} - '{name}' - {doc_type} - "
-                        "{fiscal_date:%Y-%m-%d} - {version}]"
-                        " cannot be created. The file already exists.".
-                        format(ccvm=ccvm,
-                               name=company_name,
-                               doc_type=doc_type,
-                               fiscal_date=fiscal_date,
-                               version=version))
-                    pass
+                    # We only create the company files if the file is not
+                    # already present in the system
+                    try:
+                        task_params = {
+                            "ccvm": ccvm,
+                            "doc_type": doc_type,
+                            "fiscal_date": fiscal_date,
+                            "version": version
+                        }
 
-                files.append(company_file_data)
-            else:
-                _logger.debug("The file is not available in ENET format")
+                        try:
+                            file = BovespaCompanyFile.objects.get(
+                                ccvm=ccvm,
+                                doc_type=doc_type,
+                                fiscal_date=fiscal_date,
+                                version=version)
+                            # Reactivate the task and change the file status
+                            if file.status == FILE_STATUS_ERROR:
+                                file.update(status=FILE_STATUS_NOT_PROCESSED)
+                                producer.add_crawl_params(
+                                    task_params, options)
+                        except BovespaCompanyFile.DoesNotExist:
+                            BovespaCompanyFile. \
+                                create(**company_file_data)
+                            producer.add_crawl_params(task_params, options)
+                    except LWTException as e:
+                        _logger.warning(
+                            "The company file [{ccvm} - '{name}' - {doc_type}"
+                            " - {fiscal_date:%Y-%m-%d} - {version}]"
+                            " cannot be created. The file already exists.".
+                            format(ccvm=ccvm,
+                                   name=company_name,
+                                   doc_type=doc_type,
+                                   fiscal_date=fiscal_date,
+                                   version=version))
+                        pass
+
+                    files.append(company_file_data)
+                else:
+                    _logger.debug("The file is not available in ENET format")
+        else:
+            _logger.debug(f"No {doc_type} - ENET files available "
+                          f"for company: {ccvm}")
 
         if last_file_in_page == num_of_docs:
             # We loaded all the files
@@ -205,9 +258,20 @@ def extract_ENET_files_from_page(
             element.click()
 
             # Wait until the page is loaded
-            conditions = [EC.presence_of_element_located(
-                (By.XPATH, "//form[@name='AIR']/table/*"))]
-            wait_tenaciously(driver, 10, conditions, 3, 5)
+            try:
+                conditions = [EC.presence_of_element_located(
+                    (By.XPATH, "//form[@name='AIR']/table/*"))]
+                wait_tenaciously(driver, 10, conditions, 10, 5)
+            except TimeoutException:
+                try:
+                    conditions = [EC.title_contains("CBLCNET -")]
+                    wait_tenaciously(driver, 10, conditions, 10, 5)
+                except Exception:
+                    _logger.warning(
+                        "There is no documents page for company {ccvm} "
+                        "and {doc_type}. Showing 'Error de Aplicacao'".
+                            format(ccvm=ccvm, doc_type=doc_type))
+                    raise
             bs = BeautifulSoup(driver.page_source, "html.parser")
 
     return files
@@ -215,7 +279,7 @@ def extract_ENET_files_from_page(
 
 @Throttle(crawler_name=BOVESPA_CRAWLER, minutes=1, rate=50, max_tokens=50)
 def obtain_company_files(
-        ccvm, options, doc_type, from_date=None, to_date=None):
+        producer, ccvm, options, doc_type, from_date=None, to_date=None):
     """
     This function is responsible for get the relation of files to be
     processed for the company and start its download.
@@ -250,15 +314,56 @@ def obtain_company_files(
 
         try:
             conditions = [EC.presence_of_element_located((By.NAME, 'AIR'))]
-            wait_tenaciously(driver, 10, conditions, 3, 5)
+            wait_tenaciously(driver, 10, conditions, 10, 5)
         except TimeoutException:
-            conditions = [EC.title_contains("CBLCNET -")]
-            wait_tenaciously(driver, 10, conditions, 3, 5)
-            _logger.warning(
-                "There is no documents page for company {ccvm} "
-                "and {doc_type}. Showing 'Error de Aplicacao'".
+            # try again using a new driver, to start a clean session
+            try:
+                if driver:
+                    _logger.debug("Closing the Selenium Driver for company "
+                                  "[{ccvm} - {doc_type}]".
+                                  format(ccvm=ccvm, doc_type=doc_type))
+                    driver.quit()
+
+                driver = CrawlersRegistry().get_crawler(
+                    BOVESPA_CRAWLER).get_web_driver(**options)
+                driver.get(url)
+                conditions = [EC.presence_of_element_located((By.NAME, 'AIR'))]
+                wait_tenaciously(driver, 10, conditions, 10, 5)
+            except TimeoutException:
+                try:
+                    conditions = [EC.title_contains("CBLCNET -")]
+                    wait_tenaciously(driver, 10, conditions, 10, 5)
+                    _logger.debug(
+                        "There is no documents page for company {ccvm} "
+                        "and {doc_type}. Showing 'Error de Aplicacao'".
+                        format(ccvm=ccvm, doc_type=doc_type))
+                    return ccvm, []
+                except TimeoutException:
+                    _logger.exception(
+                        "There is no documents page for company {ccvm} "
+                        "and {doc_type}. Showing 'Error de Aplicacao'".
+                        format(ccvm=ccvm, doc_type=doc_type))
+                    return ccvm, None
+
+        # We check if there is doc_type between the available type of
+        # financial reports provided by the company.
+        result = driver.find_elements_by_xpath(
+            "//form[@name='AIR']/table/*//a")
+        if len(result) > 0:
+            available_doc_types = [link.text.lower() for link in result
+                                   if link.text]
+            if doc_type.lower() not in available_doc_types:
+                _logger.debug(
+                    "The OPEN company {ccvm} does not have financial"
+                    " reports of {doc_type} type".
+                    format(ccvm=ccvm, doc_type=doc_type))
+                return ccvm, []
+        else:
+            _logger.debug(
+                "The OPEN company {ccvm} does not have presented"
+                " any financial report".
                 format(ccvm=ccvm, doc_type=doc_type))
-            return files
+            return ccvm, []
 
         # Once the page is ready, we can select the doc_type from the list
         # of documentation available and navigate to the results page
@@ -270,15 +375,18 @@ def obtain_company_files(
         try:
             conditions = [EC.presence_of_element_located(
                 (By.XPATH, "//form[@name='AIR']/table/*"))]
-            wait_tenaciously(driver, 10, conditions, 3, 5)
+            wait_tenaciously(driver, 10, conditions, 10, 5)
         except TimeoutException:
-            conditions = [EC.title_contains("CBLCNET -")]
-            wait_tenaciously(driver, 10, conditions, 3, 5)
-            _logger.warning(
-                "There is no documents page for company {ccvm} "
-                "and {doc_type}. Showing 'Error de Aplicacao'".
-                format(ccvm=ccvm, doc_type=doc_type))
-            return files
+            try:
+                conditions = [EC.title_contains("CBLCNET -")]
+                wait_tenaciously(driver, 10, conditions, 10, 5)
+                return ccvm, []
+            except Exception:
+                _logger.exception(
+                    "There is no documents page for company {ccvm} "
+                    "and {doc_type}. Showing 'Error de Aplicacao'".
+                    format(ccvm=ccvm, doc_type=doc_type))
+                return ccvm, None
 
         bs = BeautifulSoup(driver.page_source, "html.parser")
 
@@ -286,14 +394,48 @@ def obtain_company_files(
         # The ENET files are ZIP files that contains textual document that
         # we can parse and extract information from them
         files = extract_ENET_files_from_page(
+            producer, options,
             ccvm, driver, bs, doc_type, from_date, to_date)
 
-        return files
+        return ccvm, files
     except NoSuchElementException as ex:
+        # This exception happen when:
+        #  A) There is not list of documents
+        #  B) There is not the type of document available
+        result = driver.find_elements_by_xpath(
+            "//*[text()='Não há informações disponíveis "
+            "para os parâmetros selecionados.']")
+        if len(result) > 0:
+            _logger.debug(
+                "The company {ccvm} do not have {doc_type} documents".
+                format(ccvm=ccvm, doc_type=doc_type))
+            return ccvm, []
+
+        result = driver.find_elements_by_xpath(
+            "//*[contains(text(), 'Companhia Aberta não encontrada')]")
+        if len(result) > 0:
+            _logger.debug(
+                "The OPEN company {ccvm} wan not found in Bovespa".
+                format(ccvm=ccvm, doc_type=doc_type))
+            return ccvm, []
+
+        result = driver.find_elements_by_xpath(
+            "//form[@name='AIR']/table/*//a")
+        if len(result) > 0:
+            available_doc_types = [link.text for link in result if link.text]
+            _logger.debug(
+                f"The company {ccvm} do not have {doc_type} documents."
+                f" The only available documents are: {available_doc_types}")
+            return ccvm, []
+
+        _logger.error(f"Unexpected error. The company has documents but there "
+                      f"is not list of documents available. URL: {url}")
+        return ccvm, None
+    except WebDriverException as ex:
         _logger.warning(
             "The company {ccvm} do not have {doc_type} documents".
             format(ccvm=ccvm, doc_type=doc_type))
-        return []
+        return ccvm, None
     finally:
         _logger.debug(
             "Finishing to crawl company "
@@ -307,7 +449,7 @@ def obtain_company_files(
 
 
 def crawl_companies_files(
-        options, workers_num=10,
+        options, producer, workers_num=10,
         include_companies=None, from_date=None, to_date=None):
     """
 
@@ -322,13 +464,15 @@ def crawl_companies_files(
 
     """
 
-    companies_files = []
     pool = Pool(processes=workers_num)
+
+    call_results = []
 
     try:
         # Obtain the ccvm codes of all the listed companies
         ccvm_codes = [r.ccvm for r in
-                      BovespaCompany.objects.only(["ccvm"]).all()]
+                      BovespaCompany.objects.only(["ccvm"]).all()
+                      if not has_files_to_be_processed(r.ccvm)]
 
         ccvm_codes = sorted(ccvm_codes)
 
@@ -348,14 +492,15 @@ def crawl_companies_files(
 
             for doc_type in DOC_TYPES:
                 func_params.append([
-                    ccvm_code, options, doc_type, from_date, to_date])
+                    producer, ccvm_code, options, doc_type,
+                    from_date, to_date])
 
         # call_results = pool.starmap(obtain_company_files, func_params)
-        pool.starmap(obtain_company_files, func_params)
+        call_results = pool.starmap(obtain_company_files, func_params)
 
         # Merge all the responses into one only list
         # companies_files += list(
-        #    itertools.chain.from_iterable(call_results))
+        #    itertools.chain.from_iterable(call_results.get()))
 
     except TimeoutError:
         print("Timeout error")
@@ -365,3 +510,6 @@ def crawl_companies_files(
         pool.close()
         pool.join()
         pool.terminate()
+
+        return [result for result in call_results if result[1] is not None],\
+               [result for result in call_results if result[1] is None]
