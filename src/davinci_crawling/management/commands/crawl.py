@@ -11,15 +11,15 @@ import time
 import traceback
 from datetime import datetime
 from threading import Thread
+from persistqueue import SQLiteAckQueue
 
 from davinci_crawling.management.commands.utils.utils import \
     update_task_status
-from davinci_crawling.management.commands.utils.multiprocessing_producer \
-    import MultiprocessingProducer
 from django.conf import settings
 from davinci_crawling.task.models import Task, STATUS_CREATED, STATUS_FAULTY,\
     STATUS_QUEUED
-from davinci_crawling.management.commands.utils.consumer import CrawlConsumer
+from davinci_crawling.management.commands.utils.consumer import \
+    CrawlConsumer, QUEUE_LOCATION
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError, \
     handle_default_options
@@ -47,7 +47,7 @@ def _pool_tasks(interval, times_to_run):
         forever. [ONLY FOR TESTING]
     """
     times_run = 0
-    producer = MultiprocessingProducer()
+    tasks_queue = SQLiteAckQueue(QUEUE_LOCATION)
     # this while condition will only be checked on testing, otherwise this loop
     # should run forever.
     while not times_to_run or times_run < times_to_run:
@@ -77,7 +77,7 @@ def _pool_tasks(interval, times_to_run):
 
                 params = json.loads(task.params)
 
-                producer.add_crawl_params(params, options)
+                tasks_queue.put([params, options])
                 update_task_status(task, STATUS_QUEUED)
             except Exception as e:
                 update_task_status(task, STATUS_FAULTY,
