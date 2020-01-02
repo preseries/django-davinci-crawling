@@ -18,6 +18,8 @@ CHROME_OPTIONS = {
     "chromium_bin_file": settings.CHROMIUM_BIN_FILE
 }
 
+ProxyManager.set_proxy_manager("davinci_crawling.proxy.proxy_mesh.ProxyMesh")
+
 
 class TestProxy(CaravaggioBaseTest):
     """
@@ -29,8 +31,7 @@ class TestProxy(CaravaggioBaseTest):
 
     @classmethod
     def setUpTestData(cls):
-        ProxyManager.set_proxy_manager(
-            "davinci_crawling.proxy.proxy_mesh.ProxyMesh")
+        pass
 
     def _get_ip(self, driver):
         """
@@ -142,7 +143,7 @@ class TestProxy(CaravaggioBaseTest):
     def test_quality_checker(self):
         proxy_manager = ProxyManager()
         worked = False
-        for _ in range(3):
+        for _ in range(5):
             try:
                 self.assertNotEquals(proxy_manager.get_available_proxies(),
                                      proxy_manager.get_to_use_proxies())
