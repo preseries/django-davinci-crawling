@@ -81,6 +81,7 @@ def _pool_tasks(interval, times_to_run):
                 update_task_status(task, STATUS_QUEUED)
             except Exception as e:
                 update_task_status(task, STATUS_FAULTY,
+                                   source="crawl command",
                                    more_info=traceback.format_exc())
                 _logger.error("Error while adding params to queue", e)
         time.sleep(interval)

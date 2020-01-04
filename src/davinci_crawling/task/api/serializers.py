@@ -12,8 +12,22 @@ from rest_framework_cache.registry import cache_registry
 from caravaggio_rest_api.drf_haystack import serializers as dse_serializers
 from caravaggio_rest_api import fields as dse_fields
 
-from davinci_crawling.task.models import Task, ON_DEMAND_TASK, STATUS_CREATED
+from davinci_crawling.task.models import Task, ON_DEMAND_TASK, \
+    STATUS_CREATED, TaskMoreInfo
 from davinci_crawling.task.search_indexes import TaskIndex
+
+
+class TaskMoreInfoSerializer(dse_serializers.UserTypeSerializer):
+    source = serializers.CharField(required=False, allow_null=True)
+
+    created_at = serializers.DateTimeField(required=False, allow_null=True)
+
+    details = serializers.CharField(required=False, allow_null=True)
+
+    class Meta(object):
+        """Meta options."""
+
+        __type__ = TaskMoreInfo
 
 
 class TaskSerializerV1(
@@ -35,6 +49,9 @@ class TaskSerializerV1(
         help_text='the exactly same content as `options` but saved'
                   ' on a way that we can search using solr '
                   '(KeyEncodedMap).')
+
+    more_info = fields.ListField(required=False, allow_null=True,
+                                 child=TaskMoreInfoSerializer())
 
     class Meta:
         model = Task

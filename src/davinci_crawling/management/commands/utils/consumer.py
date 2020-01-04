@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*
 # Copyright (c) 2019 BuildGroup Data Services Inc.
+import traceback
+
 import logging
 import time
 from datetime import datetime
@@ -111,7 +113,9 @@ class CrawlConsumer(object):
                 time.sleep(1)
             except Exception as e:
                 if task_id and object_queue:
-                    update_task_status(task_id, STATUS_FAULTY)
+                    update_task_status(task_id, STATUS_FAULTY,
+                                       source="crawl consumer",
+                                       more_info=traceback.format_exc())
                     tasks_queue.ack_failed(object_queue)
 
                 # TODO add the error message to the db
