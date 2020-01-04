@@ -118,6 +118,5 @@ class CrawlConsumer(object):
                                        more_info=traceback.format_exc())
                     tasks_queue.ack_failed(object_queue)
 
-                # TODO add the error message to the db
                 _logger.error("Error while crawling params from queue", e)
             times_run += 1
