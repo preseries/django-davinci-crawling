@@ -59,7 +59,7 @@ class TaskSerializerV1(
                   "created_at", "updated_at",
                   "is_deleted", "status", "kind",
                   "params", "times_performed",
-                  "type", "options")
+                  "type", "options", "more_info")
         read_only_fields = ("user", "created_at", "updated_at",
                             "is_deleted", "status",
                             "times_performed", "type", "params_map",
