@@ -53,17 +53,33 @@ class TaskSerializerV1(
     more_info = fields.ListField(required=False, allow_null=True,
                                  child=TaskMoreInfoSerializer())
 
+    differences_from_last_version = fields.JSONField(required=False,
+                                                     allow_null=True)
+
+    inserted_fields = fields.ListField(required=False, allow_null=True,
+                                       child=serializers.CharField())
+
+    updated_fields = fields.ListField(required=False, allow_null=True,
+                                      child=serializers.CharField())
+
+    deleted_fields = fields.ListField(required=False, allow_null=True,
+                                      child=serializers.CharField())
+
     class Meta:
         model = Task
         fields = ("task_id", "user",
                   "created_at", "updated_at",
                   "is_deleted", "status", "kind",
                   "params", "times_performed",
-                  "type", "options", "more_info")
+                  "type", "options", "more_info",
+                  "differences_from_last_version", "inserted_fields",
+                  "updated_fields", "deleted_fields")
         read_only_fields = ("user", "created_at", "updated_at",
                             "is_deleted", "status",
                             "times_performed", "type", "params_map",
-                            "options_map")
+                            "options_map",
+                            "differences_from_last_version", "inserted_fields",
+                            "updated_fields", "deleted_fields")
         extra_kwargs = {
             'task_id': {
                 'help_text': 'the task id that is the unique partition key.'

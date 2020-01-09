@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
+import json
+
 import os
 
 import django
@@ -18,13 +20,14 @@ from django.core.management import CommandParser
 from django.core.management.base import DjangoHelpFormatter
 
 from davinci_crawling.time import mk_datetime
+from django.test import RequestFactory
 from django.utils import timezone
 
 from selenium import webdriver
 from seleniumwire import webdriver as wire_webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-
+from src.davinci_crawling.entity_diff.diff import make_diff
 
 _logger = logging.getLogger("davinci_crawling")
 
@@ -56,6 +59,9 @@ class Crawler(metaclass=ABCMeta):
     # The unique name of the crawler to be identified in the system
     __crawler_name__ = None
 
+    # The serializer class that is used to transform the model to json
+    __serializer_class__ = None
+
     def __init__(self) -> None:
         super().__init__()
 
@@ -63,6 +69,12 @@ class Crawler(metaclass=ABCMeta):
             raise RuntimeError(
                 "The crawler {} must specify "
                 "class Meta attribute '__crawler_name__'".
+                format(self.__class__))
+
+        if not hasattr(self, "__serializer_class__"):
+            raise RuntimeError(
+                "The crawler {} must specify "
+                "class Meta attribute '__serializer_class__'".
                 format(self.__class__))
 
         if hasattr(settings, "DAVINCI_CONF") and "crawler-params" in \
@@ -76,6 +88,8 @@ class Crawler(metaclass=ABCMeta):
                                             self.__crawler_name__])
 
         self.__prepare_parser()
+        self.serializer = self.__serializer_class__(context={
+            'request': self._get_fake_request()})
 
     @classmethod
     def get_web_driver(cls, **options):
@@ -343,3 +357,33 @@ class Crawler(metaclass=ABCMeta):
         }
 
         Task.create(**task_data)
+
+    @staticmethod
+    def _get_fake_request():
+        return RequestFactory().get('./fake_path')
+
+    def _object_to_dict(self, instance):
+        return self.serializer.to_representation(instance, use_cache=False)
+
+    def register_differences(self, previous_object, current_object,
+                             task_id):
+        previous_dict = self._object_to_dict(previous_object)
+        current_object_dict = self._object_to_dict(current_object)
+
+        diff = make_diff(previous_dict, current_object_dict)
+
+        all_diff = diff["all"]
+
+        inserted_fields = diff["inserts"]
+        updated_fields = diff["updates"]
+        deleted_fields = diff["deletes"]
+
+        task = Task.objects.filter(task_id=task_id).first()
+
+        if not task:
+            raise Exception("Not found task")
+
+        task.update(**{"differences_from_last_version": json.dumps(all_diff),
+                       "inserted_fields": inserted_fields,
+                       "updated_fields": updated_fields,
+                       "deleted_fields": deleted_fields})
