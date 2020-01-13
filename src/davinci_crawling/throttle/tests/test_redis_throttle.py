@@ -36,7 +36,7 @@ class TestRedisThrottle(CaravaggioBaseTest):
             times_throttled = throttle.wait_for_token("test")
             # only the 10th will be throttled
             if quantity == 10:
-                self.assertEqual(2, times_throttled)
+                self.assertTrue(2 <= times_throttled <= 3)
                 quantity = 0
             else:
                 self.assertEqual(0, times_throttled)

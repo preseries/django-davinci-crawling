@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*
 # Copyright (c) 2019 BuildGroup Data Services Inc.
+import traceback
+
 import logging
 import time
 from datetime import datetime
@@ -7,14 +9,15 @@ from davinci_crawling.management.commands.utils.utils import \
     update_task_status, get_crawler_by_name
 from davinci_crawling.task.models import STATUS_IN_PROGRESS, STATUS_FAULTY, \
     STATUS_FINISHED
-from persistqueue import Queue
+from persistqueue import SQLiteAckQueue
 from persistqueue.exceptions import Empty
 from threading import Thread
 
 _logger = logging.getLogger("davinci_crawling.queue")
 
-# stores the multiprocess queue used between crawl_params and crawl method
-multiprocess_queue = Queue("tasks_queue")
+QUEUE_LOCATION = "tasks_queue"
+# create the queue for the first time
+SQLiteAckQueue(QUEUE_LOCATION)
 
 
 class CrawlConsumer(object):
@@ -81,12 +84,15 @@ class CrawlConsumer(object):
         Will run forever than we need to Ctrl+C to finish this.
         """
         times_run = 0
+        tasks_queue = SQLiteAckQueue(QUEUE_LOCATION)
         while True:
             if self.times_to_run and times_run > self.times_to_run:
                 return
             task_id = None
+            object_queue = None
             try:
-                crawl_param, options = multiprocess_queue.get(block=False)
+                object_queue = tasks_queue.get(block=False)
+                crawl_param, options = object_queue
                 crawler_name = options.get("crawler")
                 task_id = options.get("task_id")
                 update_task_status(task_id, STATUS_IN_PROGRESS)
@@ -97,7 +103,7 @@ class CrawlConsumer(object):
 
                 self._crawl(crawler_name, task_id, crawl_param, options)
                 update_task_status(task_id, STATUS_FINISHED)
-                multiprocess_queue.task_done()
+                tasks_queue.ack(object_queue)
             except Empty:
                 # Means that the queue is empty and we need to count many times
                 # that the occurs to the close logic, we just start counting
@@ -106,10 +112,11 @@ class CrawlConsumer(object):
                               "second and try again")
                 time.sleep(1)
             except Exception as e:
-                if task_id:
-                    update_task_status(task_id, STATUS_FAULTY)
-                    multiprocess_queue.task_done()
+                if task_id and object_queue:
+                    update_task_status(task_id, STATUS_FAULTY,
+                                       source="crawl consumer",
+                                       more_info=traceback.format_exc())
+                    tasks_queue.ack_failed(object_queue)
 
-                # TODO add the error message to the db
                 _logger.error("Error while crawling params from queue", e)
             times_run += 1

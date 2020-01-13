@@ -16,8 +16,12 @@ from django.dispatch import receiver
 
 try:
     from dse.cqlengine import columns, ValidationError
+    from dse.cqlengine.columns import UserDefinedType
+    from dse.cqlengine.usertype import UserType
 except ImportError:
     from cassandra.cqlengine import columns, ValidationError
+    from cassandra.cqlengine.columns import UserDefinedType
+    from cassandra.cqlengine.usertype import UserType
 
 _logger = logging.getLogger("davinci_crawling.task")
 
@@ -37,6 +41,18 @@ ON_DEMAND_TASK = 1
 BATCH_TASK = 2
 
 ALL_TASK_TYPES = [ON_DEMAND_TASK, BATCH_TASK]
+
+
+class TaskMoreInfo(UserType):
+    __type_name__ = "task_more_info"
+
+    # from where the more info was created
+    source = columns.Text()
+
+    created_at = columns.DateTime()
+
+    # details about the error
+    details = columns.Text()
 
 
 class Task(CustomDjangoCassandraModel):
@@ -102,7 +118,7 @@ class Task(CustomDjangoCassandraModel):
 
     type = columns.SmallInt(default=ON_DEMAND_TASK)
 
-    more_info = columns.Text(required=False)
+    more_info = columns.List(value_type=UserDefinedType(TaskMoreInfo))
 
     class Meta:
         get_pk_field = "task_id"

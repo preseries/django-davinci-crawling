@@ -25,6 +25,7 @@ class Throttle(object):
             pass
     """
     manager = None
+    manager_clazz = None
 
     def __init__(self, crawler_name, seconds=1, minutes=0, hours=0, rate=10,
                  max_tokens=10, throttle_suffix_field=None):
@@ -36,8 +37,9 @@ class Throttle(object):
         self.crawler_name = crawler_name
         self.suffix_field = throttle_suffix_field
 
-    def get_throttle_manager(self):
-        if not self.manager:
+    @classmethod
+    def get_manager_clazz(cls):
+        if not cls.manager_clazz:
             if hasattr(settings, 'DAVINCI_CONF') and \
                     "throttle" in settings.DAVINCI_CONF["architecture-params"]\
                     and "implementation" in settings.DAVINCI_CONF[
@@ -47,7 +49,13 @@ class Throttle(object):
             else:
                 throttle_implementation = DEFAULT_THROTTLE_MANAGER
 
-            manager_clazz = get_class_from_name(throttle_implementation)
+            cls.manager_clazz = get_class_from_name(throttle_implementation)
+
+        return cls.manager_clazz
+
+    def get_throttle_manager(self):
+        if not self.manager:
+            manager_clazz = self.get_manager_clazz()
 
             self.manager = manager_clazz(
                 self.crawler_name, seconds=self.throttle_period.seconds,

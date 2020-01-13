@@ -8,6 +8,7 @@ from davinci_crawling.management.commands.tests.test_crawl import \
     CRAWLER_OPTIONS
 from davinci_crawling.task.models import STATUS_CREATED, ON_DEMAND_TASK,\
     Task, STATUS_FAULTY, STATUS_MAINTENANCE
+from davinci_crawling.utils import CrawlersRegistry
 
 
 class TestCrawl(CaravaggioBaseTest):
@@ -61,12 +62,24 @@ class TestCrawl(CaravaggioBaseTest):
         task_id = task.task_id
 
         status_ = '{"status": 500}'
-        Crawler.error(task_id, more_info=status_)
+        status_2 = '{"status": 400}'
+        crawler_clazz = CrawlersRegistry().get_crawler("bovespa")
+
+        crawler = crawler_clazz()
+        crawler.error(task_id, more_info=status_)
+        crawler.error(task_id, more_info=status_2)
 
         task_error = Task.objects.get(task_id=task_id)
 
         self.assertEquals(STATUS_FAULTY, task_error.status)
-        self.assertEquals(status_, task_error.more_info)
+        self.assertEquals(2, len(task_error.more_info))
+        self.assertEquals(status_, task_error.more_info[0].details)
+        self.assertEquals("bovespa", task_error.more_info[0].source)
+        self.assertIsNotNone(task_error.more_info[0].created_at)
+
+        self.assertEquals(status_2, task_error.more_info[1].details)
+        self.assertEquals("bovespa", task_error.more_info[1].source)
+        self.assertIsNotNone(task_error.more_info[1].created_at)
 
     def test_maintenance_task(self):
         """
@@ -80,12 +93,17 @@ class TestCrawl(CaravaggioBaseTest):
         task_id = task.task_id
 
         status_ = '{"status": 500}'
+        crawler_clazz = CrawlersRegistry().get_crawler("bovespa")
 
-        Crawler.maintenance_notice(task_id, more_info=status_)
+        crawler = crawler_clazz()
+
+        crawler.maintenance_notice(task_id, more_info=status_)
 
         task = Task.objects.all().filter(status=STATUS_MAINTENANCE, kind=kind)
         task = task.first()
 
         self.assertIsNotNone(task)
         self.assertEquals(STATUS_MAINTENANCE, task.status)
-        self.assertEquals(status_, task.more_info)
+        self.assertEquals(status_, task.more_info[0].details)
+        self.assertEquals("bovespa", task.more_info[0].source)
+        self.assertIsNotNone(task.more_info[0].created_at)

@@ -7,9 +7,10 @@ from _datetime import datetime
 from abc import ABCMeta
 import abc
 import logging
+from davinci_crawling.management.commands.utils.utils import update_task_status
 
 from davinci_crawling.task.models import Task, STATUS_FAULTY, \
-    STATUS_MAINTENANCE
+    STATUS_MAINTENANCE, TaskMoreInfo
 from davinci_crawling.proxy.proxy import ProxyManager
 from django.conf import settings
 
@@ -17,6 +18,7 @@ from django.core.management import CommandParser
 from django.core.management.base import DjangoHelpFormatter
 
 from davinci_crawling.time import mk_datetime
+from django.utils import timezone
 
 from selenium import webdriver
 from seleniumwire import webdriver as wire_webdriver
@@ -300,8 +302,7 @@ class Crawler(metaclass=ABCMeta):
     def crawl(self, task_id, crawling_params, options):
         raise NotImplementedError()
 
-    @staticmethod
-    def error(task_id, more_info=None):
+    def error(self, task_id, more_info=None):
         """
         Change the task (with the task_id) to the error status and also add
         the more_info to the more_info of the task.
@@ -309,15 +310,10 @@ class Crawler(metaclass=ABCMeta):
             task_id: The task id to add the error
             more_info: more information about the error
         """
-        task = Task.objects.get(task_id=task_id)
+        update_task_status(task_id, STATUS_FAULTY,
+                           source=self.__crawler_name__, more_info=more_info)
 
-        if not task:
-            raise Exception("Not found task with task id %s", task_id)
-
-        task.update(**{"status": STATUS_FAULTY, "more_info": more_info})
-
-    @staticmethod
-    def maintenance_notice(task_id, more_info=None):
+    def maintenance_notice(self, task_id, more_info=None):
         """
         Create a new task on the DB with the status maintenance, that signals
         that something is wrong with that task but we can continue processing
@@ -341,7 +337,9 @@ class Crawler(metaclass=ABCMeta):
             "params": task.params,
             "type": task.type,
             "user": task.user,
-            "more_info": more_info
+            "more_info": [TaskMoreInfo(**{"source": self.__crawler_name__,
+                                          "created_at": timezone.now(),
+                                          "details": more_info})]
         }
 
         Task.create(**task_data)
