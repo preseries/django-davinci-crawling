@@ -71,8 +71,10 @@ class TestCrawl(CaravaggioBaseTest):
 
         task = Task.objects.filter(task_id=task.task_id).first()
 
-        self.assertListEqual(["created_at", "updated_at", "company_name"],
-                             task.updated_fields)
+        expected = sorted(["created_at", "updated_at", "company_name"])
+        updated_fields = sorted(task.updated_fields)
+
+        self.assertListEqual(expected, updated_fields)
         self.assertListEqual([], task.deleted_fields)
         self.assertListEqual([], task.inserted_fields)
         self.assertIsNotNone(task.differences_from_last_version)
