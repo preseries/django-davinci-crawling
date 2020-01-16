@@ -27,7 +27,7 @@ from selenium import webdriver
 from seleniumwire import webdriver as wire_webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from src.davinci_crawling.entity_diff.diff import make_diff
+from davinci_crawling.entity_diff.diff import make_diff
 
 _logger = logging.getLogger("davinci_crawling")
 

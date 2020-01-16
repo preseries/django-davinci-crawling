@@ -4,7 +4,7 @@ import copy
 
 import logging
 from caravaggio_rest_api.tests import CaravaggioBaseTest
-from src.davinci_crawling.entity_diff.diff import make_diff
+from davinci_crawling.entity_diff.diff import make_diff
 
 _logger = logging.getLogger("davinci_crawling.testing")
 
