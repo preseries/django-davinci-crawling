@@ -7,6 +7,7 @@ from datetime import datetime
 from haystack import indexes
 
 from caravaggio_rest_api.haystack.indexes import BaseSearchIndex
+from caravaggio_rest_api.haystack import indexes as custom_indexes
 
 from .models import Task
 
@@ -44,6 +45,18 @@ class TaskIndex(BaseSearchIndex, indexes.Indexable):
 
     type = indexes.IntegerField(
         model_attr="type", faceted=True)
+
+    differences_from_last_version = indexes.CharField(
+        model_attr="differences_from_last_version")
+
+    inserted_fields = custom_indexes.CaravaggioListField(
+        model_attr="inserted_fields")
+
+    updated_fields = custom_indexes.CaravaggioListField(
+        model_attr="updated_fields")
+
+    deleted_fields = custom_indexes.CaravaggioListField(
+        model_attr="deleted_fields")
 
     class Meta:
 

@@ -120,6 +120,14 @@ class Task(CustomDjangoCassandraModel):
 
     more_info = columns.List(value_type=UserDefinedType(TaskMoreInfo))
 
+    differences_from_last_version = columns.Text()
+
+    inserted_fields = columns.List(value_type=columns.Text)
+
+    updated_fields = columns.List(value_type=columns.Text)
+
+    deleted_fields = columns.List(value_type=columns.Text)
+
     class Meta:
         get_pk_field = "task_id"
 
