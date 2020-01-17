@@ -105,9 +105,12 @@ def _translate(json_diff_result, translated_result, inserted_fields,
         # when the key is int it's because we're dealing with a one_to_many
         # dict
         elif isinstance(key, int):
-            # remove the dot from the string and add [] to represent
+            # remove the dot or [] from the string and add [] to represent
             # position
-            last_field = "%s[%s]" % (last_field[0:-1], key)
+            if last_field.endswith("]"):
+                last_field = "%s[%s]" % (last_field[0:-3], key)
+            else:
+                last_field = "%s[%s]" % (last_field[0:-1], key)
             _translate(value, translated_result, inserted_fields,
                        updated_fields, deleted_fields, last_field)
 

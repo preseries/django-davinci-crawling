@@ -150,3 +150,41 @@ class TestDiff(CaravaggioBaseTest):
                                  key=lambda i: i["uuid"])
 
         self._compare_diff(sorted_current, sorted_previous, expected)
+
+    def test_object_list_update_many(self):
+        original_json = {
+            "many": [
+                {
+                    "uuid": 1
+                },
+                {
+                    "uuid": 2
+                }
+            ]
+        }
+        modified_json = {
+            "many": [
+                {
+                    "uuid": 2
+                },
+                {
+                    "uuid": 1
+                }
+            ]
+        }
+
+        expected = {
+            "all": {
+                "updates": {
+                    "many[0].uuid": {"new_value": 2, "old_value": 1},
+                    "many[1].uuid": {"new_value": 1, "old_value": 2}
+                }
+            },
+            "inserts": [],
+            "updates": ["many*"],
+            "deletes": []
+        }
+
+        # this should fail because we are not in the same order on the two
+        # dictionaries
+        self._compare_diff(original_json, modified_json, expected)
