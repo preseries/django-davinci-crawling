@@ -12,14 +12,6 @@ davinci\_crawling.management.commands.utils.consumer module
    :undoc-members:
    :show-inheritance:
 
-davinci\_crawling.management.commands.utils.multiprocessing\_producer module
-----------------------------------------------------------------------------
-
-.. automodule:: davinci_crawling.management.commands.utils.multiprocessing_producer
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 davinci\_crawling.management.commands.utils.utils module
 --------------------------------------------------------
 

@@ -368,6 +368,38 @@ class Crawler(metaclass=ABCMeta):
 
     def register_differences(self, previous_object=None, current_object=None,
                              already_computed_diff=None, task_id=None):
+        """
+        This method is used to register the differences between two "resources"
+        on the DB that the task_id generated, this method will use the jsondiff
+        implementation that will compare the two objects and generate a diff.
+        Once the diff is generated we will write it on the Task table on the
+        task that has the task_id that was passed on this method, there we will
+        have three fields, the `differences_from_last_version` that have all
+        the changes that occurred and the `updated_fields`, `deleted_fields`
+        and `inserted_fields` that contains all the fields that have been
+        changed.
+
+        There are two ways to generate these differences, you can pass the two
+        objects `previous_object` and `current_object` or you can add the
+        `already_computed_diff` with the diff that you already calculated, the
+        `already_computed_diff` dict should contains four main keys, that are
+        the `all` that goes to the `differences_from_last_version` field and
+        the `inserts`, `updates` and `deletes` that goes to: inserted_fields,
+        updated_fields and deleted_fields.
+
+        IMPORTANT: if you have a complex structure on your object, like: a list
+        of objects you'll need to sort that list to guarantee that every time
+        this method is called we have the list on the same order, if the order
+        changes the jsondiff lib could generate a wrong output.
+        Args:
+            previous_object: the previous version of the object used to
+                compare.
+            current_object: the current version of the object used to compare.
+            already_computed_diff: if the diff is already computed this will be
+                the result of the diff on dict format.
+            task_id: the task id that generated the current_object and where we
+            will store the result of the diff.
+        """
         if task_id is None:
             raise Exception("Task id couldn't be None")
 

@@ -36,6 +36,7 @@ Contents
    TODO <todo>
    Module Reference <api/modules>
     :ref:`ProxyMesh <davinci_proxy_mesh>`
+    :ref:`JsonDiff <davinci_json_diff`
 
 
 Indices and tables
