@@ -66,12 +66,54 @@ class TestCrawl(CaravaggioBaseTest):
         bovespa_current = self._create_bovespa_company("123", "OpenExchange",
                                                        "CREATED")
 
-        crawler.register_differences(bovespa_previous, bovespa_current,
-                                     task.task_id)
+        crawler.register_differences(previous_object=bovespa_previous,
+                                     current_object=bovespa_current,
+                                     task_id=task.task_id)
 
         task = Task.objects.filter(task_id=task.task_id).first()
 
         expected = sorted(["created_at", "updated_at", "company_name"])
+        updated_fields = sorted(task.updated_fields)
+
+        self.assertListEqual(expected, updated_fields)
+        self.assertListEqual([], task.deleted_fields)
+        self.assertListEqual([], task.inserted_fields)
+        self.assertIsNotNone(task.differences_from_last_version)
+
+    def test_register_differences_already_computed(self):
+        crawler_clazz = CrawlersRegistry().get_crawler("bovespa")
+
+        crawler = crawler_clazz()
+
+        task_data = {
+            "user": "user1",
+            "status": STATUS_CREATED,
+            "kind": "bovespa",
+            "params": "{}",
+            "options": "{}",
+            "type": ON_DEMAND_TASK
+        }
+        task = Task.create(**task_data)
+
+        already_computed = {
+            "all": {
+                "updates": {
+                    "created_at": {
+                        "new_value": 1,
+                        "old_value": 0
+                    }
+                }
+            },
+            "inserts": [],
+            "updates": ["created_at"],
+            "deletes": []
+        }
+        crawler.register_differences(already_computed_diff=already_computed,
+                                     task_id=task.task_id)
+
+        task = Task.objects.filter(task_id=task.task_id).first()
+
+        expected = sorted(["created_at"])
         updated_fields = sorted(task.updated_fields)
 
         self.assertListEqual(expected, updated_fields)

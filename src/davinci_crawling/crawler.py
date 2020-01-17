@@ -88,8 +88,9 @@ class Crawler(metaclass=ABCMeta):
                                             self.__crawler_name__])
 
         self.__prepare_parser()
-        self.serializer = self.__serializer_class__(context={
-            'request': self._get_fake_request()})
+        if self.__serializer_class__:
+            self.serializer = self.__serializer_class__(context={
+                'request': self._get_fake_request()})
 
     @classmethod
     def get_web_driver(cls, **options):
@@ -365,12 +366,23 @@ class Crawler(metaclass=ABCMeta):
     def _object_to_dict(self, instance):
         return self.serializer.to_representation(instance, use_cache=False)
 
-    def register_differences(self, previous_object, current_object,
-                             task_id):
-        previous_dict = self._object_to_dict(previous_object)
-        current_object_dict = self._object_to_dict(current_object)
+    def register_differences(self, previous_object=None, current_object=None,
+                             already_computed_diff=None, task_id=None):
+        if task_id is None:
+            raise Exception("Task id couldn't be None")
 
-        diff = make_diff(previous_dict, current_object_dict)
+        if previous_object is None and current_object is None and \
+                already_computed_diff is None:
+            raise Exception("You should specify at least the objects or the "
+                            "computed diff")
+
+        if not already_computed_diff:
+            previous_dict = self._object_to_dict(previous_object)
+            current_object_dict = self._object_to_dict(current_object)
+
+            diff = make_diff(previous_dict, current_object_dict)
+        else:
+            diff = already_computed_diff
 
         all_diff = diff["all"]
 
