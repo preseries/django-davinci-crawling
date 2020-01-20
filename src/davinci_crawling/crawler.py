@@ -363,11 +363,17 @@ class Crawler(metaclass=ABCMeta):
     def _get_fake_request():
         return RequestFactory().get('./fake_path')
 
-    def _object_to_dict(self, instance):
-        return self.serializer.to_representation(instance, use_cache=False)
+    def _object_to_dict(self, instance, serializer_class):
+        if serializer_class:
+            serializer = serializer_class(context={
+                'request': self._get_fake_request()})
+        else:
+            serializer = self.serializer
+        return serializer.to_representation(instance, use_cache=False)
 
     def register_differences(self, previous_object=None, current_object=None,
-                             already_computed_diff=None, task_id=None):
+                             already_computed_diff=None, task_id=None,
+                             serializer_class=None):
         """
         This method is used to register the differences between two "resources"
         on the DB that the task_id generated, this method will use the jsondiff
@@ -399,6 +405,9 @@ class Crawler(metaclass=ABCMeta):
                 the result of the diff on dict format.
             task_id: the task id that generated the current_object and where we
             will store the result of the diff.
+            serializer_class: if you want to specify another serializer class
+                different from self.__serializer_class__ you can do on this
+                variable.
         """
         if task_id is None:
             raise Exception("Task id couldn't be None")
@@ -409,8 +418,10 @@ class Crawler(metaclass=ABCMeta):
                             "computed diff")
 
         if not already_computed_diff:
-            previous_dict = self._object_to_dict(previous_object)
-            current_object_dict = self._object_to_dict(current_object)
+            previous_dict = self._object_to_dict(previous_object,
+                                                 serializer_class)
+            current_object_dict = self._object_to_dict(current_object,
+                                                       serializer_class)
 
             diff = make_diff(previous_dict, current_object_dict)
         else:
