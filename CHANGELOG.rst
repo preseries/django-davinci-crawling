@@ -47,6 +47,7 @@ Improvements or Changes
 - Add a `more_info` field to the task;
 - Remove unnecessary usage of the setup_cassandra_object_mapper inside the bovespa crawler;
 - Change table name from harvest_checkpoint to davinci_checkpoint;
+- Add feature that allows the user to restrict the countries where we can get the proxies from.
 
 Bug Fixing
 **********

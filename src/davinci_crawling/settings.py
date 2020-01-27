@@ -166,7 +166,8 @@ class Common(Configuration):
                     "authentication":
                         "Basic aWFucmlja2V5OlZhcmlhYmxlZGF0YTEwMSE=",
                     "authorized_proxies_url":
-                        "https://proxymesh.com/api/proxies/"
+                        "https://proxymesh.com/api/proxies/",
+                    "only-proxies-from": "us"
                 },
                 "proxies-availability-checker": {
                     "elapse-time-between-checks": 60
