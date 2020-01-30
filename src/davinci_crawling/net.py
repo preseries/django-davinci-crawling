@@ -123,7 +123,7 @@ def get_json(url, timeout=None, custom_header=None, use_proxy=True):
         raise ex
 
 
-def post_json(url, json_obj, timeout=None):
+def post_json(url, json_obj, timeout=None, use_proxy=True):
     """
     Send and receive json by posting to the given URL.
     The body should be provided as a map for conversion
@@ -134,7 +134,7 @@ def post_json(url, json_obj, timeout=None):
 
         timeout = timeout if timeout else DEFAULT_TIMEOUT
 
-        proxy_address = get_proxy_address()
+        proxy_address = get_proxy_address() if use_proxy else {}
 
         return requests.post(
             url=url, data=json_body,

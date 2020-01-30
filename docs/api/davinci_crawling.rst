@@ -6,11 +6,14 @@ Subpackages
 
 .. toctree::
 
+   davinci_crawling.entity_diff
    davinci_crawling.example
    davinci_crawling.gcp
    davinci_crawling.management
+   davinci_crawling.proxy
    davinci_crawling.scheduler
    davinci_crawling.task
+   davinci_crawling.tests
    davinci_crawling.throttle
 
 Submodules

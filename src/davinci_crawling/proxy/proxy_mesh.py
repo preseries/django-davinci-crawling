@@ -44,11 +44,27 @@ class ProxyMesh(Proxy):
         self.to_use_proxies = proxies
 
     @classmethod
+    def get_country_from_proxy_address(cls, proxy_address):
+        """
+        Extract the country from the proxy_address, that are the first two
+        letters on the domain before the first dot.
+        Args:
+            proxy_address: the proxy_address to be extract.
+        Returns:
+            The country from the proxy_address.
+        """
+        if proxy_address[0:4] == "open":
+            # open is a set of proxies that have no country associated with
+            return None
+
+        return proxy_address[0:2]
+
+    @classmethod
     def get_available_proxies(cls):
         """
         Proxy Mesh has a list of proxies to use, this method will acess proxy
         mesh api to get this list of ips.
-        Returns:
+        Returns: The list of available proxies.
 
         """
         if not cls.available_proxies and PROXY_MESH_SETTINGS:
@@ -60,7 +76,18 @@ class ProxyMesh(Proxy):
             response = response.json()
             proxies = []
 
+            only_proxies_from = PROXY_MESH_SETTINGS.get("only-proxies-from")
+            only_proxies_from = only_proxies_from.split(",") \
+                if only_proxies_from else None
             for proxy in response["proxies"]:
+                if only_proxies_from:
+                    country = cls.get_country_from_proxy_address(proxy)
+                    if not country:
+                        continue
+
+                    if country not in only_proxies_from:
+                        continue
+
                 _proxy = PROXY_TEMPLATE % (settings.PROXY_MESH_USER,
                                            settings.PROXY_MESH_PASSWORD,
                                            proxy)

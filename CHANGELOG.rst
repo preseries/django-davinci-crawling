@@ -20,6 +20,7 @@ New Features
 - Add proxy mesh to chrome driver on selenium;
 - Add proxy mesh to fetch_file to download files;
 - Add persistent-queue to the crawl flow to avoid losing tasks if their state are QUEUED or RUNNING;
+- Add jsondiff on the register_differences method to allow comparison between resource versions created by crawlers;
 
 Improvements or Changes
 ***********************
@@ -46,6 +47,7 @@ Improvements or Changes
 - Add a `more_info` field to the task;
 - Remove unnecessary usage of the setup_cassandra_object_mapper inside the bovespa crawler;
 - Change table name from harvest_checkpoint to davinci_checkpoint;
+- Add feature that allows the user to restrict the countries where we can get the proxies from.
 
 Bug Fixing
 **********

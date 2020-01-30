@@ -1,0 +1,269 @@
+[
+  {
+    "name": "BGDS",
+    "short_description": "Build Group Data Service",
+    "primary_role": "company",
+    "city": "Austin",
+    "region": "TX",
+    "country": "United States",
+    "country_code": "USA",
+    "permalink_aliases": [
+      "BGAI"
+    ],
+    "created_date": "2019-10-10T00:00:00Z",
+    "updated_date": "2019-10-10T00:00:00Z",
+    "founded_date": "2019-10-10",
+    "num_employees_min": 1,
+    "num_employees_max": 8,
+    "num_employees_avg": 4,
+    "stock_exchange": "adx",
+    "stock_symbol": "BG",
+    "total_funding_usd": 1000000,
+    "number_of_investments": 10,
+    "contact_email": "help@bgds.com",
+    "phone_number": "+1551122334455",
+    "rank": 1,
+    "role_company": true,
+    "founders": [
+      "fd9c075a-f834-4140-9e35-f43e707a5d9e",
+      "fb6a2d71-4ac4-44c2-ae35-07e1bded9401"
+    ],
+    "featured_team": [
+      {
+        "job_id": "55b229c1-3cbf-46c3-a2a9-0b5966fd88b2",
+        "title": "Software Intern",
+        "is_current": false,
+        "started_on": "2019-01-01",
+        "ended_on": null,
+        "created_date": "2019-10-10T00:00:00Z",
+        "updated_date": "2019-10-10T00:00:00Z",
+        "organization_uuid": "fb6a2d71-4ac4-44c2-ae35-07e1bded9401",
+        "person_uuid": "fb6a2d71-4ac4-44c2-ae35-07e1bded9401",
+        "job_type": "full"
+      }
+    ],
+    "current_team": [
+      {
+        "job_id": "55b229c1-3cbf-46c3-a2a9-0b5966fd88b2",
+        "title": "Software Intern",
+        "is_current": false,
+        "started_on": "2019-01-01",
+        "ended_on": null,
+        "created_date": "2019-10-10T00:00:00Z",
+        "updated_date": "2019-10-10T00:00:00Z",
+        "organization_uuid": "fb6a2d71-4ac4-44c2-ae35-07e1bded9401",
+        "person_uuid": "fb6a2d71-4ac4-44c2-ae35-07e1bded9401",
+        "job_type": "full"
+      }
+    ],
+    "past_team": [
+      {
+        "job_id": "55b229c1-3cbf-46c3-a2a9-0b5966fd88b2",
+        "title": "Software Intern",
+        "is_current": false,
+        "started_on": "2019-01-01",
+        "ended_on": null,
+        "created_date": "2019-10-10T00:00:00Z",
+        "updated_date": "2019-10-10T00:00:00Z",
+        "organization_uuid": "fb6a2d71-4ac4-44c2-ae35-07e1bded9401",
+        "person_uuid": "fb6a2d71-4ac4-44c2-ae35-07e1bded9401",
+        "job_type": "full"
+      }
+    ],
+    "board_members_and_advisors": [
+      {
+        "job_id": "55b229c1-3cbf-46c3-a2a9-0b5966fd88b2",
+        "title": "Software Intern",
+        "is_current": false,
+        "started_on": "2019-01-01",
+        "ended_on": null,
+        "created_date": "2019-10-10T00:00:00Z",
+        "updated_date": "2019-10-10T00:00:00Z",
+        "organization_uuid": "fb6a2d71-4ac4-44c2-ae35-07e1bded9401",
+        "person_uuid": "fb6a2d71-4ac4-44c2-ae35-07e1bded9401",
+        "job_type": "full"
+      }
+    ],
+    "investors": [
+      "72c245e3-1c0d-45ae-9f5c-2812e609cbc5",
+      "5160f85d-62b1-4ebb-99c4-be3a69620a14"
+    ],
+    "sub_organizations": [
+      "f153431a-4aa4-4562-be1d-021a71c75aa7"
+    ],
+    "headquarters": {
+      "address_id": "305cbe5f-3770-4780-b1d2-3bb0a4e8249b",
+      "name": "headquarters",
+      "street_1": "35th Jefferson street",
+      "street_2": null,
+      "city": "Austin",
+      "region": "Texas",
+      "country": "United States",
+      "country_code": "USA",
+      "postal_code": "11211",
+      "latitude": 11221.00,
+      "longitude": 11.51,
+      "created_date": "2019-10-10T00:00:00Z",
+      "updated_date": "2019-10-10T00:00:00Z"
+    },
+    "offices": [
+      {
+        "address_id": "3da54dc1-9738-42ff-b837-23b9a2db5fcd",
+        "name": "office",
+        "street_1": "35th Jefferson street",
+        "street_2": null,
+        "city": "Austin",
+        "region": "Texas",
+        "country": "United States",
+        "country_code": "USA",
+        "postal_code": "11211",
+        "latitude": 11221.00,
+        "longitude": 11.51,
+        "created_date": "2019-10-10T00:00:00Z",
+        "updated_date": "2019-10-10T00:00:00Z"
+      }
+    ],
+    "categories": [
+      "company",
+      "ia",
+      "investment"
+    ],
+    "funding_rounds": [
+      {
+        "funding_round_id": "b09607fc-081f-4212-be62-3e7a8a786eb0",
+        "funding_type": "seed",
+        "series": null,
+        "series_qualifier": null,
+        "announced_on": "2019-10-10",
+        "closed_on": "2019-10-11",
+        "money_raised": 1000000,
+        "money_raised_currency_code": "USD",
+        "money_raised_usd": 1000000,
+        "target_money_raised": 1000000,
+        "target_money_raised_currency_code": "USD",
+        "target_money_raised_usd": 1000000,
+        "created_date": "2019-10-10T00:00:00Z",
+        "updated_date": "2019-10-10T00:00:00Z",
+        "pre_money_valuation": 1000000,
+        "pre_money_valuation_currency_code": "USD",
+        "pre_money_valuation_usd": 1000000,
+        "rank": 1
+      }
+    ],
+    "investments": [
+      {
+        "investment_id": "7c396944-71f4-4c73-b9c7-1ad177f46f0b",
+        "money_invested": 1000000,
+        "money_invested_currency_code": "usd",
+        "money_invested_usd": 1000000,
+        "is_lead_investor": true,
+        "announced_on": "2019-01-01",
+        "created_date": "2019-10-10T00:00:00Z",
+        "updated_date": "2019-10-10T00:00:00Z",
+        "invested_in": null,
+        "funding_round": {
+          "funding_round_id": "e46ce350-b755-4185-bdd2-e5ad4b898c1b",
+          "funding_type": "seed",
+          "series": null,
+          "series_qualifier": null,
+          "announced_on": "2019-10-10",
+          "closed_on": null,
+          "money_raised": 121222,
+          "money_raised_currency_code": "USD",
+          "money_raised_usd": 242444,
+          "target_money_raised": 121222,
+          "target_money_raised_currency_code": "USD",
+          "target_money_raised_usd": 242444,
+          "created_date": "2019-10-10T00:00:00Z",
+          "updated_date": "2019-10-10T00:00:00Z",
+          "pre_money_valuation": 121222,
+          "pre_money_valuation_currency_code": "USD",
+          "pre_money_valuation_usd": 242444,
+          "rank": 1
+        }
+      }
+    ],
+    "acquisition": [
+      {
+        "acquisition_id": "f05b4a62-c8de-4300-863e-5275198b3b36",
+        "price": 121222,
+        "price_currency_code": "USD",
+        "price_usd": 242444,
+        "payment_type": "cash",
+        "acquisition_type": "lbo",
+        "acquisition_status": "complete",
+        "disposition_of_acquired": "combined",
+        "announced_on": "2019-10-10",
+        "completed_on": "2019-10-11",
+        "created_date": "2019-10-10T00:00:00Z",
+        "updated_date": "2019-10-10T00:00:00Z",
+        "rank": 1,
+        "acquires": "5c1cb6d8-5e34-4b80-9cf8-ed2247a45b10"
+      }
+    ],
+    "acquired_by": "4552fbea-492b-49a5-b74d-df94aaa5ae67",
+    "ipo": {
+      "ipo_id": "77afefb5-1771-46d6-a422-003a02e1f773",
+      "went_public_on": "2019-10-10",
+      "stock_exchange": "adx",
+      "stock_symbol": "BG",
+      "shares_sold": 35,
+      "opening_share_price": 1000000.50,
+      "opening_share_price_currency_code": "USD",
+      "opening_share_price_usd": 1000000.50,
+      "opening_valuation": 1000000,
+      "opening_valuation_currency_code": "USD",
+      "opening_valuation_usd": 1000000,
+      "money_raised": 1000000,
+      "money_raised_currency_code": "USD",
+      "money_raised_usd": 1000000,
+      "created_date": "2019-10-10T00:00:00Z",
+      "updated_date": "2019-10-10T00:00:00Z",
+      "random_list": [
+        {
+          "ab": "bc",
+          "cb": "ab"
+        }
+      ],
+      "random_object": {
+        "ab": "bc",
+        "cd": "dc"
+      }
+    },
+    "funds": [
+      {
+        "fund_id": "9ff8bea6-2ab0-4868-993e-b4ce9f8f6f9e",
+        "name": "fund",
+        "announced_on": "2019-10-10",
+        "money_raised": 1000000,
+        "money_raised_currency_code": "USD",
+        "money_raised_usd": 1000000,
+        "created_date": "2019-10-10T00:00:00Z",
+        "updated_date": "2019-10-10T00:00:00Z",
+        "investor": "be021300-1831-47a2-8d03-da48cddd4364"
+      }
+    ],
+    "quantity_news": 10,
+    "websites": [
+      {
+        "website_id": "5fef58d0-a545-4f02-af40-db2434df6536",
+        "name": "website",
+        "website_type": "homepage",
+        "url": "www.john.com",
+        "created_date": "2019-10-10T00:00:00Z",
+        "updated_date": "2019-10-10T00:00:00Z"
+      },
+      {
+        "website_id": "3574182e-74bb-4c21-8d81-4f6091fedc12",
+        "name": "facebook",
+        "website_type": "facebook",
+        "url": "www.facebook.com/john",
+        "created_date": "2019-10-10T00:00:00Z",
+        "updated_date": "2019-10-10T00:00:00Z"
+      }
+    ],
+    "profile_image_url": "http://myimage.com/image.jpg",
+    "created_at": "2019-10-10T00:00:00Z",
+    "updated_at": "2019-10-10T00:00:00Z"
+  }
+]

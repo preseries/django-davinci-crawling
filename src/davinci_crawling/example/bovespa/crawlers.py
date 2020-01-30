@@ -8,6 +8,8 @@ from caravaggio_rest_api.haystack.backends.utils import \
 from datetime import datetime
 
 from dateutil.parser import parse as date_parse
+from davinci_crawling.example.bovespa.api.serializers import \
+    BovespaCompanySerializerV1
 
 from solrq import Q, Range, ANY, Value
 
@@ -208,6 +210,8 @@ def process_companies_files(
 class BovespaCrawler(Crawler):
 
     __crawler_name__ = BOVESPA_CRAWLER
+
+    __serializer_class__ = BovespaCompanySerializerV1
 
     def add_arguments(self, parser):
         # Process files from an specific date

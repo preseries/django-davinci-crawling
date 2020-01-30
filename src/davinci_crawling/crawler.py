@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2019 BuildGroup Data Services Inc.
+import json
+
 import os
 
 import django
@@ -18,13 +20,14 @@ from django.core.management import CommandParser
 from django.core.management.base import DjangoHelpFormatter
 
 from davinci_crawling.time import mk_datetime
+from django.test import RequestFactory
 from django.utils import timezone
 
 from selenium import webdriver
 from seleniumwire import webdriver as wire_webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-
+from davinci_crawling.entity_diff.diff import make_diff
 
 _logger = logging.getLogger("davinci_crawling")
 
@@ -56,6 +59,9 @@ class Crawler(metaclass=ABCMeta):
     # The unique name of the crawler to be identified in the system
     __crawler_name__ = None
 
+    # The serializer class that is used to transform the model to json
+    __serializer_class__ = None
+
     def __init__(self) -> None:
         super().__init__()
 
@@ -63,6 +69,12 @@ class Crawler(metaclass=ABCMeta):
             raise RuntimeError(
                 "The crawler {} must specify "
                 "class Meta attribute '__crawler_name__'".
+                format(self.__class__))
+
+        if not hasattr(self, "__serializer_class__"):
+            raise RuntimeError(
+                "The crawler {} must specify "
+                "class Meta attribute '__serializer_class__'".
                 format(self.__class__))
 
         if hasattr(settings, "DAVINCI_CONF") and "crawler-params" in \
@@ -76,6 +88,9 @@ class Crawler(metaclass=ABCMeta):
                                             self.__crawler_name__])
 
         self.__prepare_parser()
+        if self.__serializer_class__:
+            self.serializer = self.__serializer_class__(context={
+                'request': self._get_fake_request()})
 
     @classmethod
     def get_web_driver(cls, **options):
@@ -343,3 +358,87 @@ class Crawler(metaclass=ABCMeta):
         }
 
         Task.create(**task_data)
+
+    @staticmethod
+    def _get_fake_request():
+        return RequestFactory().get('./fake_path')
+
+    def _object_to_dict(self, instance, serializer_class):
+        if serializer_class:
+            serializer = serializer_class(context={
+                'request': self._get_fake_request()})
+        else:
+            serializer = self.serializer
+        return serializer.to_representation(instance, use_cache=False)
+
+    def register_differences(self, previous_object=None, current_object=None,
+                             already_computed_diff=None, task_id=None,
+                             serializer_class=None):
+        """
+        This method is used to register the differences between two "resources"
+        on the DB that the task_id generated, this method will use the jsondiff
+        implementation that will compare the two objects and generate a diff.
+        Once the diff is generated we will write it on the Task table on the
+        task that has the task_id that was passed on this method, there we will
+        have three fields, the `differences_from_last_version` that have all
+        the changes that occurred and the `updated_fields`, `deleted_fields`
+        and `inserted_fields` that contains all the fields that have been
+        changed.
+
+        There are two ways to generate these differences, you can pass the two
+        objects `previous_object` and `current_object` or you can add the
+        `already_computed_diff` with the diff that you already calculated, the
+        `already_computed_diff` dict should contains four main keys, that are
+        the `all` that goes to the `differences_from_last_version` field and
+        the `inserts`, `updates` and `deletes` that goes to: inserted_fields,
+        updated_fields and deleted_fields.
+
+        IMPORTANT: if you have a complex structure on your object, like: a list
+        of objects you'll need to sort that list to guarantee that every time
+        this method is called we have the list on the same order, if the order
+        changes the jsondiff lib could generate a wrong output.
+        Args:
+            previous_object: the previous version of the object used to
+                compare.
+            current_object: the current version of the object used to compare.
+            already_computed_diff: if the diff is already computed this will be
+                the result of the diff on dict format.
+            task_id: the task id that generated the current_object and where we
+            will store the result of the diff.
+            serializer_class: if you want to specify another serializer class
+                different from self.__serializer_class__ you can do on this
+                variable.
+        """
+        if task_id is None:
+            raise Exception("Task id couldn't be None")
+
+        if previous_object is None and current_object is None and \
+                already_computed_diff is None:
+            raise Exception("You should specify at least the objects or the "
+                            "computed diff")
+
+        if not already_computed_diff:
+            previous_dict = self._object_to_dict(previous_object,
+                                                 serializer_class)
+            current_object_dict = self._object_to_dict(current_object,
+                                                       serializer_class)
+
+            diff = make_diff(previous_dict, current_object_dict)
+        else:
+            diff = already_computed_diff
+
+        all_diff = diff["all"]
+
+        inserted_fields = diff["inserts"]
+        updated_fields = diff["updates"]
+        deleted_fields = diff["deletes"]
+
+        task = Task.objects.filter(task_id=task_id).first()
+
+        if not task:
+            raise Exception("Not found task")
+
+        task.update(**{"differences_from_last_version": json.dumps(all_diff),
+                       "inserted_fields": inserted_fields,
+                       "updated_fields": updated_fields,
+                       "deleted_fields": deleted_fields})
