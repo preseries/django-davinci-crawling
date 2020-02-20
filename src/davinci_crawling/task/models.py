@@ -128,6 +128,8 @@ class Task(CustomDjangoCassandraModel):
 
     deleted_fields = columns.List(value_type=columns.Text)
 
+    changed_fields = columns.List(value_type=columns.Text)
+
     class Meta:
         get_pk_field = "task_id"
 

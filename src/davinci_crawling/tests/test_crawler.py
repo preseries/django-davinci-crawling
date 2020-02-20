@@ -74,10 +74,12 @@ class TestCrawl(CaravaggioBaseTest):
 
         expected = sorted(["created_at", "updated_at", "company_name"])
         updated_fields = sorted(task.updated_fields)
+        changed_fields = sorted(task.changed_fields)
 
         self.assertListEqual(expected, updated_fields)
         self.assertListEqual([], task.deleted_fields)
         self.assertListEqual([], task.inserted_fields)
+        self.assertListEqual(expected, changed_fields)
         self.assertIsNotNone(task.differences_from_last_version)
 
     def test_register_differences_already_computed(self):
@@ -115,8 +117,10 @@ class TestCrawl(CaravaggioBaseTest):
 
         expected = sorted(["created_at"])
         updated_fields = sorted(task.updated_fields)
+        changed_fields = sorted(task.changed_fields)
 
         self.assertListEqual(expected, updated_fields)
         self.assertListEqual([], task.deleted_fields)
         self.assertListEqual([], task.inserted_fields)
+        self.assertListEqual(expected, changed_fields)
         self.assertIsNotNone(task.differences_from_last_version)

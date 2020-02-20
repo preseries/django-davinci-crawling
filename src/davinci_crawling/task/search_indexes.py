@@ -58,6 +58,9 @@ class TaskIndex(BaseSearchIndex, indexes.Indexable):
     deleted_fields = custom_indexes.CaravaggioListField(
         model_attr="deleted_fields")
 
+    changed_fields = custom_indexes.CaravaggioListField(
+        model_attr="changed_fields")
+
     class Meta:
 
         text_fields = []
