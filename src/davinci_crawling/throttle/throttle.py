@@ -2,6 +2,7 @@
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 
 # https://quentin.pradet.me/blog/how-do-you-rate-limit-calls-with-aiohttp.html
+import inspect
 from abc import ABC, abstractmethod
 from datetime import timedelta
 from functools import wraps
@@ -69,6 +70,13 @@ class Throttle(object):
             throttle_suffix = None
             if self.suffix_field:
                 throttle_suffix = kwargs.get(self.suffix_field)
+
+                if not throttle_suffix:
+                    arguments = inspect.getfullargspec(fn).args
+                    if self.suffix_field in arguments:
+                        argument_position = arguments.index(self.suffix_field)
+                        if argument_position < len(args):
+                            throttle_suffix = args[argument_position]
 
             manager = self.get_throttle_manager()
 
