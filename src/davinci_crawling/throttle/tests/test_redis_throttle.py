@@ -15,12 +15,6 @@ CHROME_OPTIONS = {
 
 
 class TestRedisThrottle(CaravaggioBaseTest):
-    """
-    Test the proxy logic, this test requires connection with internet
-    because we use the proxy mesh api and request for real pages.
-    """
-
-    all_files_count = 0
 
     @classmethod
     def setUpTestData(cls):
