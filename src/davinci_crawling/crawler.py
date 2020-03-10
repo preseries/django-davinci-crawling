@@ -381,17 +381,17 @@ class Crawler(metaclass=ABCMeta):
         Once the diff is generated we will write it on the Task table on the
         task that has the task_id that was passed on this method, there we will
         have three fields, the `differences_from_last_version` that have all
-        the changes that occurred and the `updated_fields`, `deleted_fields`
-        and `inserted_fields` that contains all the fields that have been
-        changed.
+        the changes that occurred and the `updated_fields`, `deleted_fields`,
+        `inserted_fields` and `changed_fields` that contains all the fields
+        that have been changed.
 
         There are two ways to generate these differences, you can pass the two
         objects `previous_object` and `current_object` or you can add the
         `already_computed_diff` with the diff that you already calculated, the
         `already_computed_diff` dict should contains four main keys, that are
         the `all` that goes to the `differences_from_last_version` field and
-        the `inserts`, `updates` and `deletes` that goes to: inserted_fields,
-        updated_fields and deleted_fields.
+        the `inserts`, `updates`, `deletes` and `changes` that goes to:
+        inserted_fields, updated_fields, deleted_fields and `changed_fields`.
 
         IMPORTANT: if you have a complex structure on your object, like: a list
         of objects you'll need to sort that list to guarantee that every time
@@ -432,6 +432,9 @@ class Crawler(metaclass=ABCMeta):
         inserted_fields = diff["inserts"]
         updated_fields = diff["updates"]
         deleted_fields = diff["deletes"]
+        changed_fields = set()
+        changed_fields.update(inserted_fields, updated_fields, deleted_fields)
+        changed_fields = list(changed_fields)
 
         task = Task.objects.filter(task_id=task_id).first()
 
@@ -441,4 +444,5 @@ class Crawler(metaclass=ABCMeta):
         task.update(**{"differences_from_last_version": json.dumps(all_diff),
                        "inserted_fields": inserted_fields,
                        "updated_fields": updated_fields,
-                       "deleted_fields": deleted_fields})
+                       "deleted_fields": deleted_fields,
+                       "changed_fields": changed_fields})

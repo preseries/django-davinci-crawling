@@ -49,14 +49,13 @@ class TaskIndex(BaseSearchIndex, indexes.Indexable):
     differences_from_last_version = indexes.CharField(
         model_attr="differences_from_last_version")
 
-    inserted_fields = custom_indexes.CaravaggioListField(
-        model_attr="inserted_fields")
+    inserted_fields = indexes.MultiValueField(model_attr="inserted_fields")
 
-    updated_fields = custom_indexes.CaravaggioListField(
-        model_attr="updated_fields")
+    updated_fields = indexes.MultiValueField(model_attr="updated_fields")
 
-    deleted_fields = custom_indexes.CaravaggioListField(
-        model_attr="deleted_fields")
+    deleted_fields = indexes.MultiValueField(model_attr="deleted_fields")
+
+    changed_fields = indexes.MultiValueField(model_attr="changed_fields")
 
     class Meta:
 
