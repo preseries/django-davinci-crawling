@@ -1,0 +1,2 @@
+-r base.in
+git+ssh://git@github.com/intellstartup/django-caravaggio-rest-api.git@develop#egg=django-caravaggio-rest-api-0
