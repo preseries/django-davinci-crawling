@@ -57,6 +57,8 @@ class TaskIndex(BaseSearchIndex, indexes.Indexable):
 
     changed_fields = indexes.MultiValueField(model_attr="changed_fields")
 
+    more_info = indexes.MultiValueField(model_attr="more_info")
+
     class Meta:
 
         text_fields = []
