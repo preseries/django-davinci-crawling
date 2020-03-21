@@ -439,7 +439,7 @@ class Crawler(metaclass=ABCMeta):
         task = Task.objects.filter(task_id=task_id).first()
 
         if not task:
-            raise Exception("Not found task with task id %s", task_id)
+            raise Exception("Not found task with task id {}".format(str(task_id)))
 
         task.update(**{"differences_from_last_version": json.dumps(all_diff),
                        "inserted_fields": inserted_fields,
