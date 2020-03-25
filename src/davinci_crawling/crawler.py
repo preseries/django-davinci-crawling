@@ -22,6 +22,7 @@ from django.core.management.base import DjangoHelpFormatter
 from davinci_crawling.time import mk_datetime
 from django.test import RequestFactory
 from django.utils import timezone
+from haystack.query import SearchQuerySet
 
 from selenium import webdriver
 from seleniumwire import webdriver as wire_webdriver
@@ -325,8 +326,7 @@ class Crawler(metaclass=ABCMeta):
             task_id: The task id to add the error
             more_info: more information about the error
         """
-        update_task_status(task_id, STATUS_FAULTY,
-                           source=self.__crawler_name__, more_info=more_info)
+        update_task_status(task_id, STATUS_FAULTY, source=self.__crawler_name__, more_info=more_info)
 
     def maintenance_notice(self, task_id, more_info=None):
         """
@@ -340,7 +340,7 @@ class Crawler(metaclass=ABCMeta):
             task_id: The task id to notice
             more_info: more information about the maintenance notice
         """
-        task = Task.objects.get(task_id=task_id)
+        task = SearchQuerySet().models(Task).raw_search("task_id:%s" % task_id)[0]
 
         if not task:
             raise Exception("Not found task with task id %s", task_id)
@@ -436,7 +436,7 @@ class Crawler(metaclass=ABCMeta):
         changed_fields.update(inserted_fields, updated_fields, deleted_fields)
         changed_fields = list(changed_fields)
 
-        task = Task.objects.filter(task_id=task_id).first()
+        task = SearchQuerySet().models(Task).raw_search("task_id:%s" % task_id)[0]
 
         if not task:
             raise Exception("Not found task with task id {}".format(str(task_id)))
