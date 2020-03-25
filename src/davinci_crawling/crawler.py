@@ -342,10 +342,7 @@ class Crawler(metaclass=ABCMeta):
             task_id: The task id to notice
             more_info: more information about the maintenance notice
         """
-        _filter = Q(task_id=task_id)
-        paginator = CaravaggioSearchPaginator(query_string=str(_filter), limit=1).models(Task)
-        paginator.next()
-        task = paginator.get_results()[0]
+        task = Task.objects.get(task_id=task_id)
 
         if not task:
             raise Exception("Not found task with task id %s", task_id)
@@ -441,10 +438,7 @@ class Crawler(metaclass=ABCMeta):
         changed_fields.update(inserted_fields, updated_fields, deleted_fields)
         changed_fields = list(changed_fields)
 
-        _filter = Q(task_id=task_id)
-        paginator = CaravaggioSearchPaginator(query_string=str(_filter), limit=1).models(Task)
-        paginator.next()
-        task = paginator.get_results()[0]
+        task = Task.objects.get(task_id=task_id)
 
         if not task:
             raise Exception("Not found task with task id {}".format(str(task_id)))

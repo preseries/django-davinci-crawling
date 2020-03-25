@@ -8,7 +8,6 @@ from importlib import import_module
 from django_cassandra_engine.connection import CassandraConnection
 
 from caravaggio_rest_api.utils import get_database
-from haystack.backends import EmptyResults
 
 
 class CrawlersRegistry(object):
