@@ -9,6 +9,8 @@ from _datetime import datetime
 from abc import ABCMeta
 import abc
 import logging
+
+from caravaggio_rest_api.haystack.backends.utils import CaravaggioSearchPaginator
 from davinci_crawling.management.commands.utils.utils import update_task_status
 
 from davinci_crawling.task.models import Task, STATUS_FAULTY, \
@@ -22,13 +24,13 @@ from django.core.management.base import DjangoHelpFormatter
 from davinci_crawling.time import mk_datetime
 from django.test import RequestFactory
 from django.utils import timezone
-from haystack.query import SearchQuerySet
 
 from selenium import webdriver
 from seleniumwire import webdriver as wire_webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from davinci_crawling.entity_diff.diff import make_diff
+from solrq import Q
 
 _logger = logging.getLogger("davinci_crawling")
 
@@ -340,7 +342,10 @@ class Crawler(metaclass=ABCMeta):
             task_id: The task id to notice
             more_info: more information about the maintenance notice
         """
-        task = SearchQuerySet().models(Task).raw_search("task_id:%s" % task_id)[0]
+        _filter = Q(task_id=task_id)
+        paginator = CaravaggioSearchPaginator(query_string=str(_filter), limit=1).models(Task)
+        paginator.next()
+        task = paginator.get_results()[0]
 
         if not task:
             raise Exception("Not found task with task id %s", task_id)
@@ -436,7 +441,10 @@ class Crawler(metaclass=ABCMeta):
         changed_fields.update(inserted_fields, updated_fields, deleted_fields)
         changed_fields = list(changed_fields)
 
-        task = SearchQuerySet().models(Task).raw_search("task_id:%s" % task_id)[0]
+        _filter = Q(task_id=task_id)
+        paginator = CaravaggioSearchPaginator(query_string=str(_filter), limit=1).models(Task)
+        paginator.next()
+        task = paginator.get_results()[0]
 
         if not task:
             raise Exception("Not found task with task id {}".format(str(task_id)))

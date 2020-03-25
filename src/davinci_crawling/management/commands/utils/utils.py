@@ -3,10 +3,11 @@
 """
 Some utils used by the davinci_crawling commands.
 """
+from caravaggio_rest_api.haystack.backends.utils import CaravaggioSearchPaginator
 from davinci_crawling.utils import CrawlersRegistry
 from davinci_crawling.task.models import Task, TaskMoreInfo
 from django.utils import timezone
-from haystack.query import SearchQuerySet
+from solrq import Q
 
 cached_crawlers = {}
 
@@ -34,7 +35,10 @@ def update_task_status(task, status, source=None, more_info=None):
         use on the FAULTY state.
     """
     if not isinstance(task, Task):
-        task = SearchQuerySet().models(Task).raw_search("task_id:%s" % task)[0]
+        _filter = Q(task_id=task)
+        paginator = CaravaggioSearchPaginator(query_string=str(_filter), limit=1).models(Task)
+        paginator.next()
+        task = paginator.get_results()[0]
 
     if not task:
         raise Exception("Not found task")
