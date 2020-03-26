@@ -2,12 +2,20 @@
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 import importlib
 import inspect
+import logging
+import time
+from functools import wraps
+
 import django
 
 from importlib import import_module
+
+from django.utils import timezone
 from django_cassandra_engine.connection import CassandraConnection
 
 from caravaggio_rest_api.utils import get_database
+
+_logger = logging.getLogger("davinci_crawling")
 
 
 class CrawlersRegistry(object):
@@ -83,3 +91,51 @@ def get_class_from_name(class_name):
 
     module = importlib.import_module(module_name)
     return getattr(module, clazz_name)
+
+
+class TimeIt:
+
+    def __init__(self, suffix="", list_parameter_name=None, log_time=True):
+        if not list_parameter_name:
+            self.list_parameter_name = "execution_times"
+        else:
+            self.list_parameter_name = list_parameter_name
+        self.log_time = log_time
+        self.suffix = suffix
+
+    def get_execution_times(self, fn, args, kwargs):
+        execution_times_list = None
+        if self.list_parameter_name:
+            execution_times_list = kwargs.get(self.list_parameter_name)
+
+            if not execution_times_list:
+                arguments = inspect.getfullargspec(fn).args
+                if self.list_parameter_name in arguments:
+                    argument_position = arguments.index(self.list_parameter_name)
+                    if argument_position < len(args):
+                        execution_times_list = args[argument_position]
+        return execution_times_list
+
+    def __call__(self, fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            execution_times_list = self.get_execution_times(fn, args, kwargs)
+
+            start_time = time.time()
+            # Call the actual method
+            result = fn(*args, **kwargs)
+            end_time = time.time()
+
+            duration_time_milliseconds = int((end_time - start_time) * 1000)
+            method_name = self.suffix + fn.__name__
+
+            if self.log_time:
+                _logger.debug("Method %s executed for %d milliseconds" % (method_name, duration_time_milliseconds))
+
+            execution_times_list.append({"source": method_name, "created_at": timezone.now(),
+                                         "details": duration_time_milliseconds})
+
+            return result
+
+        return wrapper
+
