@@ -119,16 +119,15 @@ class TimeIt:
     @staticmethod
     def write_times_to_more_info(davinci_task, executions_times):
         from davinci_crawling.task.models import TaskMoreInfo
-
-        def append_more_info(more_info_dict):
-            if not davinci_task.more_info:
-                return [TaskMoreInfo(**more_info_dict)]
-
-            davinci_task.more_info.append(TaskMoreInfo(**more_info_dict))
+        more_info = []
 
         for execution_time in executions_times:
-            append_more_info(execution_time)
+            more_info.append(TaskMoreInfo(**execution_time))
 
+        if not davinci_task.more_info:
+            davinci_task.more_info = more_info
+        else:
+            davinci_task.more_info.extend(more_info)
         davinci_task.save()
 
     def __call__(self, fn):
@@ -149,7 +148,7 @@ class TimeIt:
 
             if execution_times_list is not None:
                 execution_times_list.append({"source": method_name, "created_at": timezone.now(),
-                                             "details": duration_time_milliseconds})
+                                             "details": str(duration_time_milliseconds)})
 
             return result
 
