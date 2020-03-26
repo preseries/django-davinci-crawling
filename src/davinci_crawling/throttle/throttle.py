@@ -6,7 +6,6 @@ import inspect
 from abc import ABC, abstractmethod
 from datetime import timedelta
 from functools import wraps
-import importlib
 
 from davinci_crawling.utils import get_class_from_name
 from django.conf import settings
