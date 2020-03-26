@@ -95,13 +95,13 @@ def get_class_from_name(class_name):
 
 class TimeIt:
 
-    def __init__(self, suffix="", list_parameter_name=None, log_time=True):
+    def __init__(self, prefix="", list_parameter_name=None, log_time=True):
         if not list_parameter_name:
             self.list_parameter_name = "execution_times"
         else:
             self.list_parameter_name = list_parameter_name
         self.log_time = log_time
-        self.suffix = suffix
+        self.prefix = prefix
 
     def get_execution_times(self, fn, args, kwargs):
         execution_times_list = None
@@ -116,6 +116,21 @@ class TimeIt:
                         execution_times_list = args[argument_position]
         return execution_times_list
 
+    @staticmethod
+    def write_times_to_more_info(davinci_task, executions_times):
+        from davinci_crawling.task.models import TaskMoreInfo
+
+        def append_more_info(more_info_dict):
+            if not davinci_task.more_info:
+                return [TaskMoreInfo(**more_info_dict)]
+
+            davinci_task.more_info.append(TaskMoreInfo(**more_info_dict))
+
+        for execution_time in executions_times:
+            append_more_info(execution_time)
+
+        davinci_task.save()
+
     def __call__(self, fn):
         @wraps(fn)
         def wrapper(*args, **kwargs):
@@ -127,13 +142,14 @@ class TimeIt:
             end_time = time.time()
 
             duration_time_milliseconds = int((end_time - start_time) * 1000)
-            method_name = self.suffix + fn.__name__
+            method_name = self.prefix + fn.__name__
 
             if self.log_time:
                 _logger.debug("Method %s executed for %d milliseconds" % (method_name, duration_time_milliseconds))
 
-            execution_times_list.append({"source": method_name, "created_at": timezone.now(),
-                                         "details": duration_time_milliseconds})
+            if execution_times_list is not None:
+                execution_times_list.append({"source": method_name, "created_at": timezone.now(),
+                                             "details": duration_time_milliseconds})
 
             return result
 

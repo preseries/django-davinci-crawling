@@ -23,8 +23,8 @@ class TestTimeIt(CaravaggioBaseTest):
         def method_to_time_default_parameter(execution_times=None):
             time.sleep(1)
 
-        @TimeIt(suffix="some_suffix_")
-        def method_to_time_suffix(execution_times=None):
+        @TimeIt(prefix="some_prefix_")
+        def method_to_time_prefix(execution_times=None):
             time.sleep(0.5)
 
         @TimeIt(list_parameter_name="changed_name")
@@ -33,10 +33,17 @@ class TestTimeIt(CaravaggioBaseTest):
 
         self._validate_time_it(method_to_time_default_parameter, expected_duration=1000,
                                expected_source="method_to_time_default_parameter")
-        self._validate_time_it(method_to_time_suffix, expected_duration=500,
-                               expected_source="some_suffix_method_to_time_suffix")
+        self._validate_time_it(method_to_time_prefix, expected_duration=500,
+                               expected_source="some_prefix_method_to_time_prefix")
         self._validate_time_it(method_to_time_changed_parameter, expected_duration=100,
                                expected_source="method_to_time_changed_parameter")
+
+    def test_time_it_without_list(self):
+        @TimeIt()
+        def method_to_time_no_parameter():
+            time.sleep(0.1)
+
+        method_to_time_no_parameter()
 
     def test_time_it_many_times(self):
         @TimeIt()
