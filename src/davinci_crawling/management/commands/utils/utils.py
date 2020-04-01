@@ -12,12 +12,9 @@ cached_crawlers = {}
 
 def append_more_info(task, source, more_info):
     if not task.more_info:
-        return [TaskMoreInfo(**{"source": source, "created_at": timezone.now(),
-                                "details": more_info})]
+        return [TaskMoreInfo(**{"source": source, "created_at": timezone.now(), "details": more_info})]
 
-    task.more_info.append(TaskMoreInfo(**{"source": source,
-                                          "created_at": timezone.now(),
-                                          "details": more_info}))
+    task.more_info.append(TaskMoreInfo(**{"source": source, "created_at": timezone.now(), "details": more_info}))
     return task.more_info
 
 

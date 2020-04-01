@@ -20,7 +20,7 @@ _logger = logging.getLogger("davinci_crawling")
 
 class CrawlersRegistry(object):
 
-    import_template = '{app_name}.crawlers'
+    import_template = "{app_name}.crawlers"
 
     __crawlers = {}
 
@@ -31,9 +31,11 @@ class CrawlersRegistry(object):
         """
         if django.VERSION >= (1, 7):
             from django.apps import apps
+
             return [a.name for a in apps.get_app_configs()]
         else:
             from django.db import models
+
             return models.get_apps()
 
     @classmethod
@@ -44,15 +46,11 @@ class CrawlersRegistry(object):
             try:
                 from .crawler import Crawler
 
-                crawlers_module = import_module(
-                    cls.import_template.format(app_name=app))
+                crawlers_module = import_module(cls.import_template.format(app_name=app))
 
-                for name, obj in inspect.getmembers(
-                        crawlers_module, inspect.isclass):
-                    crawler_types = (Crawler)
-                    if inspect.isclass(obj) and \
-                            issubclass(obj, crawler_types) and \
-                            not inspect.isabstract(obj):
+                for name, obj in inspect.getmembers(crawlers_module, inspect.isclass):
+                    crawler_types = Crawler
+                    if inspect.isclass(obj) and issubclass(obj, crawler_types) and not inspect.isabstract(obj):
                         crawler_name = getattr(obj, "__crawler_name__")
                         cls.__crawlers[crawler_name] = obj
             except ModuleNotFoundError:
@@ -63,8 +61,7 @@ class CrawlersRegistry(object):
 
         crawler_clazz = crawlers.get(name, None)
         if not crawler_clazz:
-            raise LookupError(
-                "Unable to find the crawler with name {}".format(name))
+            raise LookupError("Unable to find the crawler with name {}".format(name))
 
         return crawler_clazz
 
@@ -86,15 +83,14 @@ def setup_cassandra_object_mapper(alias="cassandra"):
 
 
 def get_class_from_name(class_name):
-    module_name = ".".join(class_name.split('.')[:-1])
-    clazz_name = class_name.split('.')[-1]
+    module_name = ".".join(class_name.split(".")[:-1])
+    clazz_name = class_name.split(".")[-1]
 
     module = importlib.import_module(module_name)
     return getattr(module, clazz_name)
 
 
 class TimeIt:
-
     def __init__(self, prefix="", list_parameter_name=None, log_time=True):
         if not list_parameter_name:
             self.list_parameter_name = "execution_times"
@@ -119,6 +115,7 @@ class TimeIt:
     @staticmethod
     def write_times_to_more_info(davinci_task, executions_times):
         from davinci_crawling.task.models import TaskMoreInfo
+
         more_info = []
 
         for execution_time in executions_times:
@@ -147,10 +144,10 @@ class TimeIt:
                 _logger.debug("Method %s executed for %d milliseconds" % (method_name, duration_time_milliseconds))
 
             if execution_times_list is not None:
-                execution_times_list.append({"source": method_name, "created_at": timezone.now(),
-                                             "details": str(duration_time_milliseconds)})
+                execution_times_list.append(
+                    {"source": method_name, "created_at": timezone.now(), "details": str(duration_time_milliseconds)}
+                )
 
             return result
 
         return wrapper
-

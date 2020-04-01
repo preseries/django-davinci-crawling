@@ -6,8 +6,7 @@ import logging
 import time
 from multiprocessing import Manager
 
-from davinci_crawling.throttle.throttle import \
-    ThrottleManager
+from davinci_crawling.throttle.throttle import ThrottleManager
 
 manager = Manager()
 lock = manager.Lock()
@@ -39,10 +38,9 @@ class MemoryThrottle(ThrottleManager):
 
         _throttle_info[key] = {
             "tokens": _throttle_info[key]["tokens"] - 1,
-            "updated_at": _throttle_info[key]["updated_at"]
+            "updated_at": _throttle_info[key]["updated_at"],
         }
-        _logger.debug("Tokens info. {0} -> {1}".format(
-            key, _throttle_info[key]))
+        _logger.debug("Tokens info. {0} -> {1}".format(key, _throttle_info[key]))
         lock.release()
 
     def _check_info(self, key):
@@ -50,22 +48,16 @@ class MemoryThrottle(ThrottleManager):
         info = _throttle_info.get(key, None)
         if not info:
             _logger.debug("Initialize tokens for {0}".format(key))
-            info = {"tokens": self.max_tokens,
-                    "updated_at": time.monotonic()}
+            info = {"tokens": self.max_tokens, "updated_at": time.monotonic()}
             _throttle_info[key] = info
 
     def _add_new_tokens(self, key):
         now = time.monotonic()
-        time_since_update = \
-            (now - _throttle_info[key]["updated_at"]) / \
-            self.throttle_period.seconds
+        time_since_update = (now - _throttle_info[key]["updated_at"]) / self.throttle_period.seconds
         new_tokens = int(time_since_update * self.rate)
         if new_tokens > 1:
             _throttle_info[key] = {
-                "tokens": min(
-                    _throttle_info[key]["tokens"] + new_tokens,
-                    self.max_tokens),
-                "updated_at": now
+                "tokens": min(_throttle_info[key]["tokens"] + new_tokens, self.max_tokens),
+                "updated_at": now,
             }
-            _logger.debug("New Tokens info. {0} -> {1}".format(
-                key, _throttle_info[key]))
+            _logger.debug("New Tokens info. {0} -> {1}".format(key, _throttle_info[key]))

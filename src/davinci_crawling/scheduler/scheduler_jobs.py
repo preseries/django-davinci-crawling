@@ -21,22 +21,18 @@ def crawling_job(crawler_name):
 
     now = timezone.now()
 
-    _logger.debug("Executing crawling job for {} at {}.".
-                  format(crawler_name, str(now)))
+    _logger.debug("Executing crawling job for {} at {}.".format(crawler_name, str(now)))
 
     params = {}
     params.update(crawler_config.get("arguments", {}))
 
-    base_config_keys = ["--current-date", "--verbosity",
-                        "--workers-num", "--cache-dir", "--local-dir"]
+    base_config_keys = ["--current-date", "--verbosity", "--workers-num", "--cache-dir", "--local-dir"]
 
-    current_date = params.get(
-        "--current-date", now.utcnow().strftime("%Y-%m-%d %H:%M:%S.%fZ"))
+    current_date = params.get("--current-date", now.utcnow().strftime("%Y-%m-%d %H:%M:%S.%fZ"))
     verbosity = params.get("--verbosity", "0")
     workers_num = params.get("--workers-num", "5")
     cache_dir = params.get("--cache-dir", "gs://davinci_cache")
-    local_dir = params.get(
-        "--local-dir", "fs:///data/harvest/local")
+    local_dir = params.get("--local-dir", "fs:///data/harvest/local")
 
     environment = {}
 
@@ -45,9 +41,7 @@ def crawling_job(crawler_name):
             if param_name in os.environ:
                 environment[param_name] = os.environ[param_name]
             else:
-                _logger.warning(
-                    "The variable {} is not available in the "
-                    "environment.".format(param_name))
+                _logger.warning("The variable {} is not available in the " "environment.".format(param_name))
 
     for base_key in base_config_keys:
         if base_key in params:
@@ -64,13 +58,12 @@ def crawling_job(crawler_name):
             cache_dir,
             local_dir,
             params,
-            environment)
+            environment,
+        )
 
         compute_service.wait_for_operation(crawler_name)
 
-        _logger.debug("Crawling job for {} executed. Instance: {}.".
-                      format(crawler_name, instance))
+        _logger.debug("Crawling job for {} executed. Instance: {}.".format(crawler_name, instance))
     except Exception as ex:
-        _logger.error(
-            "Unable to execute the crawler {}".format(crawler_name), ex)
+        _logger.error("Unable to execute the crawler {}".format(crawler_name), ex)
         raise ex

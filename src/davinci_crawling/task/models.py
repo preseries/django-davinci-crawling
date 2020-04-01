@@ -7,10 +7,8 @@ from datetime import datetime, date
 from django.utils import timezone
 import uuid
 
-from caravaggio_rest_api.dse.columns import \
-    KeyEncodedMap
-from caravaggio_rest_api.dse.models import \
-    CustomDjangoCassandraModel
+from caravaggio_rest_api.dse.columns import KeyEncodedMap
+from caravaggio_rest_api.dse.models import CustomDjangoCassandraModel
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
@@ -33,9 +31,16 @@ STATUS_FAULTY = 4
 STATUS_UNKNOWN = 5
 STATUS_MAINTENANCE = 6
 
-ALL_STATUS = [STATUS_CREATED, STATUS_QUEUED, STATUS_IN_PROGRESS,
-              STATUS_IN_PROGRESS, STATUS_FINISHED, STATUS_FAULTY,
-              STATUS_UNKNOWN, STATUS_MAINTENANCE]
+ALL_STATUS = [
+    STATUS_CREATED,
+    STATUS_QUEUED,
+    STATUS_IN_PROGRESS,
+    STATUS_IN_PROGRESS,
+    STATUS_FINISHED,
+    STATUS_FAULTY,
+    STATUS_UNKNOWN,
+    STATUS_MAINTENANCE,
+]
 
 ON_DEMAND_TASK = 1
 BATCH_TASK = 2
@@ -94,8 +99,7 @@ class Task(CustomDjangoCassandraModel):
     user = columns.Text()
 
     # When was created the entity and the last modification date
-    created_at = columns.DateTime(default=timezone.now, primary_key=True,
-                                  clustering_order="DESC")
+    created_at = columns.DateTime(default=timezone.now, primary_key=True, clustering_order="DESC")
     updated_at = columns.DateTime(default=timezone.now)
 
     # Controls if the entity is active or has been deleted
@@ -105,8 +109,7 @@ class Task(CustomDjangoCassandraModel):
 
     kind = columns.Text(required=True)
 
-    params_map = KeyEncodedMap(
-        key_type=columns.Text, value_type=columns.Text)
+    params_map = KeyEncodedMap(key_type=columns.Text, value_type=columns.Text)
 
     params = columns.Text(required=True)
 
@@ -137,29 +140,24 @@ class Task(CustomDjangoCassandraModel):
         super().validate()
 
         if self.type not in ALL_TASK_TYPES:
-            raise ValidationError(
-                "Invalid task type [{0}]. Valid types are: "
-                "{1}.".format(self.type, ALL_TASK_TYPES))
+            raise ValidationError("Invalid task type [{0}]. Valid types are: " "{1}.".format(self.type, ALL_TASK_TYPES))
 
         if self.status not in ALL_STATUS:
             raise ValidationError(
-                "Invalid task status [{0}]. Valid status are: "
-                "{1}.".format(self.status, ALL_STATUS))
+                "Invalid task status [{0}]. Valid status are: " "{1}.".format(self.status, ALL_STATUS)
+            )
 
 
 # We need to set the new value for the changed_at field
 @receiver(pre_save, sender=Task)
-def pre_save_task(
-        sender, instance=None, using=None, update_fields=None, **kwargs):
-    params_string = generate_key_encoded_map(instance.params,
-                                             instance.params_map)
+def pre_save_task(sender, instance=None, using=None, update_fields=None, **kwargs):
+    params_string = generate_key_encoded_map(instance.params, instance.params_map)
     if params_string:
         instance.params = params_string
 
     instance.created_at = instance.created_at.replace(microsecond=0)
 
-    options_string = generate_key_encoded_map(instance.options,
-                                              instance.options_map)
+    options_string = generate_key_encoded_map(instance.options, instance.options_map)
     if options_string:
         instance.options = options_string
     instance.updated_at = timezone.now()

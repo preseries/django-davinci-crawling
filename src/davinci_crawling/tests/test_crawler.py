@@ -26,23 +26,16 @@ class TestCrawl(CaravaggioBaseTest):
         parser = crawler.get_parser()
 
         all_defaults = {}
-        if hasattr(settings, "DAVINCI_CONF") and "crawler-params" in \
-                settings.DAVINCI_CONF:
-            all_defaults.update(settings.DAVINCI_CONF["crawler-params"].get(
-                "default", {}))
-            all_defaults.update(settings.DAVINCI_CONF["crawler-params"].get(
-                "bovespa", {}))
+        if hasattr(settings, "DAVINCI_CONF") and "crawler-params" in settings.DAVINCI_CONF:
+            all_defaults.update(settings.DAVINCI_CONF["crawler-params"].get("default", {}))
+            all_defaults.update(settings.DAVINCI_CONF["crawler-params"].get("bovespa", {}))
 
         for key, value in all_defaults.items():
             self.assertEquals(value, parser.get_default(key))
 
     @staticmethod
     def _create_bovespa_company(ccvm, company_name, situation):
-        data = {
-            "ccvm": ccvm,
-            "company_name": company_name,
-            "situation": situation
-        }
+        data = {"ccvm": ccvm, "company_name": company_name, "situation": situation}
 
         return BovespaCompany(**data)
 
@@ -57,18 +50,16 @@ class TestCrawl(CaravaggioBaseTest):
             "kind": "bovespa",
             "params": "{}",
             "options": "{}",
-            "type": ON_DEMAND_TASK
+            "type": ON_DEMAND_TASK,
         }
         task = Task.create(**task_data)
 
-        bovespa_previous = self._create_bovespa_company("123", "BGDS",
-                                                        "CREATED")
-        bovespa_current = self._create_bovespa_company("123", "OpenExchange",
-                                                       "CREATED")
+        bovespa_previous = self._create_bovespa_company("123", "BGDS", "CREATED")
+        bovespa_current = self._create_bovespa_company("123", "OpenExchange", "CREATED")
 
-        crawler.register_differences(previous_object=bovespa_previous,
-                                     current_object=bovespa_current,
-                                     task_id=task.task_id)
+        crawler.register_differences(
+            previous_object=bovespa_previous, current_object=bovespa_current, task_id=task.task_id
+        )
 
         task = Task.objects.filter(task_id=task.task_id).first()
 
@@ -93,25 +84,17 @@ class TestCrawl(CaravaggioBaseTest):
             "kind": "bovespa",
             "params": "{}",
             "options": "{}",
-            "type": ON_DEMAND_TASK
+            "type": ON_DEMAND_TASK,
         }
         task = Task.create(**task_data)
 
         already_computed = {
-            "all": {
-                "updates": {
-                    "created_at": {
-                        "new_value": 1,
-                        "old_value": 0
-                    }
-                }
-            },
+            "all": {"updates": {"created_at": {"new_value": 1, "old_value": 0}}},
             "inserts": [],
             "updates": ["created_at"],
-            "deletes": []
+            "deletes": [],
         }
-        crawler.register_differences(already_computed_diff=already_computed,
-                                     task_id=task.task_id)
+        crawler.register_differences(already_computed_diff=already_computed, task_id=task.task_id)
 
         task = Task.objects.filter(task_id=task.task_id).first()
 

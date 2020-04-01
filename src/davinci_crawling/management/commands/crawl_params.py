@@ -9,13 +9,11 @@ import logging
 
 from davinci_crawling.management.producer import Producer
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management import BaseCommand, CommandError, \
-    handle_default_options
+from django.core.management import BaseCommand, CommandError, handle_default_options
 from django.core.management.base import SystemCheckError
 from django.db import connections
 
-from davinci_crawling.utils import \
-    CrawlersRegistry
+from davinci_crawling.utils import CrawlersRegistry
 from davinci_crawling.task.models import Task, BATCH_TASK
 
 _logger = logging.getLogger("davinci_crawling.commands")
@@ -35,13 +33,7 @@ class CrawlParamsProducer(Producer):
         _logger.debug("Adding param %s to queue", param)
 
         crawler_name = options.get("crawler")
-        data = {
-            "user": "batchuser",
-            "kind": crawler_name,
-            "params": param,
-            "options": options,
-            "type": BATCH_TASK
-        }
+        data = {"user": "batchuser", "kind": crawler_name, "params": param, "options": options, "type": BATCH_TASK}
         Task.create(**data)
 
 
@@ -60,7 +52,7 @@ def crawl_command_to_task(**options):
 
 
 class Command(BaseCommand):
-    help = 'Mount the crawl params for the crawler and add them to the DB'
+    help = "Mount the crawl params for the crawler and add them to the DB"
 
     def run_from_argv(self, argv):
         global crawler_clazz, crawler
@@ -73,13 +65,12 @@ class Command(BaseCommand):
         crawler = crawler_clazz()
 
         parser = crawler.get_parser()
-        options, known_args = \
-            parser.parse_known_args(argv[2:])
+        options, known_args = parser.parse_known_args(argv[2:])
 
         cmd_options = vars(options)
         cmd_options["crawler"] = crawler.__crawler_name__
         # Move positional args out of options to mimic legacy optparse
-        args = cmd_options.pop('args', ())
+        args = cmd_options.pop("args", ())
         handle_default_options(options)
         try:
             self.execute(*args, **cmd_options)
@@ -91,7 +82,7 @@ class Command(BaseCommand):
             if isinstance(e, SystemCheckError):
                 self.stderr.write(str(e), lambda x: x)
             else:
-                self.stderr.write('%s: %s' % (e.__class__.__name__, e))
+                self.stderr.write("%s: %s" % (e.__class__.__name__, e))
             sys.exit(1)
         finally:
             try:

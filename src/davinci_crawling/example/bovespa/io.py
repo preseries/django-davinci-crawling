@@ -9,12 +9,13 @@ _logger = logging.getLogger("davinci_crawler_{}.io".format(BOVESPA_CRAWLER))
 
 
 def _doc_base_path(options, company_file):
-    path = "{0}/ccvm_{1}/{2}/date_{3:%Y%m%d}_{4}".\
-        format(get_base_dir(options),
-               company_file.ccvm,
-               company_file.doc_type,
-               company_file.fiscal_date.date(),
-               company_file.version).replace(".", "_")
+    path = "{0}/ccvm_{1}/{2}/date_{3:%Y%m%d}_{4}".format(
+        get_base_dir(options),
+        company_file.ccvm,
+        company_file.doc_type,
+        company_file.fiscal_date.date(),
+        company_file.version,
+    ).replace(".", "_")
 
     _logger.debug("Doc base path: {}".format(path))
 
@@ -25,12 +26,13 @@ def _doc_base_path(options, company_file):
 
 
 def _doc_local_base_path(options, company_file):
-    path = "{0}/ccvm_{1}/{2}/date_{3:%Y%m%d}_{4}".\
-        format(get_local_base_dir(options),
-               company_file.ccvm,
-               company_file.doc_type,
-               company_file.fiscal_date.date(),
-               company_file.version).replace(".", "_")
+    path = "{0}/ccvm_{1}/{2}/date_{3:%Y%m%d}_{4}".format(
+        get_local_base_dir(options),
+        company_file.ccvm,
+        company_file.doc_type,
+        company_file.fiscal_date.date(),
+        company_file.version,
+    ).replace(".", "_")
 
     _logger.debug("Doc base path: {}".format(path))
 
@@ -41,12 +43,13 @@ def _doc_local_base_path(options, company_file):
 
 
 def _doc_local_working_base_path(options, company_file):
-    path = "{0}/working/ccvm_{1}/{2}/date_{3:%Y%m%d}_{4}".\
-        format(get_local_base_dir(options),
-               company_file.ccvm,
-               company_file.doc_type,
-               company_file.fiscal_date.date(),
-               company_file.version).replace(".", "_")
+    path = "{0}/working/ccvm_{1}/{2}/date_{3:%Y%m%d}_{4}".format(
+        get_local_base_dir(options),
+        company_file.ccvm,
+        company_file.doc_type,
+        company_file.fiscal_date.date(),
+        company_file.version,
+    ).replace(".", "_")
 
     _logger.debug("Doc base path: {}".format(path))
 

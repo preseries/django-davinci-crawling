@@ -20,28 +20,20 @@ from caravaggio_rest_api.drf.routers import CaravaggioRouter
 from django.conf import settings
 from django.conf.urls import url, include
 
-from davinci_crawling.task.api.views import \
-    TaskViewSet, \
-    TaskSearchViewSet
+from davinci_crawling.task.api.views import TaskViewSet, TaskSearchViewSet
 
 # API v1 Router. Provide an easy way of automatically determining the URL conf.
 
 api_TASK = CaravaggioRouter()
 
 if settings.DSE_SUPPORT:
-    api_TASK.register(r'task/search',
-                      TaskSearchViewSet,
-                      base_name="task-search")
+    api_TASK.register(r"task/search", TaskSearchViewSet, base_name="task-search")
 
-    api_TASK.register(r'task/search/facets',
-                      TaskSearchViewSet,
-                      base_name="task-search-facets")
+    api_TASK.register(r"task/search/facets", TaskSearchViewSet, base_name="task-search-facets")
 
-api_TASK.register(r'task',
-                  TaskViewSet,
-                  base_name="task")
+api_TASK.register(r"task", TaskViewSet, base_name="task")
 
 urlpatterns = [
     # Company API version
-    url(r'^', include(api_TASK.urls), name="task-api"),
+    url(r"^", include(api_TASK.urls), name="task-api"),
 ]

@@ -6,8 +6,7 @@ import logging
 import time
 from multiprocessing import Manager
 
-from davinci_crawling.throttle.throttle import \
-    ThrottleManager
+from davinci_crawling.throttle.throttle import ThrottleManager
 from django.conf import settings
 from pylimit import PyRateLimit
 
@@ -25,18 +24,17 @@ class RedisThrottle(ThrottleManager):
     instead of single machine as MemoryThrottle
     """
 
-    def __init__(self, crawler_name, seconds=1, minutes=0, hours=0, rate=10,
-                 max_tokens=10):
-        super().__init__(crawler_name, seconds, minutes, hours, rate,
-                         max_tokens)
+    def __init__(self, crawler_name, seconds=1, minutes=0, hours=0, rate=10, max_tokens=10):
+        super().__init__(crawler_name, seconds, minutes, hours, rate, max_tokens)
 
-        PyRateLimit.init(redis_host=settings.REDIS_HOST_PRIMARY,
-                         redis_port=settings.REDIS_PORT_PRIMARY,
-                         redis_password=settings.REDIS_PASS_PRIMARY)
+        PyRateLimit.init(
+            redis_host=settings.REDIS_HOST_PRIMARY,
+            redis_port=settings.REDIS_PORT_PRIMARY,
+            redis_password=settings.REDIS_PASS_PRIMARY,
+        )
 
     def wait_for_token(self, key):
-        pylimit = PyRateLimit(int(self.throttle_period.total_seconds()),
-                              self.rate)
+        pylimit = PyRateLimit(int(self.throttle_period.total_seconds()), self.rate)
 
         throttle_times = 0
         current_time = int(round(time.time() * 1000000))

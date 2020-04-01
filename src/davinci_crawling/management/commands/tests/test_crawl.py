@@ -6,30 +6,34 @@ import logging
 
 from caravaggio_rest_api.tests import CaravaggioBaseTest
 from davinci_crawling.example.bovespa.crawlers import BovespaCrawler
-from davinci_crawling.example.bovespa.models import BovespaCompanyFile, \
-    FILE_STATUS_PROCESSED
+from davinci_crawling.example.bovespa.models import BovespaCompanyFile, FILE_STATUS_PROCESSED
 from davinci_crawling.management.commands.crawl import start_crawl
 from davinci_crawling.management.producer import Producer
 from django.conf import settings
 
 
-from davinci_crawling.task.models import ON_DEMAND_TASK, Task,\
-    STATUS_FINISHED, STATUS_CREATED, STATUS_IN_PROGRESS, STATUS_QUEUED,\
-    STATUS_FAULTY, STATUS_UNKNOWN
+from davinci_crawling.task.models import (
+    ON_DEMAND_TASK,
+    Task,
+    STATUS_FINISHED,
+    STATUS_CREATED,
+    STATUS_IN_PROGRESS,
+    STATUS_QUEUED,
+    STATUS_FAULTY,
+    STATUS_UNKNOWN,
+)
 
 # Default crawler params, you may change any default value if you want
 # All the things written with None value should be overwritten inside the test
 CRAWLER_OPTIONS = {
     "chromium_bin_file": settings.CHROMIUM_BIN_FILE,
     "include_companies": None,
-    "local_dir": "fs://%s/log/local" %
-                 settings.TESTS_TMP_DIR,
-    "cache_dir": "fs://%s/log/cache" %
-                 settings.TESTS_TMP_DIR,
+    "local_dir": "fs://%s/log/local" % settings.TESTS_TMP_DIR,
+    "cache_dir": "fs://%s/log/cache" % settings.TESTS_TMP_DIR,
     "crawler": None,
     "from_date": None,
     "to_date": None,
-    "crawling_initials": None
+    "crawling_initials": None,
 }
 
 WORKERS_NUM = 5
@@ -63,9 +67,16 @@ class TestCrawl(CaravaggioBaseTest):
     def setUpTestData(cls):
         pass
 
-    def create_task(self, kind, include_companies=None,
-                    from_date=None, to_date=None, crawling_initials=None,
-                    status=STATUS_CREATED, should_fail=False):
+    def create_task(
+        self,
+        kind,
+        include_companies=None,
+        from_date=None,
+        to_date=None,
+        crawling_initials=None,
+        status=STATUS_CREATED,
+        should_fail=False,
+    ):
         crawler_options = CRAWLER_OPTIONS.copy()
         # includes only the Vale company
         crawler_options["include_companies"] = include_companies
@@ -87,7 +98,7 @@ class TestCrawl(CaravaggioBaseTest):
                 "kind": kind,
                 "user": "someuser",
                 "type": ON_DEMAND_TASK,
-                "status": status
+                "status": status,
             }
 
             if should_fail:
@@ -101,13 +112,11 @@ class TestCrawl(CaravaggioBaseTest):
         validate if we have all the files on DB and if the tasks ran in
         parallel.
         """
-        self.create_task("bovespa", ["4170"], "2011-01-01T00:00:00.000000Z",
-                         "2011-12-31T00:00:00.000000Z", ["V"])
+        self.create_task("bovespa", ["4170"], "2011-01-01T00:00:00.000000Z", "2011-12-31T00:00:00.000000Z", ["V"])
 
         start_crawl(workers_num=WORKERS_NUM, interval=1, times_to_run=20)
 
-        files = BovespaCompanyFile.objects.filter(
-            status=FILE_STATUS_PROCESSED).all()
+        files = BovespaCompanyFile.objects.filter(status=FILE_STATUS_PROCESSED).all()
         # With this options we always have 5 files, unless any file got deleted
         # this assert should be 5
         files_count = len(files)
@@ -125,17 +134,14 @@ class TestCrawl(CaravaggioBaseTest):
         CREATED, the pool should not start to execute tasks with these
         statuses.
         """
-        all_status = [STATUS_QUEUED, STATUS_IN_PROGRESS, STATUS_FINISHED,
-                      STATUS_FAULTY, STATUS_UNKNOWN]
+        all_status = [STATUS_QUEUED, STATUS_IN_PROGRESS, STATUS_FINISHED, STATUS_FAULTY, STATUS_UNKNOWN]
         for status in all_status:
-            self.create_task("bovespa", ["4170"],
-                             "2011-01-01T00:00:00.000000Z",
-                             "2011-12-31T00:00:00.000000Z", ["V"],
-                             status=status)
+            self.create_task(
+                "bovespa", ["4170"], "2011-01-01T00:00:00.000000Z", "2011-12-31T00:00:00.000000Z", ["V"], status=status
+            )
             start_crawl(workers_num=WORKERS_NUM, interval=1, times_to_run=5)
 
-            files = BovespaCompanyFile.objects.filter(
-                status=FILE_STATUS_PROCESSED).all()
+            files = BovespaCompanyFile.objects.filter(status=FILE_STATUS_PROCESSED).all()
             # As this will not be processed we will not have any processed file
             files_count = len(files)
             self.assertEqual(files_count, 0)
@@ -146,14 +152,13 @@ class TestCrawl(CaravaggioBaseTest):
         CREATED, the pool should not start to execute tasks with these
         statuses.
         """
-        self.create_task("bovespa", ["4170"], "2011-01-01T00:00:00.000000Z",
-                         "2011-12-31T00:00:00.000000Z", ["V"],
-                         should_fail=True)
+        self.create_task(
+            "bovespa", ["4170"], "2011-01-01T00:00:00.000000Z", "2011-12-31T00:00:00.000000Z", ["V"], should_fail=True
+        )
 
         start_crawl(workers_num=WORKERS_NUM, interval=1, times_to_run=20)
 
-        files = BovespaCompanyFile.objects.filter(
-            status=FILE_STATUS_PROCESSED).all()
+        files = BovespaCompanyFile.objects.filter(status=FILE_STATUS_PROCESSED).all()
         # With this options we always have 5 files, unless any file got deleted
         # this assert should be 5
         files_count = len(files)
@@ -171,11 +176,9 @@ class TestCrawl(CaravaggioBaseTest):
         then we start the pool again to retrieve the tasks from the file of the
         persistent queue.
         """
-        self.create_task("bovespa", ["4170"], "2011-01-01T00:00:00.000000Z",
-                         "2011-12-31T00:00:00.000000Z", ["V"])
+        self.create_task("bovespa", ["4170"], "2011-01-01T00:00:00.000000Z", "2011-12-31T00:00:00.000000Z", ["V"])
 
-        start_crawl(workers_num=WORKERS_NUM, interval=1, times_to_run=2,
-                    initialize_consumer=False)
+        start_crawl(workers_num=WORKERS_NUM, interval=1, times_to_run=2, initialize_consumer=False)
 
         tasks = Task.objects.filter(status=STATUS_QUEUED).all()
         # With this options we always have 5 files, unless any file got deleted

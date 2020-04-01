@@ -21,28 +21,14 @@ class TestDiff(CaravaggioBaseTest):
     @classmethod
     def setUpTestData(cls):
         cls.original_json = {
-            "list_strings": [
-                "abc",
-                "def"
-            ],
+            "list_strings": ["abc", "def"],
             "list_objects": [
-                {
-                    "uuid": "f8626a86-a9ca-4b3c-958b-5f2c71442a3c",
-                    "name": "John",
-                    "age": 24,
-                    "country": "Brazil"
-                },
-                {
-                    "uuid": "b0652153-000d-4100-85e5-1d25c7793542",
-                    "name": "Mary",
-                    "age": 31,
-                    "country": "USA"
-                }
-            ]
+                {"uuid": "f8626a86-a9ca-4b3c-958b-5f2c71442a3c", "name": "John", "age": 24, "country": "Brazil"},
+                {"uuid": "b0652153-000d-4100-85e5-1d25c7793542", "name": "Mary", "age": 31, "country": "USA"},
+            ],
         }
 
-    def _compare_diff(self, original_json, modified_json, expected,
-                      should_fail=False):
+    def _compare_diff(self, original_json, modified_json, expected, should_fail=False):
         """
         Call the diff using the original and the modified json and compare with
         the expected.
@@ -74,16 +60,10 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["list_strings"].insert(0, "new_string")
 
         expected = {
-            "all": {
-                "inserts": {
-                    "list_strings[0]": {
-                        "new_value": "new_string"
-                    }
-                }
-            },
+            "all": {"inserts": {"list_strings[0]": {"new_value": "new_string"}}},
             "inserts": ["list_strings*"],
             "updates": [],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -93,16 +73,10 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["list_strings"].insert(1, "new_string")
 
         expected = {
-            "all": {
-                "inserts": {
-                    "list_strings[1]": {
-                        "new_value": "new_string"
-                    }
-                }
-            },
+            "all": {"inserts": {"list_strings[1]": {"new_value": "new_string"}}},
             "inserts": ["list_strings*"],
             "updates": [],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -112,16 +86,10 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["list_strings"].insert(0, "abc")
 
         expected = {
-            "all": {
-                "inserts": {
-                    "list_strings[0]": {
-                        "new_value": "abc"
-                    }
-                }
-            },
+            "all": {"inserts": {"list_strings[0]": {"new_value": "abc"}}},
             "inserts": ["list_strings*"],
             "updates": [],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -129,60 +97,36 @@ class TestDiff(CaravaggioBaseTest):
     def test_object_list_update(self):
         modified_json = copy.deepcopy(self.original_json)
         # invert the order of the elements
-        modified_json["list_objects"][0], modified_json["list_objects"][1] = \
-            modified_json["list_objects"][1], modified_json["list_objects"][0]
+        modified_json["list_objects"][0], modified_json["list_objects"][1] = (
+            modified_json["list_objects"][1],
+            modified_json["list_objects"][0],
+        )
 
-        expected = {
-            "all": {},
-            "inserts": [],
-            "updates": [],
-            "deletes": []
-        }
+        expected = {"all": {}, "inserts": [], "updates": [], "deletes": []}
 
         # this should fail because we are not in the same order on the two
         # dictionaries
-        self._compare_diff(self.original_json, modified_json, expected,
-                           should_fail=True)
+        self._compare_diff(self.original_json, modified_json, expected, should_fail=True)
 
-        sorted_current = sorted(self.original_json["list_objects"],
-                                key=lambda i: i["uuid"])
-        sorted_previous = sorted(modified_json["list_objects"],
-                                 key=lambda i: i["uuid"])
+        sorted_current = sorted(self.original_json["list_objects"], key=lambda i: i["uuid"])
+        sorted_previous = sorted(modified_json["list_objects"], key=lambda i: i["uuid"])
 
         self._compare_diff(sorted_current, sorted_previous, expected)
 
     def test_object_list_update_many(self):
-        original_json = {
-            "many": [
-                {
-                    "uuid": 1
-                },
-                {
-                    "uuid": 2
-                }
-            ]
-        }
-        modified_json = {
-            "many": [
-                {
-                    "uuid": 2
-                },
-                {
-                    "uuid": 1
-                }
-            ]
-        }
+        original_json = {"many": [{"uuid": 1}, {"uuid": 2}]}
+        modified_json = {"many": [{"uuid": 2}, {"uuid": 1}]}
 
         expected = {
             "all": {
                 "updates": {
                     "many[0].uuid": {"new_value": 2, "old_value": 1},
-                    "many[1].uuid": {"new_value": 1, "old_value": 2}
+                    "many[1].uuid": {"new_value": 1, "old_value": 2},
                 }
             },
             "inserts": [],
             "updates": ["many*"],
-            "deletes": []
+            "deletes": [],
         }
 
         # this should fail because we are not in the same order on the two

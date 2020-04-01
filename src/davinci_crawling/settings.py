@@ -31,8 +31,7 @@ class Common(Configuration):
     # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
     # SECURITY WARNING: keep the secret key used in production secret!
-    SECRET_KEY = os.getenv(
-        "SECRET_KEY", "2w=es4^%3i4n2cya(0)ws&bq+@h)m1nepzkvd&pi+wvgsue%ms")
+    SECRET_KEY = os.getenv("SECRET_KEY", "2w=es4^%3i4n2cya(0)ws&bq+@h)m1nepzkvd&pi+wvgsue%ms")
 
     # SECURITY WARNING: don't run with debug turned on in production!
     DEBUG = os.getenv("DEBUG", "False") == "True"
@@ -59,79 +58,74 @@ class Common(Configuration):
     # Application definition
 
     INSTALLED_APPS = [
-        'django_cassandra_engine',
-        'django_cassandra_engine.sessions',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
+        "django_cassandra_engine",
+        "django_cassandra_engine.sessions",
+        "django.contrib.auth",
+        "django.contrib.contenttypes",
         # 'django.contrib.sessions',
-        'django.contrib.sites',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
+        "django.contrib.sites",
+        "django.contrib.messages",
+        "django.contrib.staticfiles",
         # Comment the next line to disable the admin:
-        'django.contrib.admin',
+        "django.contrib.admin",
         # Comment the next line to disable admin documentation:
-        'django.contrib.admindocs',
-        'rest_framework',
-        'rest_framework_filters',
-        'rest_framework.authtoken',
-        'rest_framework_cache',
-        'drf_yasg',
-        'haystack',
-        'caravaggio_rest_api',
-        'caravaggio_rest_api.logging',
-        'caravaggio_rest_api.users',
-        'davinci_crawling',
-        'davinci_crawling.task'
+        "django.contrib.admindocs",
+        "rest_framework",
+        "rest_framework_filters",
+        "rest_framework.authtoken",
+        "rest_framework_cache",
+        "drf_yasg",
+        "haystack",
+        "caravaggio_rest_api",
+        "caravaggio_rest_api.logging",
+        "caravaggio_rest_api.users",
+        "davinci_crawling",
+        "davinci_crawling.task",
     ]
 
     MIDDLEWARE = [
-        'django.middleware.security.SecurityMiddleware',
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        "django.middleware.security.SecurityMiddleware",
+        "django.contrib.sessions.middleware.SessionMiddleware",
+        "django.middleware.common.CommonMiddleware",
+        "django.middleware.csrf.CsrfViewMiddleware",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "django.contrib.messages.middleware.MessageMiddleware",
+        "django.middleware.clickjacking.XFrameOptionsMiddleware",
     ]
 
-    ROOT_URLCONF = 'davinci_crawling.urls'
+    ROOT_URLCONF = "davinci_crawling.urls"
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [
-                os.path.join(BASE_DIR, 'davinci_crawling/templates'),
-            ],
-            'APP_DIRS': True,
-            'OPTIONS': {
-                'context_processors': [
-                    'django.contrib.auth.context_processors.auth',
-                    'django.template.context_processors.debug',
-                    'django.template.context_processors.i18n',
-                    'django.template.context_processors.media',
-                    'django.template.context_processors.static',
-                    'django.template.context_processors.tz',
-                    'django.template.context_processors.request',
-                    'django.contrib.messages.context_processors.messages',
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [os.path.join(BASE_DIR, "davinci_crawling/templates"),],
+            "APP_DIRS": True,
+            "OPTIONS": {
+                "context_processors": [
+                    "django.contrib.auth.context_processors.auth",
+                    "django.template.context_processors.debug",
+                    "django.template.context_processors.i18n",
+                    "django.template.context_processors.media",
+                    "django.template.context_processors.static",
+                    "django.template.context_processors.tz",
+                    "django.template.context_processors.request",
+                    "django.contrib.messages.context_processors.messages",
                 ],
             },
         },
     ]
 
-    WSGI_APPLICATION = 'davinci_crawling.wsgi.application'
+    WSGI_APPLICATION = "davinci_crawling.wsgi.application"
 
     # A sample logging configuration. The only tangible logging
     # performed by this configuration is to send an email to
     # the site admins on every HTTP 500 error when DEBUG=False.
     # See http://docs.djangoproject.com/en/dev/topics/logging for
     # more details on how to customize your logging configuration.
-    LOGGING_FILE = os.getenv("LOGGING_FILE", "/data/davinci_crawling/"
-                                             "log/davinci_crawling-debug.log")
+    LOGGING_FILE = os.getenv("LOGGING_FILE", "/data/davinci_crawling/" "log/davinci_crawling-debug.log")
     LOGGING_DIR = "/".join(LOGGING_FILE.split("/")[:-1])
 
-    CHROMIUM_BIN_FILE = os.getenv("CHROMIUM_BIN_FILE",
-                                  "/Applications/Chromium.app/Contents"
-                                  "/MacOS/Chromium")
+    CHROMIUM_BIN_FILE = os.getenv("CHROMIUM_BIN_FILE", "/Applications/Chromium.app/Contents" "/MacOS/Chromium")
 
     PROXY_MESH_USER = os.getenv("PROXY_MESH_USER")
     PROXY_MESH_PASSWORD = os.getenv("PROXY_MESH_PASSWORD")
@@ -147,105 +141,73 @@ class Common(Configuration):
                 "local_dir": "fs://%s/log/local" % LOGGING_DIR,
                 "cache_dir": "fs://%s/log/cache" % LOGGING_DIR,
                 "workers_num": 10,
-                'chromium_bin_file': CHROMIUM_BIN_FILE,
-                'io_gs_project': 'centering-badge-212119',
+                "chromium_bin_file": CHROMIUM_BIN_FILE,
+                "io_gs_project": "centering-badge-212119",
             },
-            "bovespa": {
-                'companies_listing_update_elapsetime': 30,
-                'companies_files_update_elapsetime': 30
-            },
+            "bovespa": {"companies_listing_update_elapsetime": 30, "companies_files_update_elapsetime": 30},
         },
         "architecture-params": {
-            "throttle": {
-                "implementation": "davinci_crawling.throttle.memory_throttle."
-                                  "MemoryThrottle"
-            },
+            "throttle": {"implementation": "davinci_crawling.throttle.memory_throttle." "MemoryThrottle"},
             "proxy": {
                 # to change proxy usage add the implementation key
                 "proxy_mesh": {
-                    "authentication":
-                        "Basic aWFucmlja2V5OlZhcmlhYmxlZGF0YTEwMSE=",
-                    "authorized_proxies_url":
-                        "https://proxymesh.com/api/proxies/",
-                    "only-proxies-from": "us"
+                    "authentication": "Basic aWFucmlja2V5OlZhcmlhYmxlZGF0YTEwMSE=",
+                    "authorized_proxies_url": "https://proxymesh.com/api/proxies/",
+                    "only-proxies-from": "us",
                 },
-                "proxies-availability-checker": {
-                    "elapse-time-between-checks": 60
-                }
+                "proxies-availability-checker": {"elapse-time-between-checks": 60},
             },
-            "parallelism": {
-                "multiproc": {
-                    "default_num_workers": 10
-                }
-            }
-        }
+            "parallelism": {"multiproc": {"default_num_workers": 10}},
+        },
     }
 
     LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'filters': {
-            'require_debug_false': {
-                '()': 'django.utils.log.RequireDebugFalse'
-            }
+        "version": 1,
+        "disable_existing_loggers": False,
+        "filters": {"require_debug_false": {"()": "django.utils.log.RequireDebugFalse"}},
+        "formatters": {
+            "verbose": {"format": "%(levelname)s %(asctime)s %(module)s %(process)d " "%(thread)d %(message)s"},
+            "simple": {"format": "%(levelname)s %(message)s"},
         },
-        'formatters': {
-            'verbose': {
-                'format':
-                    '%(levelname)s %(asctime)s %(module)s %(process)d '
-                    '%(thread)d %(message)s'
+        "handlers": {
+            "console": {"level": "DEBUG", "class": "logging.StreamHandler", "formatter": "simple"},
+            "mail_admins": {
+                "level": "ERROR",
+                "filters": ["require_debug_false"],
+                "class": "django.utils.log.AdminEmailHandler",
             },
-            'simple': {
-                'format': '%(levelname)s %(message)s'
+            "debug_log": {
+                "level": "DEBUG",
+                "class": "logging.handlers.RotatingFileHandler",
+                "filename": LOGGING_FILE,
+                "maxBytes": 1024 * 1024 * 100,
+                "backupCount": 1,
+                "formatter": "verbose",
             },
         },
-        'handlers': {
-            'console': {
-                'level': 'DEBUG',
-                'class': 'logging.StreamHandler',
-                'formatter': 'simple'
+        "loggers": {
+            "django.request": {"handlers": ["mail_admins"], "level": "ERROR", "propagate": True,},
+            "django_cassandra_engine": {
+                "handlers": ["console", "debug_log", "mail_admins"],
+                "level": "DEBUG",
+                "propagate": True,
             },
-            'mail_admins': {
-                'level': 'ERROR',
-                'filters': ['require_debug_false'],
-                'class': 'django.utils.log.AdminEmailHandler'
+            "caravaggio_rest_api": {
+                "handlers": ["console", "debug_log", "mail_admins"],
+                "level": "DEBUG",
+                "propagate": True,
             },
-            'debug_log': {
-                'level': 'DEBUG',
-                'class': 'logging.handlers.RotatingFileHandler',
-                'filename': LOGGING_FILE,
-                'maxBytes': 1024 * 1024 * 100,
-                'backupCount': 1,
-                'formatter': 'verbose'
-            }
+            "davinci_crawling": {
+                "handlers": ["console", "debug_log", "mail_admins"],
+                "level": "DEBUG",
+                "propagate": True,
+            },
+            "davinci_crawler_crawler_11": {
+                "handlers": ["console", "mail_admins"],
+                "level": "DEBUG",
+                "propagate": True,
+            },
         },
-        'loggers': {
-            'django.request': {
-                'handlers': ['mail_admins'],
-                'level': 'ERROR',
-                'propagate': True,
-            },
-            'django_cassandra_engine': {
-                'handlers': ['console', 'debug_log', 'mail_admins'],
-                'level': 'DEBUG',
-                'propagate': True,
-            },
-            'caravaggio_rest_api': {
-                'handlers': ['console', 'debug_log', 'mail_admins'],
-                'level': 'DEBUG',
-                'propagate': True,
-            },
-            'davinci_crawling': {
-                'handlers': ['console', 'debug_log', 'mail_admins'],
-                'level': 'DEBUG',
-                'propagate': True,
-            },
-            'davinci_crawler_crawler_11': {
-                'handlers': ['console', 'mail_admins'],
-                'level': 'DEBUG',
-                'propagate': True,
-            }
-        }
     }
 
     # Database
@@ -267,13 +229,11 @@ class Common(Configuration):
     DB_USER = os.getenv("DB_USER", "davinci")
     DB_PASSWORD = os.getenv("DB_PASSWORD", "davinci")
 
-    CASSANDRA_DB_HOST = os.getenv(
-        "CASSANDRA_DB_HOST", "127.0.0.1,127.0.0.2,127.0.0.3")
+    CASSANDRA_DB_HOST = os.getenv("CASSANDRA_DB_HOST", "127.0.0.1,127.0.0.2,127.0.0.3")
     CASSANDRA_DB_NAME = os.getenv("CASSANDRA_DB_NAME", "davinci")
     CASSANDRA_DB_USER = os.getenv("CASSANDRA_DB_USER", "davinci")
     CASSANDRA_DB_PASSWORD = os.getenv("CASSANDRA_DB_PASSWORD", "davinci")
-    CASSANDRA_DB_STRATEGY = os.getenv("CASSANDRA_DB_STRATEGY",
-                                      "SimpleStrategy")
+    CASSANDRA_DB_STRATEGY = os.getenv("CASSANDRA_DB_STRATEGY", "SimpleStrategy")
     CASSANDRA_DB_REPLICATION = os.getenv("CASSANDRA_DB_REPLICATION", 1)
 
     try:
@@ -289,40 +249,38 @@ class Common(Configuration):
     # Running on production App Engine, so connect to Google Cloud SQL using
     # the unix socket at /cloudsql/<your-cloudsql-connection string>
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'HOST': DB_HOST,
-            'PORT': DB_PORT,
-            'NAME': DB_NAME,
-            'USER': DB_USER,
-            'PASSWORD': DB_PASSWORD,
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "HOST": DB_HOST,
+            "PORT": DB_PORT,
+            "NAME": DB_NAME,
+            "USER": DB_USER,
+            "PASSWORD": DB_PASSWORD,
         },
-        'cassandra': {
-            'ENGINE': 'django_cassandra_engine',
-            'NAME': CASSANDRA_DB_NAME,
-            'TEST': {
-                'NAME': "test_{}".format(CASSANDRA_DB_NAME)
-            },
-            'HOST': CASSANDRA_DB_HOST,
-            'USER': CASSANDRA_DB_USER,
-            'PASSWORD': CASSANDRA_DB_PASSWORD,
-            'OPTIONS': {
-                'replication': {
-                    'strategy_class': CASSANDRA_DB_STRATEGY,
-                    'replication_factor': CASSANDRA_DB_REPLICATION
+        "cassandra": {
+            "ENGINE": "django_cassandra_engine",
+            "NAME": CASSANDRA_DB_NAME,
+            "TEST": {"NAME": "test_{}".format(CASSANDRA_DB_NAME)},
+            "HOST": CASSANDRA_DB_HOST,
+            "USER": CASSANDRA_DB_USER,
+            "PASSWORD": CASSANDRA_DB_PASSWORD,
+            "OPTIONS": {
+                "replication": {
+                    "strategy_class": CASSANDRA_DB_STRATEGY,
+                    "replication_factor": CASSANDRA_DB_REPLICATION,
                 },
-                'connection': {
-                    'consistency': ConsistencyLevel.LOCAL_ONE,
-                    'retry_connect': True
+                "connection": {
+                    "consistency": ConsistencyLevel.LOCAL_ONE,
+                    "retry_connect": True
                     # + All connection options for cassandra.cluster.Cluster()
                 },
-                'session': {
-                    'default_timeout': 10,
-                    'default_fetch_size': 10000
+                "session": {
+                    "default_timeout": 10,
+                    "default_fetch_size": 10000
                     # + All options for cassandra.cluster.Session()
-                }
-            }
-        }
+                },
+            },
+        },
     }
     # [END db_setup]
 
@@ -330,22 +288,10 @@ class Common(Configuration):
     # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
     AUTH_PASSWORD_VALIDATORS = [
-        {
-            'NAME': 'django.contrib.auth.password_validation.'
-                    'UserAttributeSimilarityValidator',
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.'
-                    'MinimumLengthValidator',
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.'
-                    'CommonPasswordValidator',
-        },
-        {
-            'NAME': 'django.contrib.auth.password_validation.'
-                    'NumericPasswordValidator',
-        },
+        {"NAME": "django.contrib.auth.password_validation." "UserAttributeSimilarityValidator",},
+        {"NAME": "django.contrib.auth.password_validation." "MinimumLengthValidator",},
+        {"NAME": "django.contrib.auth.password_validation." "CommonPasswordValidator",},
+        {"NAME": "django.contrib.auth.password_validation." "NumericPasswordValidator",},
     ]
 
     # Internationalization
@@ -375,118 +321,100 @@ class Common(Configuration):
 
     # Absolute filesystem path to the directory that will hold user-uploaded
     # files. Example: "/home/media/media.lawrence.com/media/"
-    MEDIA_ROOT = ''
+    MEDIA_ROOT = ""
 
     # URL that handles the media served from MEDIA_ROOT. Make sure to use a
     # trailing slash.
     # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-    MEDIA_URL = ''
+    MEDIA_URL = ""
 
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/1.8/howto/static-files/
-    STATIC_ROOT = os.path.join(BASE_DIR + '/davinci_crawling/static')
+    STATIC_ROOT = os.path.join(BASE_DIR + "/davinci_crawling/static")
 
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/1.8/howto/static-files/
     # STATIC_URL = '/static/'
-    STATIC_URL = os.getenv('STATIC_URL', '/static/')
+    STATIC_URL = os.getenv("STATIC_URL", "/static/")
 
     STATICFILES_DIRS = (
         # Put strings here, like "/home/html/static" or "C:/www/django/static".
         # Always use forward slashes, even on Windows.
         # Don't forget to use absolute paths, not relative paths.
-        os.path.join(BASE_DIR + '/davinci_crawling/task/static'),
+        os.path.join(BASE_DIR + "/davinci_crawling/task/static"),
     )
 
     # List of finder classes that know how to find static files in
     # various locations.
     STATICFILES_FINDERS = (
-        'django.contrib.staticfiles.finders.FileSystemFinder',
-        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+        "django.contrib.staticfiles.finders.FileSystemFinder",
+        "django.contrib.staticfiles.finders.AppDirectoriesFinder",
         # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
     )
 
     REST_FRAMEWORK = {
-        'PAGE_SIZE': 10,
-        'DEFAULT_PAGINATION_CLASS':
-            'rest_framework.pagination.PageNumberPagination',
-
-        'DEFAULT_THROTTLE_CLASSES': (
-            'rest_framework.throttling.AnonRateThrottle',
-            'rest_framework.throttling.UserRateThrottle',
-            'rest_framework.throttling.ScopedRateThrottle'
+        "PAGE_SIZE": 10,
+        "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+        "DEFAULT_THROTTLE_CLASSES": (
+            "rest_framework.throttling.AnonRateThrottle",
+            "rest_framework.throttling.UserRateThrottle",
+            "rest_framework.throttling.ScopedRateThrottle",
         ),
-
-        'DEFAULT_THROTTLE_RATES': {
-            'anon': '100/day',
-            'user': '60/minute'
-        },
-
+        "DEFAULT_THROTTLE_RATES": {"anon": "100/day", "user": "60/minute"},
         # The name of the alternative query string  be can use for authenticate
         # users in each request
         # Ex. http://mydomain.com/users/user/?auth_token=<token_key>"
-        'QUERY_STRING_AUTH_TOKEN': "auth_token",
-
+        "QUERY_STRING_AUTH_TOKEN": "auth_token",
         # Do we want to log any access made to the API?
-        'LOG_ACCESSES': True,
-
+        "LOG_ACCESSES": True,
         # Use Django's standard `django.contrib.auth` permissions,
         # or allow read-only access for unauthenticated users.
-        'DEFAULT_AUTHENTICATION_CLASSES': (
+        "DEFAULT_AUTHENTICATION_CLASSES": (
             # 'rest_framework.authentication.BasicAuthentication',
-            'rest_framework.authentication.SessionAuthentication',
-            'rest_framework.authentication.TokenAuthentication',
-            'caravaggio_rest_api.drf.authentication.'
-            'TokenAuthSupportQueryString',
+            "rest_framework.authentication.SessionAuthentication",
+            "rest_framework.authentication.TokenAuthentication",
+            "caravaggio_rest_api.drf.authentication." "TokenAuthSupportQueryString",
         ),
-
         # Use Django's standard `django.contrib.auth` permissions,
         # or allow read-only access for unauthenticated users.
-        'DEFAULT_PERMISSION_CLASSES': [
+        "DEFAULT_PERMISSION_CLASSES": [
             # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-            'rest_framework.permissions.IsAuthenticated'
+            "rest_framework.permissions.IsAuthenticated"
         ],
         # REST framework also includes support for generic filtering backends
         # that allow you to easily construct complex searches and filters
-        'DEFAULT_FILTER_BACKENDS':
-            ('drf_haystack.filters.HaystackFilter',
-             'drf_haystack.filters.HaystackBoostFilter',
-             'drf_haystack.filters.HaystackOrderingFilter',),
-
-        'TEST_REQUEST_DEFAULT_FORMAT': 'json',
-
-        'ORDERING_PARAM': 'order_by',
-
+        "DEFAULT_FILTER_BACKENDS": (
+            "drf_haystack.filters.HaystackFilter",
+            "drf_haystack.filters.HaystackBoostFilter",
+            "drf_haystack.filters.HaystackOrderingFilter",
+        ),
+        "TEST_REQUEST_DEFAULT_FORMAT": "json",
+        "ORDERING_PARAM": "order_by",
         # https://www.django-rest-framework.org/api-guide/fields/#decimalfield
         # To use decimal as representation by default
-        'COERCE_DECIMAL_TO_STRING': False,
-        'EXCEPTION_HANDLER':
-            'caravaggio_rest_api.drf.exceptions.caravaggio_exception_handler'
+        "COERCE_DECIMAL_TO_STRING": False,
+        "EXCEPTION_HANDLER": "caravaggio_rest_api.drf.exceptions.caravaggio_exception_handler",
     }
 
     ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-    ACCOUNT_AUTHENTICATION_METHOD = 'email'
+    ACCOUNT_AUTHENTICATION_METHOD = "email"
 
     ACCOUNT_EMAIL_REQUIRED = True
     ACCOUNT_UNIQUE_EMAIL = True
     ACCOUNT_USERNAME_REQUIRED = False
-    ACCOUNT_USER_EMAIL_FIELD = 'email'
+    ACCOUNT_USER_EMAIL_FIELD = "email"
     ACCOUNT_LOGOUT_ON_GET = True
 
-    AUTH_USER_MODEL = 'users.CaravaggioUser'
+    AUTH_USER_MODEL = "users.CaravaggioUser"
 
     REST_AUTH_SERIALIZERS = {
-        "USER_DETAILS_SERIALIZER":
-            "caravaggio_rest_api.users.serializers."
-            "CaravaggioUserDetailsSerializer",
+        "USER_DETAILS_SERIALIZER": "caravaggio_rest_api.users.serializers." "CaravaggioUserDetailsSerializer",
     }
     REST_AUTH_REGISTER_SERIALIZERS = {
-        "REGISTER_SERIALIZER":
-            "caravaggio_rest_api.users.serializers."
-            "CaravaggioUserRegisterSerializer",
+        "REGISTER_SERIALIZER": "caravaggio_rest_api.users.serializers." "CaravaggioUserRegisterSerializer",
     }
 
-    SESSION_ENGINE = 'django_cassandra_engine.sessions.backends.db'
+    SESSION_ENGINE = "django_cassandra_engine.sessions.backends.db"
     CASSANDRA_FALLBACK_ORDER_BY_PYTHON = True
 
     # Enable/Disable throttling
@@ -503,38 +431,35 @@ class Common(Configuration):
     FACETS_THROTTLE_RATE = "6000/minute"
 
     THROTTLE_OPERATIONS = {
-        'retrieve': GET_THROTTLE_RATE,
-        'highlight': GET_THROTTLE_RATE,
-        'list': LIST_THROTTLE_RATE,
-        'create': POST_THROTTLE_RATE,
-        'update': PUT_THROTTLE_RATE,
-        'destroy': DELETE_THROTTLE_RATE,
-        'validate': VALIDATE_THROTTLE_RATE,
-        'partial_update': PATCH_THROTTLE_RATE,
-        'metadata': METADATA_THROTTLE_RATE,
-        'facets': FACETS_THROTTLE_RATE
+        "retrieve": GET_THROTTLE_RATE,
+        "highlight": GET_THROTTLE_RATE,
+        "list": LIST_THROTTLE_RATE,
+        "create": POST_THROTTLE_RATE,
+        "update": PUT_THROTTLE_RATE,
+        "destroy": DELETE_THROTTLE_RATE,
+        "validate": VALIDATE_THROTTLE_RATE,
+        "partial_update": PATCH_THROTTLE_RATE,
+        "metadata": METADATA_THROTTLE_RATE,
+        "facets": FACETS_THROTTLE_RATE,
     }
 
     HAYSTACK_DJANGO_ID_FIELD = "id"
 
     HAYSTACK_KEYSPACE = CASSANDRA_DB_NAME
-    if 'test' in sys.argv:
+    if "test" in sys.argv:
         HAYSTACK_KEYSPACE = "test_{}".format(HAYSTACK_KEYSPACE)
 
     HAYSTACK_URL = os.getenv("HAYSTACK_URL", "http://127.0.0.1:8983/solr")
-    HAYSTACK_ADMIN_URL = os.getenv(
-        "HAYSTACK_ADMIN_URL", "http://127.0.0.1:8983/solr/admin/cores")
+    HAYSTACK_ADMIN_URL = os.getenv("HAYSTACK_ADMIN_URL", "http://127.0.0.1:8983/solr/admin/cores")
 
     HAYSTACK_CONNECTIONS = {
-        'default': {
-            'ENGINE':
-                'caravaggio_rest_api.haystack.backends.'
-                'solr_backend.CassandraSolrEngine',
-            'URL': HAYSTACK_URL,
-            'KEYSPACE': HAYSTACK_KEYSPACE,
-            'ADMIN_URL': HAYSTACK_ADMIN_URL,
-            'BATCH_SIZE': 100,
-            'INCLUDE_SPELLING': True,
+        "default": {
+            "ENGINE": "caravaggio_rest_api.haystack.backends." "solr_backend.CassandraSolrEngine",
+            "URL": HAYSTACK_URL,
+            "KEYSPACE": HAYSTACK_KEYSPACE,
+            "ADMIN_URL": HAYSTACK_ADMIN_URL,
+            "BATCH_SIZE": 100,
+            "INCLUDE_SPELLING": True,
             "DISTANCE_AVAILABLE": True,
         },
     }
@@ -549,28 +474,23 @@ class Common(Configuration):
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
             "LOCATION": "redis://{0}{1}:{2}/1".format(
-                ":{0}@".format(REDIS_PASS_PRIMARY)
-                if REDIS_PASS_PRIMARY else "",
-                REDIS_HOST_PRIMARY, REDIS_PORT_PRIMARY),
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            },
-            "KEY_PREFIX": "davinci_crawling"
+                ":{0}@".format(REDIS_PASS_PRIMARY) if REDIS_PASS_PRIMARY else "", REDIS_HOST_PRIMARY, REDIS_PORT_PRIMARY
+            ),
+            "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient",},
+            "KEY_PREFIX": "davinci_crawling",
         },
-        'disk_cache': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-            'LOCATION': '/var/tmp/davinci_crawl_cache',
-            'TIMEOUT': 300,
-            'OPTIONS': {
-                'MAX_ENTRIES': 10000
-            },
-            "KEY_PREFIX": "davinci_crawling"
+        "disk_cache": {
+            "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+            "LOCATION": "/var/tmp/davinci_crawl_cache",
+            "TIMEOUT": 300,
+            "OPTIONS": {"MAX_ENTRIES": 10000},
+            "KEY_PREFIX": "davinci_crawling",
         },
-        'mem_cache': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            'LOCATION': 'davinci_crawling_cache',
-            "KEY_PREFIX": "davinci_crawling"
-        }
+        "mem_cache": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "davinci_crawling_cache",
+            "KEY_PREFIX": "davinci_crawling",
+        },
     }
 
     # DRF Caching
@@ -579,83 +499,60 @@ class Common(Configuration):
         # in a distributed environment. That is, many instances of the app
         # running separated. For instance: two or more balanced instances
         # of the REST API
-        "DEFAULT_CACHE_BACKEND": 'default',
+        "DEFAULT_CACHE_BACKEND": "default",
         "DEFAULT_CACHE_TIMEOUT": 86400,  # Default is 1 day
     }
 
     # Swagger Docs
     SWAGGER_SETTINGS = {
-        'DEFAULT_INFO': 'davinci_crawling.views.api_info',
-        'SECURITY_DEFINITIONS': {
-            'api_key': {
-                'type': 'apiKey',
-                'in': 'header',
-                'name': 'Authorization'
-            }
-        },
-        'LOGIN_URL': 'rest_framework:login',
-        'LOGOUT_URL': 'rest_framework:logout',
-        'DOC_EXPANSION': "none",
-        'APIS_SORTER': 'alpha',
-        'OPERATIONS_SORTER': None,
-        'JSON_EDITOR': True,
-        'USE_SESSION_AUTH': True,
-        'SHOW_REQUEST_HEADERS': True,
-        'SUPPORTED_SUBMIT_METHODS': [
-            'get',
-            'post',
-            'put',
-            'delete',
-            'patch'
-        ],
+        "DEFAULT_INFO": "davinci_crawling.views.api_info",
+        "SECURITY_DEFINITIONS": {"api_key": {"type": "apiKey", "in": "header", "name": "Authorization"}},
+        "LOGIN_URL": "rest_framework:login",
+        "LOGOUT_URL": "rest_framework:logout",
+        "DOC_EXPANSION": "none",
+        "APIS_SORTER": "alpha",
+        "OPERATIONS_SORTER": None,
+        "JSON_EDITOR": True,
+        "USE_SESSION_AUTH": True,
+        "SHOW_REQUEST_HEADERS": True,
+        "SUPPORTED_SUBMIT_METHODS": ["get", "post", "put", "delete", "patch"],
     }
 
     # APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"  # Default
 
-    PROJECT_DOCKER_IMAGE = os.getenv(
-        "PROJECT_DOCKER_IMAGE",
-        "eu.gcr.io/dotted-ranger-212213/my-project:v0-0-1")
+    PROJECT_DOCKER_IMAGE = os.getenv("PROJECT_DOCKER_IMAGE", "eu.gcr.io/dotted-ranger-212213/my-project:v0-0-1")
 
     DAVINCI_CRAWLERS_ENV_PARAMS = [
         "DSE_SUPPORT",
         "ENVIRONMENT",
-
         "CASSANDRA_DB_HOST",
         "CASSANDRA_DB_NAME",
         "CASSANDRA_DB_PASSWORD",
         "CASSANDRA_DB_REPLICATION",
         "CASSANDRA_DB_STRATEGY",
         "CASSANDRA_DB_USER",
-
         "DB_HOST",
         "DB_NAME",
         "DB_PASSWORD",
         "DB_PORT",
         "DB_USER",
         "DB_USER",
-
         "HAYSTACK_ACTIVE",
         "HAYSTACK_ADMIN_URL",
         "HAYSTACK_KEYSPACE",
         "HAYSTACK_URL",
-
         "REDIS_HOST_PRIMARY",
         "REDIS_PASS_PRIMARY",
         "REDIS_PORT_PRIMARY",
-
         "SECRET_KEY",
         "SECURE_SSL_HOST",
         "SECURE_SSL_REDIRECT",
-
         "STATIC_URL",
         "THROTTLE_ENABLED",
-
         "EMAIL_HOST_PASSWORD",
         "EMAIL_HOST_USER",
-
         "GAE_SERVICE",
-
-        "GOOGLE_ANALYTICS_ID"
+        "GOOGLE_ANALYTICS_ID",
     ]
 
     DAVINCI_CRAWLERS = {
@@ -665,7 +562,6 @@ class Common(Configuration):
         #        "cloud": "gcp",
         #        "project": "dotted-ranger-212213",  # Sandbox
         #        "zone": "europe-west2-a",
-
         #        # A list of available machine types can be found here:
         #        # https://cloud.google.com/compute/docs/machine-types
         #        "machine-type": "n1-standard-1",#
@@ -689,93 +585,87 @@ class Development(Common):
     """
     The in-development settings and the default configuration.
     """
+
     DEBUG = os.getenv("DEBUG", "True") == "True"
 
     TESTS_TMP_DIR = "/tmp/davinci/tests"
 
     ALLOWED_HOSTS = []
 
-    INTERNAL_IPS = [
-        '127.0.0.1'
-    ]
+    INTERNAL_IPS = ["127.0.0.1"]
 
-    INSTALLED_APPS = Common.INSTALLED_APPS + [
-        'django_extensions', 'debug_toolbar'
-    ]
+    INSTALLED_APPS = Common.INSTALLED_APPS + ["django_extensions", "debug_toolbar"]
 
     INSTALLED_APPS += [
         # Add here the davinci crawlers (apps),
-        'davinci_crawling.example.bovespa'
+        "davinci_crawling.example.bovespa"
     ]
 
-    Common.LOGGING["loggers"]['davinci_crawler_bovespa'] = {
-        'handlers': ['console', 'debug_log', 'mail_admins'],
-        'level': 'DEBUG',
-        'propagate': True,
+    Common.LOGGING["loggers"]["davinci_crawler_bovespa"] = {
+        "handlers": ["console", "debug_log", "mail_admins"],
+        "level": "DEBUG",
+        "propagate": True,
     }
 
-    MIDDLEWARE = Common.MIDDLEWARE + [
-        'debug_toolbar.middleware.DebugToolbarMiddleware'
-    ]
+    MIDDLEWARE = Common.MIDDLEWARE + ["debug_toolbar.middleware.DebugToolbarMiddleware"]
 
-    Common.REST_FRAMEWORK['LOG_ACCESSES'] = False
+    Common.REST_FRAMEWORK["LOG_ACCESSES"] = False
 
 
 class Staging(Common):
     """
     The in-staging settings.
     """
+
     # Databases
 
     # The docker container starts a PGBouncer server in local to manage
     # the pool of connections. We need to connect to the local pgbounce
     # server
-    CASSANDRA_DB_STRATEGY = os.getenv(
-        "CASSANDRA_DB_STRATEGY", "NetworkTopologyStrategy")
+    CASSANDRA_DB_STRATEGY = os.getenv("CASSANDRA_DB_STRATEGY", "NetworkTopologyStrategy")
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
             "HOST": "127.0.0.1",
             "PORT": "6543",
-            'NAME': Common.DB_NAME,
-            'USER': Common.DB_USER,
-            'PASSWORD': Common.DB_PASSWORD,
+            "NAME": Common.DB_NAME,
+            "USER": Common.DB_USER,
+            "PASSWORD": Common.DB_PASSWORD,
         },
-        'cassandra': {
-            'ENGINE': 'django_cassandra_engine',
-            'NAME': Common.CASSANDRA_DB_NAME,
-            'HOST': Common.CASSANDRA_DB_HOST,
-            'USER': Common.CASSANDRA_DB_USER,
-            'PASSWORD': Common.CASSANDRA_DB_PASSWORD,
-            'OPTIONS': {
-                'replication': {
-                    'strategy_class': CASSANDRA_DB_STRATEGY,
-                    'replication_factor': Common.CASSANDRA_DB_REPLICATION
-
+        "cassandra": {
+            "ENGINE": "django_cassandra_engine",
+            "NAME": Common.CASSANDRA_DB_NAME,
+            "HOST": Common.CASSANDRA_DB_HOST,
+            "USER": Common.CASSANDRA_DB_USER,
+            "PASSWORD": Common.CASSANDRA_DB_PASSWORD,
+            "OPTIONS": {
+                "replication": {
+                    "strategy_class": CASSANDRA_DB_STRATEGY,
+                    "replication_factor": Common.CASSANDRA_DB_REPLICATION
                     # 'strategy_class': 'NetworkTopologyStrategy',
                     # 'datacenter1': N1,
                     # ...,
                     # 'datacenterN': Nn
                 },
-                'connection': {
-                    'consistency': ConsistencyLevel.LOCAL_ONE,
-                    'retry_connect': True
+                "connection": {
+                    "consistency": ConsistencyLevel.LOCAL_ONE,
+                    "retry_connect": True
                     # + All connection options for cassandra.cluster.Cluster()
                 },
-                'session': {
-                    'default_timeout': 10,
-                    'default_fetch_size': 10000
+                "session": {
+                    "default_timeout": 10,
+                    "default_fetch_size": 10000
                     # + All options for cassandra.cluster.Session()
-                }
-            }
-        }
+                },
+            },
+        },
     }
 
     THROTTLE_ENABLED = True
 
     # Security
-    SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', "False") == "True"
+    SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "False") == "True"
     USE_X_FORWARDED_HOST = SECURE_SSL_REDIRECT
     CSRF_COOKIE_SECURE = SECURE_SSL_REDIRECT
     SESSION_COOKIE_SECURE = SECURE_SSL_REDIRECT
@@ -784,10 +674,9 @@ class Staging(Common):
     SECURE_HSTS_INCLUDE_SUBDOMAINS = SECURE_SSL_REDIRECT
     SECURE_HSTS_SECONDS = 31536000
     SECURE_REDIRECT_EXEMPT = []
-    SECURE_SSL_HOST = os.getenv('SECURE_SSL_HOST', None)
+    SECURE_SSL_HOST = os.getenv("SECURE_SSL_HOST", None)
     SECURE_SSL_REDIRECT = SECURE_SSL_REDIRECT
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO',
-                               "https" if SECURE_SSL_REDIRECT else "http")
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https" if SECURE_SSL_REDIRECT else "http")
 
 
 class Production(Staging):

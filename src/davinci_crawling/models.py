@@ -35,14 +35,13 @@ class Checkpoint(CustomDjangoCassandraModel):
     data = columns.Text(required=False)
 
     class Meta:
-        get_pk_field = 'source'
+        get_pk_field = "source"
 
     def get_data(self):
         return json.loads(self.data)
 
     def set_data(self, json_data):
-        self.data = json.dumps(json_data, sort_keys=True,
-                               indent=4, default=default)
+        self.data = json.dumps(json_data, sort_keys=True, indent=4, default=default)
 
 
 # We need to set the new value for the changed_at field

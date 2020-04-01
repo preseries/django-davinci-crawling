@@ -14,6 +14,7 @@ class Proxy(metaclass=ABCMeta):
     """
     The abstract class used to get new proxy addresses to be used on requests
     """
+
     @abc.abstractmethod
     def get_to_use_proxies(self):
         raise NotImplementedError()
@@ -32,7 +33,6 @@ class Proxy(metaclass=ABCMeta):
 
 
 class NoProxy(Proxy):
-
     def get_to_use_proxies(self):
         return None
 
@@ -65,16 +65,14 @@ class ProxyManager:
     @classmethod
     def get_proxy_manager(cls):
         if not cls.manager:
-            if hasattr(settings, 'DAVINCI_CONF') and \
-                    "proxy" in settings.DAVINCI_CONF["architecture-params"]\
-                    and "implementation" in settings.DAVINCI_CONF[
-                    "architecture-params"]["proxy"]:
-                proxy_implementation = settings.DAVINCI_CONF[
-                    "architecture-params"]["proxy"]["implementation"]
+            if (
+                hasattr(settings, "DAVINCI_CONF")
+                and "proxy" in settings.DAVINCI_CONF["architecture-params"]
+                and "implementation" in settings.DAVINCI_CONF["architecture-params"]["proxy"]
+            ):
+                proxy_implementation = settings.DAVINCI_CONF["architecture-params"]["proxy"]["implementation"]
             else:
-                proxy_implementation = os.getenv(
-                    'DEFAULT_PROXY_IMPLEMENTATION',
-                    DEFAULT_PROXY_IMPLEMENTATION)
+                proxy_implementation = os.getenv("DEFAULT_PROXY_IMPLEMENTATION", DEFAULT_PROXY_IMPLEMENTATION)
 
             cls.set_proxy_manager(proxy_implementation)
 

@@ -21,16 +21,17 @@ except ImportError:
 from requests.exceptions import ReadTimeout, Timeout
 
 from google.cloud import storage
+
 # Imports the Google Cloud client libraries
 from google.api_core.exceptions import GoogleAPIError
 
 from davinci_crawling.models import Checkpoint
 
-BACKEND_RE = r'(.*)://.*'
-BUCKET_NAME_RE = r'gs:\/\/(\w+)\/?.*$'
-BUCKET_PATH_RE = r'gs:\/\/\w+\/?(.*)$'
-FILE_EXTENSION_RE = r'^.*\.(.*)$'
-FILE_PATH_RE = r'fs://(.*)'
+BACKEND_RE = r"(.*)://.*"
+BUCKET_NAME_RE = r"gs:\/\/(\w+)\/?.*$"
+BUCKET_PATH_RE = r"gs:\/\/\w+\/?(.*)$"
+FILE_EXTENSION_RE = r"^.*\.(.*)$"
+FILE_PATH_RE = r"fs://(.*)"
 
 _logger = logging.getLogger("davinci_crawling")
 
@@ -49,8 +50,7 @@ def get_gs_bucket_name(options):
     try:
         return re.match(BUCKET_NAME_RE, cache_dir)[1]
     except TypeError as ex:
-        msg = "Unable to get the bucket name " \
-              "from the cache_dir OPTION: {}".format(cache_dir)
+        msg = "Unable to get the bucket name " "from the cache_dir OPTION: {}".format(cache_dir)
         _logger.exception(msg)
         raise Exception(msg)
 
@@ -92,8 +92,7 @@ def upload_gs_file(options, source_file, dest_file, chunk_size=None, n=3, s=5):
 
     dest_file = get_gs_path(dest_file)
 
-    _logger.debug(("Upload file [%s] into [gs://%s/%s]" %
-                   (source_file, bucket.name, dest_file)))
+    _logger.debug(("Upload file [%s] into [gs://%s/%s]" % (source_file, bucket.name, dest_file)))
 
     blob = bucket.blob(dest_file, chunk_size=chunk_size)
 
@@ -144,9 +143,7 @@ def download_gs_file(options, source_file, dest_file):
 
     blob.download_to_filename(file_path)
 
-    _logger.debug('Blob {} downloaded to {}.'.format(
-        source_file,
-        dest_file))
+    _logger.debug("Blob {} downloaded to {}.".format(source_file, dest_file))
 
     return dest_file
 
@@ -170,8 +167,7 @@ def get_base_dir(options):
         if not local_path.exists():
             _logger.info("Local control dir doesn't exits. Creating it...")
             local_path.mkdir(parents=True, exist_ok=True)
-            _logger.info("Local control dir %s successfully created." %
-                         local_path.absolute())
+            _logger.info("Local control dir %s successfully created." % local_path.absolute())
 
         output_dir = str(local_path.absolute())
         _logger.debug("Output dir: {}".format(output_dir))
@@ -183,11 +179,9 @@ def get_base_dir(options):
         try:
             bucket = storage_client.get_bucket(bucket_name)
         except GoogleAPIError:
-            _logger.info("Bucket {} not found. Creating it...".
-                         format(bucket_name))
+            _logger.info("Bucket {} not found. Creating it...".format(bucket_name))
             bucket = storage_client.create_bucket(bucket_name)
-            _logger.info("Bucket {} successfully created.".
-                         format(bucket_name))
+            _logger.info("Bucket {} successfully created.".format(bucket_name))
 
         output_dir = "{0}/{1}".format(cache_dir, crawler_name)
         _logger.debug("Output dir: {}".format(output_dir))
@@ -221,8 +215,7 @@ def get_backend_and_path(options, file, raise_exceptions=False):
         backend = get_backend(file)
     except Exception as ex:
         if not raise_exceptions:
-            _logger.warning("Unable to determine the backend"
-                            " of the folder, USING FS:// by default.")
+            _logger.warning("Unable to determine the backend" " of the folder, USING FS:// by default.")
 
             # Using FS by default
             backend = "fs"
@@ -252,22 +245,17 @@ def extract_zip(options, source_file, dest_folder, force=False):
     src_backend, file_to_export = get_backend_and_path(options, source_file)
     backend, clean_dest_folder = get_backend_and_path(options, dest_folder)
 
-    _logger.debug("EXTRACT ZIP: Source backend: {}".
-                  format(src_backend))
-    _logger.debug("EXTRACT ZIP: Source file to export: {}".
-                  format(file_to_export))
-    _logger.debug("EXTRACT ZIP: Destination backend: {}".
-                  format(backend))
-    _logger.debug("EXTRACT ZIP: Destination folder: {}".
-                  format(clean_dest_folder))
+    _logger.debug("EXTRACT ZIP: Source backend: {}".format(src_backend))
+    _logger.debug("EXTRACT ZIP: Source file to export: {}".format(file_to_export))
+    _logger.debug("EXTRACT ZIP: Destination backend: {}".format(backend))
+    _logger.debug("EXTRACT ZIP: Destination folder: {}".format(clean_dest_folder))
 
     files_ref = []
 
     if backend == "fs":
         # Only extract if we are force to do it or if there is not files
         # already exported before
-        if force or not pathlib.Path(clean_dest_folder).exists() or \
-                not os.listdir(clean_dest_folder):
+        if force or not pathlib.Path(clean_dest_folder).exists() or not os.listdir(clean_dest_folder):
             with zipfile.ZipFile(file_to_export, "r") as zip_ref:
                 zip_ref.extractall(clean_dest_folder)
 
@@ -314,8 +302,7 @@ def exists(options, dest_file):
         bucket = storage_client.get_bucket(bucket_name)
 
         dest_file = get_gs_path(dest_file)
-        _logger.debug(("Checking existence of file [%s] into [gs://%s]" %
-                       (dest_file, bucket.name)))
+        _logger.debug(("Checking existence of file [%s] into [gs://%s]" % (dest_file, bucket.name)))
 
         blob = bucket.blob(dest_file)
         return blob.exists()
@@ -325,8 +312,7 @@ def delete_all(options, path):
     try:
         backend = get_backend(path)
     except Exception as ex:
-        _logger.exception("Unable to determine the backend"
-                          " of the folder. Using FS by default.")
+        _logger.exception("Unable to determine the backend" " of the folder. Using FS by default.")
         backend = "fs"
 
     if backend == "fs":
@@ -339,9 +325,7 @@ def delete_all(options, path):
             try:
                 os.unlink(clean_path)
             except Exception as e:
-                raise Exception(
-                    "Unable to delete the file [{0}]. "
-                    "Clean version: [{1}]".format(path, clean_path))
+                raise Exception("Unable to delete the file [{0}]. " "Clean version: [{1}]".format(path, clean_path))
         else:
             for the_file in os.listdir(clean_path):
                 file_path = os.path.join(clean_path, the_file)
@@ -352,20 +336,19 @@ def delete_all(options, path):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     raise Exception(
-                        "Unable to delete the files in folder [{0}]. "
-                        "Clean version: [{1}]".format(path, clean_path))
+                        "Unable to delete the files in folder [{0}]. " "Clean version: [{1}]".format(path, clean_path)
+                    )
 
 
 def copy_file(options, source_file, dest_file, chunk_size=None):
     with tempfile.TemporaryDirectory() as temp_path:
         # If the backend if FS in source_file we have the reference to the
         # local FS file
-        source_backend, source_file = \
-            get_backend_and_path(options, source_file)
+        source_backend, source_file = get_backend_and_path(options, source_file)
         if source_backend == "gs":
             source_file = download_gs_file(
-                options, "gs://{}".format(source_file),
-                "fs://{0}/{1}".format(temp_path, "test.zip"))
+                options, "gs://{}".format(source_file), "fs://{0}/{1}".format(temp_path, "test.zip")
+            )
             try:
                 source_file = re.match(FILE_PATH_RE, source_file)[1]
             except TypeError:
@@ -381,8 +364,7 @@ def copy_file(options, source_file, dest_file, chunk_size=None):
         elif dest_backend == "gs":
             # In GS the paths are created automatically when we
             # copy/upload the file
-            upload_gs_file(options, source_file, dest_file,
-                           chunk_size=chunk_size)
+            upload_gs_file(options, source_file, dest_file, chunk_size=chunk_size)
 
             return dest_file
 
@@ -392,8 +374,8 @@ def get_control_dir(options):
 
 
 def put_control_timestamp(
-        config, control_file_name="crawl-timestamp.txt",
-        custom_timestamp=datetime.datetime.utcnow().isoformat()):
+    config, control_file_name="crawl-timestamp.txt", custom_timestamp=datetime.datetime.utcnow().isoformat()
+):
     control_dir = get_control_dir(config)
 
     backend = get_backend(control_dir)
@@ -404,8 +386,7 @@ def put_control_timestamp(
         spit(filename, custom_timestamp)
 
 
-def get_control_timestamp(options,
-                          control_file_name="crawl-timestamp.txt"):
+def get_control_timestamp(options, control_file_name="crawl-timestamp.txt"):
     control_dir = get_control_dir(options)
 
     backend = get_backend(control_dir)
@@ -420,8 +401,7 @@ def get_control_timestamp(options,
 
 def get_checkpoint_data(source, key, default=None):
     try:
-        return Checkpoint.objects.filter(source=source, key=key).get(). \
-            get_data()
+        return Checkpoint.objects.filter(source=source, key=key).get().get_data()
     except DoesNotExist:
         return default
 

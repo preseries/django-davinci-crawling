@@ -34,8 +34,7 @@ class TestProxyMesh(CaravaggioBaseTest):
         Test if we can get the available proxies from the proxy mesh api,
         with country restrictions on the settings.
         """
-        proxy_mesh_settings = settings.DAVINCI_CONF["architecture-params"][
-            "proxy"]["proxy_mesh"]
+        proxy_mesh_settings = settings.DAVINCI_CONF["architecture-params"]["proxy"]["proxy_mesh"]
 
         self._assert_proxies_are_from(proxy_mesh_settings, ["fr"])
         self._assert_proxies_are_from(proxy_mesh_settings, ["us"])

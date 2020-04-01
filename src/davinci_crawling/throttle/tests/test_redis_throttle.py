@@ -9,13 +9,10 @@ from django.conf import settings
 
 _logger = logging.getLogger("davinci_crawling.testing")
 
-CHROME_OPTIONS = {
-    "chromium_bin_file": settings.CHROMIUM_BIN_FILE
-}
+CHROME_OPTIONS = {"chromium_bin_file": settings.CHROMIUM_BIN_FILE}
 
 
 class TestRedisThrottle(CaravaggioBaseTest):
-
     @classmethod
     def setUpTestData(cls):
         pass
@@ -37,10 +34,8 @@ class TestRedisThrottle(CaravaggioBaseTest):
                 quantity += 1
 
     def test_thread_throttle(self):
-
         def do_thread(results):
-            throttle = RedisThrottle("test", seconds=10, rate=10,
-                                     max_tokens=10)
+            throttle = RedisThrottle("test", seconds=10, rate=10, max_tokens=10)
 
             times_throttled = 0
             for x in range(10):

@@ -12,29 +12,31 @@ from .utils import *
 from google.api_core.exceptions import GoogleAPIError
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description='Run a Datalab Cluster in Dataproc')
-    parser.add_argument('--username',
-                        type=str,
-                        required=True,
-                        default=None,
-                        dest='username',
-                        help="The name of the user starting the cluster"
-                             "(ex: --username xalperte)")
-    parser.add_argument('--project-name',
-                        type=str,
-                        required=True,
-                        dest='project_name',
-                        help="The GCP project used to run the jobs"
-                             "(ex: --project-name bgds-prod)")
-    parser.add_argument('--region',
-                        type=str,
-                        required=False,
-                        default='us-east1',
-                        dest='region',
-                        help="The GCP region where provision the cluster"
-                             "(ex: --region us-east1)")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run a Datalab Cluster in Dataproc")
+    parser.add_argument(
+        "--username",
+        type=str,
+        required=True,
+        default=None,
+        dest="username",
+        help="The name of the user starting the cluster" "(ex: --username xalperte)",
+    )
+    parser.add_argument(
+        "--project-name",
+        type=str,
+        required=True,
+        dest="project_name",
+        help="The GCP project used to run the jobs" "(ex: --project-name bgds-prod)",
+    )
+    parser.add_argument(
+        "--region",
+        type=str,
+        required=False,
+        default="us-east1",
+        dest="region",
+        help="The GCP region where provision the cluster" "(ex: --region us-east1)",
+    )
 
     args = parser.parse_args()
 
@@ -57,26 +59,22 @@ if __name__ == '__main__':
 
     # Stop a datalab cluster
     dataproc_client = get_dataproc_client()
-    clusters = list_clusters(dataproc=dataproc_client,
-                             project=args.project_name,
-                             region=args.region)
+    clusters = list_clusters(dataproc=dataproc_client, project=args.project_name, region=args.region)
 
     cluster_name = None
 
-    if 'clusters' in clusters:
-        cluster_list = clusters['clusters']
+    if "clusters" in clusters:
+        cluster_list = clusters["clusters"]
         for cluster in cluster_list:
-            print("{} - {}"
-                  .format(cluster['clusterName'], cluster['status']['state']))
-            if cluster['clusterName'] == hashed_name:
+            print("{} - {}".format(cluster["clusterName"], cluster["status"]["state"]))
+            if cluster["clusterName"] == hashed_name:
                 cluster_name = hashed_name
                 break
 
     if cluster_name:
-        delete_cluster(dataproc=dataproc_client,
-                       project=args.project_name,
-                       region=args.region,
-                       cluster_name=cluster_name)
+        delete_cluster(
+            dataproc=dataproc_client, project=args.project_name, region=args.region, cluster_name=cluster_name
+        )
         print("Cluster STOPPED!! you can now open your browser.")
     else:
         print("No Cluster was found for the user %s." % args.username)

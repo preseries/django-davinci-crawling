@@ -35,12 +35,15 @@ class TestTimeIt(CaravaggioBaseTest):
         def method_to_time_changed_parameter(changed_name=None):
             time.sleep(0.1)
 
-        self._validate_time_it(method_to_time_default_parameter, expected_duration=1000,
-                               expected_source="method_to_time_default_parameter")
-        self._validate_time_it(method_to_time_prefix, expected_duration=500,
-                               expected_source="some_prefix_method_to_time_prefix")
-        self._validate_time_it(method_to_time_changed_parameter, expected_duration=100,
-                               expected_source="method_to_time_changed_parameter")
+        self._validate_time_it(
+            method_to_time_default_parameter, expected_duration=1000, expected_source="method_to_time_default_parameter"
+        )
+        self._validate_time_it(
+            method_to_time_prefix, expected_duration=500, expected_source="some_prefix_method_to_time_prefix"
+        )
+        self._validate_time_it(
+            method_to_time_changed_parameter, expected_duration=100, expected_source="method_to_time_changed_parameter"
+        )
 
     def test_time_it_without_list(self):
         @TimeIt()
@@ -65,7 +68,7 @@ class TestTimeIt(CaravaggioBaseTest):
             "options": "{}",
             "params": "{}",
             "type": 2,
-            "more_info": [TaskMoreInfo(source="test", created_at=timezone.now(), details="a")]
+            "more_info": [TaskMoreInfo(source="test", created_at=timezone.now(), details="a")],
         }
         task = Task.create(**task_data)
         task = Task.objects.get(task_id=task.task_id)

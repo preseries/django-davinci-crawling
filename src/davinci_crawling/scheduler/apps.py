@@ -2,7 +2,7 @@ from django.apps import AppConfig
 
 
 class DaVinciCrawlingSchedulerConfig(AppConfig):
-    name = 'davinci_crawling.scheduler'
+    name = "davinci_crawling.scheduler"
     verbose_name = "Scheduler of Django DaVinci Crawling"
 
     scheduler = None

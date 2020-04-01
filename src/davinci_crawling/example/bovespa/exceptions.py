@@ -13,10 +13,8 @@ ERRORS = {
     "22015": "Invalid hour",
     "22016": "No record found",
     "22017": "Invalid document type",
-
     "22013": "Internal error generating the XML",
-
-    "1": "Incorrect login"
+    "1": "Incorrect login",
 }
 
 
@@ -30,6 +28,7 @@ class BovespaError(Exception):
         <FONTE_DO_ERRO>RetornaXMLDonwloadMultiplo</FONTE_DO_ERRO>
     </ERROS>
     """
+
     requested_date = None
     doc_type = None
     request_date = None
@@ -48,12 +47,12 @@ class BovespaError(Exception):
         self.message = ERRORS.get(self.error_code, "Unknown")
 
     def __str__(self):
-        return "{error: %s, message: %s, source: %s, " \
-               "doc: %s, request_date: %s, " \
-               "requested_date: %s" % \
-               (self.error_code, self.message,
-                self.error_source, self.doc_type,
-                self.request_date, self.requested_date)
+        return (
+            "{error: %s, message: %s, source: %s, "
+            "doc: %s, request_date: %s, "
+            "requested_date: %s"
+            % (self.error_code, self.message, self.error_source, self.doc_type, self.request_date, self.requested_date)
+        )
 
 
 class DownloadError(Exception):

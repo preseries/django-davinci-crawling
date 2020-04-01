@@ -18,8 +18,4 @@ api_info = openapi.Info(
     license=openapi.License(name=settings.CARAVAGGIO_API_LICENSE),
 )
 
-schema_view = get_schema_view(
-    api_info,
-    public=True,
-    permission_classes=(AllowAny,),
-)
+schema_view = get_schema_view(api_info, public=True, permission_classes=(AllowAny,),)

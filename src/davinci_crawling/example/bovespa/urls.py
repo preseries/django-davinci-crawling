@@ -19,10 +19,14 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 
-from davinci_crawling.example.bovespa.api.views import \
-    BovespaCompanyViewSet, BovespaCompanySearchViewSet, \
-    BovespaCompanyFileViewSet, BovespaCompanyFileSearchViewSet, \
-    BovespaAccountViewSet, BovespaAccountSearchViewSet
+from davinci_crawling.example.bovespa.api.views import (
+    BovespaCompanyViewSet,
+    BovespaCompanySearchViewSet,
+    BovespaCompanyFileViewSet,
+    BovespaCompanyFileSearchViewSet,
+    BovespaAccountViewSet,
+    BovespaAccountSearchViewSet,
+)
 
 from rest_framework import routers
 
@@ -30,30 +34,19 @@ from rest_framework import routers
 
 api_BOVESPA = routers.DefaultRouter()
 
-api_BOVESPA.register(r'company-file/search',
-                     BovespaCompanyFileSearchViewSet,
-                     base_name="bovespa-company-file-search")
+api_BOVESPA.register(r"company-file/search", BovespaCompanyFileSearchViewSet, base_name="bovespa-company-file-search")
 
-api_BOVESPA.register(r'company-file',
-                     BovespaCompanyFileViewSet,
-                     base_name="bovespa-company-file")
+api_BOVESPA.register(r"company-file", BovespaCompanyFileViewSet, base_name="bovespa-company-file")
 
-api_BOVESPA.register(r'company-account/search',
-                     BovespaAccountSearchViewSet,
-                     base_name="bovespa-company-account-search")
+api_BOVESPA.register(r"company-account/search", BovespaAccountSearchViewSet, base_name="bovespa-company-account-search")
 
-api_BOVESPA.register(r'company-account',
-                     BovespaAccountViewSet,
-                     base_name="bovespa-company-account")
+api_BOVESPA.register(r"company-account", BovespaAccountViewSet, base_name="bovespa-company-account")
 
-api_BOVESPA.register(r'company/search',
-                     BovespaCompanySearchViewSet,
-                     base_name="bovespa-company-search")
+api_BOVESPA.register(r"company/search", BovespaCompanySearchViewSet, base_name="bovespa-company-search")
 
-api_BOVESPA.register(r'company',
-                     BovespaCompanyViewSet, base_name="bovespa-company")
+api_BOVESPA.register(r"company", BovespaCompanyViewSet, base_name="bovespa-company")
 
 urlpatterns = [
     # Company API version
-    url(r'^', include(api_BOVESPA.urls), name="bovespa-api"),
+    url(r"^", include(api_BOVESPA.urls), name="bovespa-api"),
 ]

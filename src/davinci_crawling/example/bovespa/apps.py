@@ -6,7 +6,7 @@ from django.apps import AppConfig
 
 
 class DaVinciCrawlerConfig(AppConfig):
-    name = 'davinci_crawling.example.bovespa'
+    name = "davinci_crawling.example.bovespa"
     verbose_name = "Django DaVinci Crawler Bovespa"
 
     def ready(self):

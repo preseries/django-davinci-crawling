@@ -16,12 +16,12 @@ _logger = logging.getLogger("davinci_crawling")
 
 
 def get_proxy_mesh_settings():
-    if hasattr(settings, 'DAVINCI_CONF') and \
-            "proxy" in settings.DAVINCI_CONF["architecture-params"] \
-            and "proxy_mesh" in settings.DAVINCI_CONF["architecture-params"][
-                "proxy"]:
-        return settings.DAVINCI_CONF[
-            "architecture-params"]["proxy"]["proxy_mesh"]
+    if (
+        hasattr(settings, "DAVINCI_CONF")
+        and "proxy" in settings.DAVINCI_CONF["architecture-params"]
+        and "proxy_mesh" in settings.DAVINCI_CONF["architecture-params"]["proxy"]
+    ):
+        return settings.DAVINCI_CONF["architecture-params"]["proxy"]["proxy_mesh"]
     else:
         return None
 
@@ -68,17 +68,15 @@ class ProxyMesh(Proxy):
 
         """
         if not cls.available_proxies and PROXY_MESH_SETTINGS:
-            custom_header = {
-                "authorization": PROXY_MESH_SETTINGS["authentication"]
-            }
-            response = get_json(PROXY_MESH_SETTINGS["authorized_proxies_url"],
-                                custom_header=custom_header, use_proxy=False)
+            custom_header = {"authorization": PROXY_MESH_SETTINGS["authentication"]}
+            response = get_json(
+                PROXY_MESH_SETTINGS["authorized_proxies_url"], custom_header=custom_header, use_proxy=False
+            )
             response = response.json()
             proxies = []
 
             only_proxies_from = PROXY_MESH_SETTINGS.get("only-proxies-from")
-            only_proxies_from = only_proxies_from.split(",") \
-                if only_proxies_from else None
+            only_proxies_from = only_proxies_from.split(",") if only_proxies_from else None
             for proxy in response["proxies"]:
                 if only_proxies_from:
                     country = cls.get_country_from_proxy_address(proxy)
@@ -88,13 +86,11 @@ class ProxyMesh(Proxy):
                     if country not in only_proxies_from:
                         continue
 
-                _proxy = PROXY_TEMPLATE % (settings.PROXY_MESH_USER,
-                                           settings.PROXY_MESH_PASSWORD,
-                                           proxy)
+                _proxy = PROXY_TEMPLATE % (settings.PROXY_MESH_USER, settings.PROXY_MESH_PASSWORD, proxy)
                 _proxy = {
-                    'http': 'http://' + _proxy,
-                    'https': 'https://' + _proxy,
-                    'no_proxy': 'localhost,127.0.0.1'   # excludes
+                    "http": "http://" + _proxy,
+                    "https": "https://" + _proxy,
+                    "no_proxy": "localhost,127.0.0.1",  # excludes
                 }
                 proxies.append(_proxy)
             cls.available_proxies = proxies

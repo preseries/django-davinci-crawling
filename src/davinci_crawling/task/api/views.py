@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*
 # Copyright (c) 2019 BuildGroup Data Services Inc.
-from caravaggio_rest_api.drf_haystack.viewsets import \
-    CaravaggioCassandraModelViewSet, \
-    CaravaggioHaystackGEOSearchViewSet, \
-    CaravaggioHaystackFacetSearchViewSet
+from caravaggio_rest_api.drf_haystack.viewsets import (
+    CaravaggioCassandraModelViewSet,
+    CaravaggioHaystackGEOSearchViewSet,
+    CaravaggioHaystackFacetSearchViewSet,
+)
 
-from .serializers import TaskSerializerV1, \
-    TaskSearchSerializerV1, \
-    TaskFacetSerializerV1
+from .serializers import TaskSerializerV1, TaskSearchSerializerV1, TaskFacetSerializerV1
 
 from davinci_crawling.task.models import Task
 
@@ -23,7 +22,7 @@ class TaskViewSet(CaravaggioCassandraModelViewSet):
     # permission_classes = (IsAuthenticated,)
 
     serializer_class = TaskSerializerV1
-    http_method_names = ['get', 'post']
+    http_method_names = ["get", "post"]
 
 
 class TaskSearchViewSet(CaravaggioHaystackFacetSearchViewSet):
@@ -53,6 +52,12 @@ class TaskSearchViewSet(CaravaggioHaystackFacetSearchViewSet):
     results_serializer_class = TaskSerializerV1
 
     ordering_fields = (
-        "_id", "name", "short_description", "long_description",
-        "situation", "crawl_param",
-        "created_at", "updated_at")
+        "_id",
+        "name",
+        "short_description",
+        "long_description",
+        "situation",
+        "crawl_param",
+        "created_at",
+        "updated_at",
+    )

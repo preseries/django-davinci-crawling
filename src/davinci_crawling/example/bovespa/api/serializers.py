@@ -4,8 +4,7 @@
 from datetime import datetime, timedelta
 from dateutil.parser import parse as parse_date
 
-from caravaggio_rest_api.drf_haystack.serializers import \
-    BaseCachedSerializerMixin, CustomHaystackSerializer
+from caravaggio_rest_api.drf_haystack.serializers import BaseCachedSerializerMixin, CustomHaystackSerializer
 from drf_haystack.serializers import HaystackFacetSerializer
 
 from rest_framework import fields
@@ -14,14 +13,15 @@ from rest_framework_cache.registry import cache_registry
 
 from caravaggio_rest_api.drf_haystack import serializers as dse_serializers
 
-from davinci_crawling.example.bovespa.models import \
-    BovespaCompany, BovespaCompanyFile, BovespaAccount
-from davinci_crawling.example.bovespa.search_indexes import \
-    BovespaCompanyIndex, BovespaCompanyFileIndex, BovespaAccountIndex
+from davinci_crawling.example.bovespa.models import BovespaCompany, BovespaCompanyFile, BovespaAccount
+from davinci_crawling.example.bovespa.search_indexes import (
+    BovespaCompanyIndex,
+    BovespaCompanyFileIndex,
+    BovespaAccountIndex,
+)
 
 
-class BovespaCompanySerializerV1(
-        dse_serializers.CassandraModelSerializer, BaseCachedSerializerMixin):
+class BovespaCompanySerializerV1(dse_serializers.CassandraModelSerializer, BaseCachedSerializerMixin):
     """
     Represents a Business Object API View with support for JSON, list, and map
     fields.
@@ -29,17 +29,24 @@ class BovespaCompanySerializerV1(
 
     class Meta:
         model = BovespaCompany
-        fields = ("ccvm",
-                  "created_at", "cnpj", "updated_at",
-                  "company_name", "situation", "company_type",
-                  "is_deleted", "deleted_reason",
-                  "granted_date", "canceled_date")
+        fields = (
+            "ccvm",
+            "created_at",
+            "cnpj",
+            "updated_at",
+            "company_name",
+            "situation",
+            "company_type",
+            "is_deleted",
+            "deleted_reason",
+            "granted_date",
+            "canceled_date",
+        )
 
         read_only_fields = ("created_at", "updated_at")
 
 
-class BovespaCompanySearchSerializerV1(
-        CustomHaystackSerializer, BaseCachedSerializerMixin):
+class BovespaCompanySearchSerializerV1(CustomHaystackSerializer, BaseCachedSerializerMixin):
     """
     A Fast Searcher (Solr) version of the original Business Object API View
     """
@@ -56,15 +63,20 @@ class BovespaCompanySearchSerializerV1(
         # NOTE: Make sure you don't confuse these with model attributes. These
         # fields belong to the search index!
         fields = [
-            "entity_type", "ccvm",
-            "created_at", "cnpj", "updated_at",
-            "company_name", "situation", "company_type",
-            "granted_date", "canceled_date",
-            "score"]
-
-        search_fields = [
-            "text"
+            "entity_type",
+            "ccvm",
+            "created_at",
+            "cnpj",
+            "updated_at",
+            "company_name",
+            "situation",
+            "company_type",
+            "granted_date",
+            "canceled_date",
+            "score",
         ]
+
+        search_fields = ["text"]
 
 
 class BovespaCompanyFacetSerializerV1(HaystackFacetSerializer):
@@ -77,10 +89,16 @@ class BovespaCompanyFacetSerializerV1(HaystackFacetSerializer):
 
     class Meta:
         index_classes = [BovespaCompany]
-        fields = ["created_at", "updated_at",
-                  "situation", "company_type",
-                  "granted_date", "canceled_date",
-                  "ccvm", "cnpj"]
+        fields = [
+            "created_at",
+            "updated_at",
+            "situation",
+            "company_type",
+            "granted_date",
+            "canceled_date",
+            "ccvm",
+            "cnpj",
+        ]
 
 
 # Cache configuration
@@ -88,8 +106,7 @@ cache_registry.register(BovespaCompanySerializerV1)
 cache_registry.register(BovespaCompanySearchSerializerV1)
 
 
-class BovespaCompanyFileSerializerV1(
-        dse_serializers.CassandraModelSerializer, BaseCachedSerializerMixin):
+class BovespaCompanyFileSerializerV1(dse_serializers.CassandraModelSerializer, BaseCachedSerializerMixin):
     """
     Represents a Business Object API View with support for JSON, list, and map
     fields.
@@ -97,19 +114,37 @@ class BovespaCompanyFileSerializerV1(
 
     class Meta:
         model = BovespaCompanyFile
-        fields = ("ccvm", "doc_type", "fiscal_date", "version", "status",
-                  "created_at", "updated_at",
-                  "protocol", "delivery_date", "delivery_type",
-                  "company_name", "company_cnpj",
-                  "fiscal_date_y", "fiscal_date_yd", "fiscal_date_q",
-                  "fiscal_date_m", "fiscal_date_md", "fiscal_date_w",
-                  "fiscal_date_wd", "fiscal_date_yq", "fiscal_date_ym",
-                  "source_url", "file_url", "file_name", "file_extension")
+        fields = (
+            "ccvm",
+            "doc_type",
+            "fiscal_date",
+            "version",
+            "status",
+            "created_at",
+            "updated_at",
+            "protocol",
+            "delivery_date",
+            "delivery_type",
+            "company_name",
+            "company_cnpj",
+            "fiscal_date_y",
+            "fiscal_date_yd",
+            "fiscal_date_q",
+            "fiscal_date_m",
+            "fiscal_date_md",
+            "fiscal_date_w",
+            "fiscal_date_wd",
+            "fiscal_date_yq",
+            "fiscal_date_ym",
+            "source_url",
+            "file_url",
+            "file_name",
+            "file_extension",
+        )
         read_only_fields = ("created_at", "updated_at")
 
 
-class BovespaCompanyFileSearchSerializerV1(
-        CustomHaystackSerializer, BaseCachedSerializerMixin):
+class BovespaCompanyFileSearchSerializerV1(CustomHaystackSerializer, BaseCachedSerializerMixin):
     """
     A Fast Searcher (Solr) version of the original Business Object API View
     """
@@ -126,19 +161,35 @@ class BovespaCompanyFileSearchSerializerV1(
         # NOTE: Make sure you don't confuse these with model attributes. These
         # fields belong to the search index!
         fields = [
-            "ccvm", "doc_type", "fiscal_date", "version", "status",
-            "created_at", "updated_at",
-            "protocol", "delivery_date", "delivery_type",
-            "company_name", "company_cnpj",
-            "fiscal_date_y", "fiscal_date_yd", "fiscal_date_q",
-            "fiscal_date_m", "fiscal_date_md", "fiscal_date_w",
-            "fiscal_date_wd", "fiscal_date_yq", "fiscal_date_ym",
-            "source_url", "file_url", "file_name", "file_extension",
-            "score"]
-
-        search_fields = [
-            "text"
+            "ccvm",
+            "doc_type",
+            "fiscal_date",
+            "version",
+            "status",
+            "created_at",
+            "updated_at",
+            "protocol",
+            "delivery_date",
+            "delivery_type",
+            "company_name",
+            "company_cnpj",
+            "fiscal_date_y",
+            "fiscal_date_yd",
+            "fiscal_date_q",
+            "fiscal_date_m",
+            "fiscal_date_md",
+            "fiscal_date_w",
+            "fiscal_date_wd",
+            "fiscal_date_yq",
+            "fiscal_date_ym",
+            "source_url",
+            "file_url",
+            "file_name",
+            "file_extension",
+            "score",
         ]
+
+        search_fields = ["text"]
 
 
 class BovespaCompanyFileFacetSerializerV1(HaystackFacetSerializer):
@@ -152,14 +203,29 @@ class BovespaCompanyFileFacetSerializerV1(HaystackFacetSerializer):
     class Meta:
         index_classes = [BovespaCompany]
         fields = [
-            "ccvm", "doc_type", "fiscal_date", "version", "status",
-            "created_at", "updated_at", "protocol",
-            "delivery_date", "delivery_type",
-            "company_name", "company_cnpj",
-            "fiscal_date_y", "fiscal_date_yd", "fiscal_date_q",
-            "fiscal_date_m", "fiscal_date_md", "fiscal_date_w",
-            "fiscal_date_wd", "fiscal_date_yq", "fiscal_date_ym",
-            "file_extension"]
+            "ccvm",
+            "doc_type",
+            "fiscal_date",
+            "version",
+            "status",
+            "created_at",
+            "updated_at",
+            "protocol",
+            "delivery_date",
+            "delivery_type",
+            "company_name",
+            "company_cnpj",
+            "fiscal_date_y",
+            "fiscal_date_yd",
+            "fiscal_date_q",
+            "fiscal_date_m",
+            "fiscal_date_md",
+            "fiscal_date_w",
+            "fiscal_date_wd",
+            "fiscal_date_yq",
+            "fiscal_date_ym",
+            "file_extension",
+        ]
 
 
 # Cache configuration
@@ -167,8 +233,7 @@ cache_registry.register(BovespaCompanyFileSerializerV1)
 cache_registry.register(BovespaCompanyFileSearchSerializerV1)
 
 
-class BovespaAccountSerializerV1(
-        dse_serializers.CassandraModelSerializer, BaseCachedSerializerMixin):
+class BovespaAccountSerializerV1(dse_serializers.CassandraModelSerializer, BaseCachedSerializerMixin):
     """
     Represents a Business Object API View with support for JSON, list, and map
     fields.
@@ -176,15 +241,22 @@ class BovespaAccountSerializerV1(
 
     class Meta:
         model = BovespaAccount
-        fields = ("ccvm", "period", "version", "number",
-                  "financial_info_type",
-                  "balance_type", "name", "amount",
-                  "created_at", "updated_at")
+        fields = (
+            "ccvm",
+            "period",
+            "version",
+            "number",
+            "financial_info_type",
+            "balance_type",
+            "name",
+            "amount",
+            "created_at",
+            "updated_at",
+        )
         read_only_fields = ("created_at", "updated_at")
 
 
-class BovespaAccountSearchSerializerV1(
-        CustomHaystackSerializer, BaseCachedSerializerMixin):
+class BovespaAccountSearchSerializerV1(CustomHaystackSerializer, BaseCachedSerializerMixin):
     """
     A Fast Searcher (Solr) version of the original Business Object API View
     """
@@ -201,15 +273,21 @@ class BovespaAccountSearchSerializerV1(
         # NOTE: Make sure you don't confuse these with model attributes. These
         # fields belong to the search index!
         fields = [
-            "ccvm", "period", "version", "number", "name",
-            "financial_info_type", "balance_type", "comments",
+            "ccvm",
+            "period",
+            "version",
+            "number",
+            "name",
+            "financial_info_type",
+            "balance_type",
+            "comments",
             "amount",
-            "created_at", "updated_at",
-            "score"]
-
-        search_fields = [
-            "text"
+            "created_at",
+            "updated_at",
+            "score",
         ]
+
+        search_fields = ["text"]
 
 
 class BovespaAccountFacetSerializerV1(HaystackFacetSerializer):
@@ -223,9 +301,17 @@ class BovespaAccountFacetSerializerV1(HaystackFacetSerializer):
     class Meta:
         index_classes = [BovespaAccount]
         fields = [
-            "ccvm", "period", "version", "number", "name",
-            "financial_info_type", "balance_type", "comments",
-            "created_at", "updated_at"]
+            "ccvm",
+            "period",
+            "version",
+            "number",
+            "name",
+            "financial_info_type",
+            "balance_type",
+            "comments",
+            "created_at",
+            "updated_at",
+        ]
 
 
 # Cache configuration

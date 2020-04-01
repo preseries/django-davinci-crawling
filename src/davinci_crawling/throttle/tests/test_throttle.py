@@ -9,9 +9,7 @@ from django.conf import settings
 
 _logger = logging.getLogger("davinci_crawling.testing")
 
-CHROME_OPTIONS = {
-    "chromium_bin_file": settings.CHROMIUM_BIN_FILE
-}
+CHROME_OPTIONS = {"chromium_bin_file": settings.CHROMIUM_BIN_FILE}
 
 
 class TestThrottle(CaravaggioBaseTest):
@@ -20,8 +18,7 @@ class TestThrottle(CaravaggioBaseTest):
         pass
 
     def test_method_with_kwargs(self):
-        @Throttle(crawler_name="test_kwargs", seconds=10, max_tokens=25,
-                  rate=25, throttle_suffix_field="suffix")
+        @Throttle(crawler_name="test_kwargs", seconds=10, max_tokens=25, rate=25, throttle_suffix_field="suffix")
         def throttle_method(prefix, suffix, print_name):
             print("%s %s %s" % (prefix, print_name, suffix))
 
@@ -36,8 +33,7 @@ class TestThrottle(CaravaggioBaseTest):
         self.assertTrue(10 < total < 20)
 
     def test_method_with_args(self):
-        @Throttle(crawler_name="test_args", seconds=10, max_tokens=25, rate=25,
-                  throttle_suffix_field="suffix")
+        @Throttle(crawler_name="test_args", seconds=10, max_tokens=25, rate=25, throttle_suffix_field="suffix")
         def throttle_method(prefix, suffix, print_name):
             print("%s %s %s" % (prefix, print_name, suffix))
 

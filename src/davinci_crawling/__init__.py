@@ -1,4 +1,3 @@
-
 r"""
 
    ___      _   ___         _   _____                ___
@@ -8,19 +7,19 @@ r"""
                                                           /___/
 """
 
-__title__ = 'Django DaVinci Crawling Framework'
-__version__ = '0.1.5-SNAPSHOT'
-__author__ = 'Javier Alperte'
-__license__ = 'MIT'
-__copyright__ = 'Copyright (c) 2019 BuildGroup Data Services Inc.'
+__title__ = "Django DaVinci Crawling Framework"
+__version__ = "0.1.5-SNAPSHOT"
+__author__ = "Javier Alperte"
+__license__ = "MIT"
+__copyright__ = "Copyright (c) 2019 BuildGroup Data Services Inc."
 
 # Version synonym
 VERSION = __version__
 
 # Header encoding (see RFC5987)
-HTTP_HEADER_ENCODING = 'iso-8859-1'
+HTTP_HEADER_ENCODING = "iso-8859-1"
 
 # Default datetime input and output formats
-ISO_8601 = 'iso-8601'
+ISO_8601 = "iso-8601"
 
-default_app_config = 'davinci_crawling.apps.DaVinciCrawlingConfig'
+default_app_config = "davinci_crawling.apps.DaVinciCrawlingConfig"

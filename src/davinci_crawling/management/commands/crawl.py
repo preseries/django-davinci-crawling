@@ -13,18 +13,13 @@ from datetime import datetime
 from threading import Thread
 from persistqueue import SQLiteAckQueue
 
-from davinci_crawling.management.commands.utils.utils import \
-    update_task_status
+from davinci_crawling.management.commands.utils.utils import update_task_status
 from django.conf import settings
-from davinci_crawling.task.models import Task, STATUS_CREATED, STATUS_FAULTY,\
-    STATUS_QUEUED
-from davinci_crawling.management.commands.utils.consumer import \
-    CrawlConsumer, QUEUE_LOCATION
+from davinci_crawling.task.models import Task, STATUS_CREATED, STATUS_FAULTY, STATUS_QUEUED
+from davinci_crawling.management.commands.utils.consumer import CrawlConsumer, QUEUE_LOCATION
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management import BaseCommand, CommandError, \
-    handle_default_options
-from django.core.management.base import SystemCheckError, CommandParser, \
-    DjangoHelpFormatter
+from django.core.management import BaseCommand, CommandError, handle_default_options
+from django.core.management.base import SystemCheckError, CommandParser, DjangoHelpFormatter
 from django.db import connections
 
 _logger = logging.getLogger("davinci_crawling.commands")
@@ -64,10 +59,8 @@ def _pool_tasks(interval, times_to_run):
 
                 # get the fixed options on the settings that will be aggregated
                 # with the options sent on the table.
-                default_settings = settings.DAVINCI_CONF["crawler-params"].get(
-                    "default", {})
-                crawler_settings = settings.DAVINCI_CONF["crawler-params"].get(
-                    crawler_name, {})
+                default_settings = settings.DAVINCI_CONF["crawler-params"].get("default", {})
+                crawler_settings = settings.DAVINCI_CONF["crawler-params"].get(crawler_name, {})
 
                 _add_default_options(options, crawler_settings)
                 _add_default_options(options, default_settings)
@@ -80,17 +73,14 @@ def _pool_tasks(interval, times_to_run):
                 tasks_queue.put([params, options])
                 update_task_status(task, STATUS_QUEUED)
             except Exception as e:
-                update_task_status(task, STATUS_FAULTY,
-                                   source="crawl command",
-                                   more_info=traceback.format_exc())
+                update_task_status(task, STATUS_FAULTY, source="crawl command", more_info=traceback.format_exc())
                 _logger.error("Error while adding params to queue", e)
         time.sleep(interval)
         if times_to_run:
             times_run += 1
 
 
-def start_crawl(workers_num, interval, times_to_run=None,
-                initialize_consumer=True):
+def start_crawl(workers_num, interval, times_to_run=None, initialize_consumer=True):
     """
     Run the necessary methods to start crawling data. This method will start a
     tasks pool that will constantly get lines from DB and if anything is new
@@ -121,55 +111,51 @@ def start_crawl(workers_num, interval, times_to_run=None,
 
 
 class Command(BaseCommand):
-    help = 'Start all the necessary methods to start crawling the database'
+    help = "Start all the necessary methods to start crawling the database"
 
     def __init__(self):
         super().__init__()
         self._parser = CommandParser(
             description="Task Pool settings",
             formatter_class=DjangoHelpFormatter,
-            missing_args_message=getattr(self, 'missing_args_message', None),
-            called_from_command_line=getattr(
-                self, '_called_from_command_line', None),
+            missing_args_message=getattr(self, "missing_args_message", None),
+            called_from_command_line=getattr(self, "_called_from_command_line", None),
         )
 
         self._parser.add_argument(
-            '--workers-num',
+            "--workers-num",
             required=False,
-            action='store',
-            dest='workers_num',
+            action="store",
+            dest="workers_num",
             default=10,
             type=int,
-            help="The number of workers (threads) to launch in parallel")
+            help="The number of workers (threads) to launch in parallel",
+        )
         self._parser.add_argument(
-            '--interval',
+            "--interval",
             required=False,
-            action='store',
-            dest='interval',
+            action="store",
+            dest="interval",
             default=5,
             type=int,
-            help="Interval to wait between pool the tasks")
+            help="Interval to wait between pool the tasks",
+        )
         self._parser.add_argument(
-            '--settings',
+            "--settings",
             help=(
-                'The Python path to a settings module, e.g. '
+                "The Python path to a settings module, e.g. "
                 '"myproject.settings.main". If this isn\'t provided, the '
-                'DJANGO_SETTINGS_MODULE environment variable will be used.'
+                "DJANGO_SETTINGS_MODULE environment variable will be used."
             ),
         )
         self._parser.add_argument(
-            '--pythonpath',
-            help='A directory to add to the Python path, e.g. '
-                 '"/home/djangoprojects/myproject".',
+            "--pythonpath", help="A directory to add to the Python path, e.g. " '"/home/djangoprojects/myproject".',
         )
         self._parser.add_argument(
-            '--no-color',
-            action='store_true', dest='no_color',
-            help="Don't colorize the command output.",
+            "--no-color", action="store_true", dest="no_color", help="Don't colorize the command output.",
         )
         self._parser.add_argument(
-            '--force-color', action='store_true',
-            help='Force colorization of the command output.',
+            "--force-color", action="store_true", help="Force colorization of the command output.",
         )
 
     def run_from_argv(self, argv):
@@ -179,7 +165,7 @@ class Command(BaseCommand):
         options, known_args = parser.parse_known_args(argv[2:])
 
         cmd_options = vars(options)
-        args = cmd_options.pop('args', ())
+        args = cmd_options.pop("args", ())
         handle_default_options(options)
         try:
             self.execute(*args, **cmd_options)
@@ -191,7 +177,7 @@ class Command(BaseCommand):
             if isinstance(e, SystemCheckError):
                 self.stderr.write(str(e), lambda x: x)
             else:
-                self.stderr.write('%s: %s' % (e.__class__.__name__, e))
+                self.stderr.write("%s: %s" % (e.__class__.__name__, e))
             sys.exit(1)
         finally:
             try:

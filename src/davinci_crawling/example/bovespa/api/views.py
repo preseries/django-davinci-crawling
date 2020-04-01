@@ -1,25 +1,29 @@
 # -*- coding: utf-8 -*
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 
-from caravaggio_rest_api.drf_haystack.viewsets import \
-    CaravaggioCassandraModelViewSet, \
-    CaravaggioHaystackFacetSearchViewSet
+from caravaggio_rest_api.drf_haystack.viewsets import (
+    CaravaggioCassandraModelViewSet,
+    CaravaggioHaystackFacetSearchViewSet,
+)
 
 
 # from rest_framework.authentication import \
 #    TokenAuthentication, SessionAuthentication
 # from rest_framework.permissions import IsAuthenticated
 
-from davinci_crawling.example.bovespa.api.serializers import \
-    BovespaCompanySerializerV1, \
-    BovespaCompanySearchSerializerV1, BovespaCompanyFacetSerializerV1, \
-    BovespaCompanyFileSerializerV1, BovespaCompanyFileSearchSerializerV1, \
-    BovespaCompanyFileFacetSerializerV1, \
-    BovespaAccountSerializerV1, BovespaAccountSearchSerializerV1, \
-    BovespaAccountFacetSerializerV1
+from davinci_crawling.example.bovespa.api.serializers import (
+    BovespaCompanySerializerV1,
+    BovespaCompanySearchSerializerV1,
+    BovespaCompanyFacetSerializerV1,
+    BovespaCompanyFileSerializerV1,
+    BovespaCompanyFileSearchSerializerV1,
+    BovespaCompanyFileFacetSerializerV1,
+    BovespaAccountSerializerV1,
+    BovespaAccountSearchSerializerV1,
+    BovespaAccountFacetSerializerV1,
+)
 
-from davinci_crawling.example.bovespa.models import \
-    BovespaCompany, BovespaCompanyFile, BovespaAccount
+from davinci_crawling.example.bovespa.models import BovespaCompany, BovespaCompanyFile, BovespaAccount
 
 
 class BovespaCompanyViewSet(CaravaggioCassandraModelViewSet):
@@ -64,9 +68,16 @@ class BovespaCompanySearchViewSet(CaravaggioHaystackFacetSearchViewSet):
     results_serializer_class = BovespaCompanySerializerV1
 
     ordering_fields = (
-        "ccvm", "cnpj", "company_name", "situation", "company_type",
-        "granted_date", "canceled_date",
-        "created_at", "updated_at")
+        "ccvm",
+        "cnpj",
+        "company_name",
+        "situation",
+        "company_type",
+        "granted_date",
+        "canceled_date",
+        "created_at",
+        "updated_at",
+    )
 
 
 class BovespaCompanyFileViewSet(CaravaggioCassandraModelViewSet):
@@ -113,14 +124,31 @@ class BovespaCompanyFileSearchViewSet(CaravaggioHaystackFacetSearchViewSet):
     results_serializer_class = BovespaCompanyFileSerializerV1
 
     ordering_fields = (
-        "ccvm", "doc_type", "fiscal_date", "version", "status",
-        "protocol", "delivery_date", "delivery_type",
-        "company_name", "company_cnpj",
-        "fiscal_date_y", "fiscal_date_yd", "fiscal_date_q",
-        "fiscal_date_m", "fiscal_date_md", "fiscal_date_w",
-        "fiscal_date_wd", "fiscal_date_yq", "fiscal_date_ym",
-        "source_url", "file_url", "file_name", "file_extension"
-        "created_at", "updated_at")
+        "ccvm",
+        "doc_type",
+        "fiscal_date",
+        "version",
+        "status",
+        "protocol",
+        "delivery_date",
+        "delivery_type",
+        "company_name",
+        "company_cnpj",
+        "fiscal_date_y",
+        "fiscal_date_yd",
+        "fiscal_date_q",
+        "fiscal_date_m",
+        "fiscal_date_md",
+        "fiscal_date_w",
+        "fiscal_date_wd",
+        "fiscal_date_yq",
+        "fiscal_date_ym",
+        "source_url",
+        "file_url",
+        "file_name",
+        "file_extension" "created_at",
+        "updated_at",
+    )
 
 
 class BovespaAccountViewSet(CaravaggioCassandraModelViewSet):
@@ -167,7 +195,15 @@ class BovespaAccountSearchViewSet(CaravaggioHaystackFacetSearchViewSet):
     results_serializer_class = BovespaAccountSerializerV1
 
     ordering_fields = (
-        "ccvm", "period", "version", "number", "name",
-        "financial_info_type", "balance_type", "comments",
+        "ccvm",
+        "period",
+        "version",
+        "number",
+        "name",
+        "financial_info_type",
+        "balance_type",
+        "comments",
         "value",
-        "created_at", "updated_at",)
+        "created_at",
+        "updated_at",
+    )

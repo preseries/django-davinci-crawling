@@ -4,8 +4,7 @@ import json
 import logging
 import time
 
-from caravaggio_rest_api.haystack.backends.utils import \
-    CaravaggioSearchPaginator
+from caravaggio_rest_api.haystack.backends.utils import CaravaggioSearchPaginator
 from caravaggio_rest_api.utils import delete_all_records
 from davinci_crawling.task.models import Task, STATUS_CREATED, ON_DEMAND_TASK
 
@@ -19,6 +18,7 @@ _logger = logging.getLogger()
 
 class ModelsTest(CaravaggioBaseTest):
     """ Test module for Task model """
+
     resources = []
 
     persisted_resources = []
@@ -42,15 +42,10 @@ class ModelsTest(CaravaggioBaseTest):
             "local_dir": "fs:///data/crawler_one/local",
             "included_companies": '["4170", "14249"]',
             "from_date": "2018-01-01T00:00:00.000000Z",
-            "crawling_initials": '["V", "P"]'
+            "crawling_initials": '["V", "P"]',
         }
 
-        params = {
-            "ccvm": 4170,
-            "doc_type": "DFP",
-            "fiscal_date": "2018-12-31",
-            "version": "2.0"
-        }
+        params = {"ccvm": 4170, "doc_type": "DFP", "fiscal_date": "2018-12-31", "version": "2.0"}
 
         task_data = {
             "user": "user1",
@@ -58,7 +53,7 @@ class ModelsTest(CaravaggioBaseTest):
             "kind": "bovespa",
             "options": options,
             "params": params,
-            "type": ON_DEMAND_TASK
+            "type": ON_DEMAND_TASK,
         }
         Task.create(**task_data)
         task_data["user"] = "user2"
@@ -73,11 +68,11 @@ class ModelsTest(CaravaggioBaseTest):
         time.sleep(1)
 
         # test without conditions
-        paginator = CaravaggioSearchPaginator(
-            query_string=str("user:user1"),
-            limit=1000, max_limit=1000). \
-            models(Task). \
-            select("task_id*",)
+        paginator = (
+            CaravaggioSearchPaginator(query_string=str("user:user1"), limit=1000, max_limit=1000)
+            .models(Task)
+            .select("task_id*",)
+        )
 
         all_tasks = []
         while paginator.has_next():

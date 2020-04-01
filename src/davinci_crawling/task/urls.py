@@ -24,11 +24,7 @@ from rest_framework.schemas import get_schema_view
 from davinci_crawling.task.api.urls import urlpatterns as task_urls
 
 urlpatterns = [
-    url(r'^api-schema/task/$',
-        get_schema_view(title="Task API",
-                        patterns=[url(r'^task/',
-                                      include(task_urls))])),
-
+    url(r"^api-schema/task/$", get_schema_view(title="Task API", patterns=[url(r"^task/", include(task_urls))])),
     # Task API version
-    url(r'^', include(task_urls)),
+    url(r"^", include(task_urls)),
 ]

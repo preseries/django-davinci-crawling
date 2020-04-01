@@ -3,11 +3,9 @@
 import logging
 
 from caravaggio_rest_api.tests import CaravaggioBaseTest
-from davinci_crawling.example.bovespa.models import BovespaCompanyFile, \
-    FILE_STATUS_PROCESSED
+from davinci_crawling.example.bovespa.models import BovespaCompanyFile, FILE_STATUS_PROCESSED
 from davinci_crawling.management.commands.crawl import start_crawl
-from davinci_crawling.management.commands.crawl_params import \
-    crawl_command_to_task
+from davinci_crawling.management.commands.crawl_params import crawl_command_to_task
 from davinci_crawling.task.models import Task, STATUS_FINISHED
 from django.conf import settings
 
@@ -17,14 +15,12 @@ from django.conf import settings
 CRAWLER_OPTIONS = {
     "chromium_bin_file": settings.CHROMIUM_BIN_FILE,
     "include_companies": None,
-    "local_dir": "fs://%s/log/local" %
-                 settings.TESTS_TMP_DIR,
-    "cache_dir": "fs://%s/log/cache" %
-                 settings.TESTS_TMP_DIR,
+    "local_dir": "fs://%s/log/local" % settings.TESTS_TMP_DIR,
+    "cache_dir": "fs://%s/log/cache" % settings.TESTS_TMP_DIR,
     "crawler": "bovespa",
     "from_date": None,
     "to_date": None,
-    "crawling_initials": None
+    "crawling_initials": None,
 }
 
 WORKERS_NUM = 5
@@ -54,8 +50,7 @@ class TestCrawlParams(CaravaggioBaseTest):
         crawl_command_to_task(**CRAWLER_OPTIONS)
         start_crawl(workers_num=WORKERS_NUM, interval=1, times_to_run=20)
 
-        files = BovespaCompanyFile.objects.filter(
-            status=FILE_STATUS_PROCESSED).all()
+        files = BovespaCompanyFile.objects.filter(status=FILE_STATUS_PROCESSED).all()
         # With this options we always have 5 files, unless any file got deleted
         # this assert should be 5
         files_count = len(files)

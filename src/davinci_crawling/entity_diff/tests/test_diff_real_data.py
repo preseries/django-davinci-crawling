@@ -60,12 +60,7 @@ class TestDiff(CaravaggioBaseTest):
     def test_non_modified(self):
         modified_json = copy.deepcopy(self.original_json)
 
-        expected = {
-            "all": {},
-            "inserts": [],
-            "updates": [],
-            "deletes": []
-        }
+        expected = {"all": {}, "inserts": [], "updates": [], "deletes": []}
 
         self._compare_diff(self.original_json, modified_json, expected)
 
@@ -74,16 +69,10 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["long_description"] = "A very very long description"
 
         expected = {
-            "all": {
-                "inserts": {
-                    "long_description": {
-                        "new_value": "A very very long description"
-                    }
-                }
-            },
+            "all": {"inserts": {"long_description": {"new_value": "A very very long description"}}},
             "inserts": ["long_description"],
             "updates": [],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -93,17 +82,10 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["name"] = "Open Exchange"
 
         expected = {
-            "all": {
-                "updates": {
-                    "name": {
-                        "new_value": "Open Exchange",
-                        "old_value": "BGDS"
-                    }
-                }
-            },
+            "all": {"updates": {"name": {"new_value": "Open Exchange", "old_value": "BGDS"}}},
             "inserts": [],
             "updates": ["name"],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -114,17 +96,10 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["name"] = None
 
         expected = {
-            "all": {
-                "updates": {
-                    "name": {
-                        "new_value": None,
-                        "old_value": "BGDS"
-                    }
-                }
-            },
+            "all": {"updates": {"name": {"new_value": None, "old_value": "BGDS"}}},
             "inserts": [],
             "updates": ["name"],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -133,16 +108,10 @@ class TestDiff(CaravaggioBaseTest):
         del modified_json["name"]
 
         expected = {
-            "all": {
-                "deletes": {
-                    "name": {
-                        "old_value": "BGDS"
-                    }
-                }
-            },
+            "all": {"deletes": {"name": {"old_value": "BGDS"}}},
             "inserts": [],
             "updates": [],
-            "deletes": ["name"]
+            "deletes": ["name"],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -152,16 +121,10 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["headquarters"]["street_3"] = "Level 3"
 
         expected = {
-            "all": {
-                "inserts": {
-                    "headquarters.street_3": {
-                        "new_value": "Level 3"
-                    }
-                }
-            },
+            "all": {"inserts": {"headquarters.street_3": {"new_value": "Level 3"}}},
             "inserts": ["headquarters*"],
             "updates": [],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -181,20 +144,14 @@ class TestDiff(CaravaggioBaseTest):
             "latitude": 11221.00,
             "longitude": 11.51,
             "created_date": "2019-10-10T00:00:00Z",
-            "updated_date": "2019-10-10T00:00:00Z"
+            "updated_date": "2019-10-10T00:00:00Z",
         }
 
         expected = {
-            "all": {
-                "inserts": {
-                    "official_headquarters": {
-                        "new_value": modified_json["official_headquarters"]
-                    }
-                }
-            },
+            "all": {"inserts": {"official_headquarters": {"new_value": modified_json["official_headquarters"]}}},
             "inserts": ["official_headquarters"],
             "updates": [],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -204,17 +161,10 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["headquarters"]["name"] = "BGDS Headquarters"
 
         expected = {
-            "all": {
-                "updates": {
-                    "headquarters.name": {
-                        "old_value": "headquarters",
-                        "new_value": "BGDS Headquarters"
-                    }
-                }
-            },
+            "all": {"updates": {"headquarters.name": {"old_value": "headquarters", "new_value": "BGDS Headquarters"}}},
             "inserts": [],
             "updates": ["headquarters*"],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -225,17 +175,10 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["headquarters"]["country_code"] = None
 
         expected = {
-            "all": {
-                "updates": {
-                    "headquarters.country_code": {
-                        "old_value": "USA",
-                        "new_value": None
-                    }
-                }
-            },
+            "all": {"updates": {"headquarters.country_code": {"old_value": "USA", "new_value": None}}},
             "inserts": [],
             "updates": ["headquarters*"],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -243,16 +186,10 @@ class TestDiff(CaravaggioBaseTest):
         del modified_json["headquarters"]["country_code"]
 
         expected = {
-            "all": {
-                "deletes": {
-                    "headquarters.country_code": {
-                        "old_value": "USA"
-                    }
-                }
-            },
+            "all": {"deletes": {"headquarters.country_code": {"old_value": "USA"}}},
             "inserts": [],
             "updates": [],
-            "deletes": ["headquarters*"]
+            "deletes": ["headquarters*"],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -262,38 +199,25 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["featured_team"][0]["name"] = "John"
 
         expected = {
-            "all": {
-                "inserts": {
-                    "featured_team[0].name": {
-                        "new_value": "John"
-                    }
-                }
-            },
+            "all": {"inserts": {"featured_team[0].name": {"new_value": "John"}}},
             "inserts": ["featured_team*"],
             "updates": [],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
 
     def test_one_to_many_insert_object(self):
         modified_json = copy.deepcopy(self.original_json)
-        modified_json["featured_team"].append({
-            "job_id": "55b229c1-3cbf-46c3-a2a9-0b5966fd99b2",
-            "title": "Software Developer"
-        })
+        modified_json["featured_team"].append(
+            {"job_id": "55b229c1-3cbf-46c3-a2a9-0b5966fd99b2", "title": "Software Developer"}
+        )
 
         expected = {
-            "all": {
-                "inserts": {
-                    "featured_team[1]": {
-                        "new_value": modified_json["featured_team"][1]
-                    }
-                }
-            },
+            "all": {"inserts": {"featured_team[1]": {"new_value": modified_json["featured_team"][1]}}},
             "inserts": ["featured_team*"],
             "updates": [],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -303,17 +227,10 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["featured_team"][0]["ended_on"] = "2019-31-12"
 
         expected = {
-            "all": {
-                "updates": {
-                    "featured_team[0].ended_on": {
-                        "new_value": "2019-31-12",
-                        "old_value": None
-                    }
-                }
-            },
+            "all": {"updates": {"featured_team[0].ended_on": {"new_value": "2019-31-12", "old_value": None}}},
             "inserts": [],
             "updates": ["featured_team*"],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -327,20 +244,19 @@ class TestDiff(CaravaggioBaseTest):
                 "deletes": {
                     "websites[1]": {
                         "old_value": {
-                            "website_id":
-                                "3574182e-74bb-4c21-8d81-4f6091fedc12",
+                            "website_id": "3574182e-74bb-4c21-8d81-4f6091fedc12",
                             "name": "facebook",
                             "website_type": "facebook",
                             "url": "www.facebook.com/john",
                             "created_date": "2019-10-10T00:00:00Z",
-                            "updated_date": "2019-10-10T00:00:00Z"
+                            "updated_date": "2019-10-10T00:00:00Z",
                         }
                     }
                 }
             },
             "inserts": [],
             "updates": [],
-            "deletes": ["websites*"]
+            "deletes": ["websites*"],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -351,17 +267,10 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["funds"][0]["money_raised"] = None
 
         expected = {
-            "all": {
-                "updates": {
-                    "funds[0].money_raised": {
-                        "old_value": 1000000,
-                        "new_value": None
-                    }
-                }
-            },
+            "all": {"updates": {"funds[0].money_raised": {"old_value": 1000000, "new_value": None}}},
             "inserts": [],
             "updates": ["funds*"],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -369,16 +278,10 @@ class TestDiff(CaravaggioBaseTest):
         del modified_json["funds"][0]["money_raised"]
 
         expected = {
-            "all": {
-                "deletes": {
-                    "funds[0].money_raised": {
-                        "old_value": 1000000
-                    }
-                }
-            },
+            "all": {"deletes": {"funds[0].money_raised": {"old_value": 1000000}}},
             "inserts": [],
             "updates": [],
-            "deletes": ["funds*"]
+            "deletes": ["funds*"],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -388,37 +291,27 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["investments"][0]["funding_round"]["is_series"] = True
 
         expected = {
-            "all": {
-                "inserts": {
-                    "investments[0].funding_round.is_series": {
-                        "new_value": True
-                    }
-                }
-            },
+            "all": {"inserts": {"investments[0].funding_round.is_series": {"new_value": True}}},
             "inserts": ["investments*"],
             "updates": [],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
 
     def test_update_on_second_level_list(self):
         modified_json = copy.deepcopy(self.original_json)
-        modified_json["investments"][0]["funding_round"]["announced_on"] = \
-            "2019-10-11"
+        modified_json["investments"][0]["funding_round"]["announced_on"] = "2019-10-11"
 
         expected = {
             "all": {
                 "updates": {
-                    "investments[0].funding_round.announced_on": {
-                        "old_value": "2019-10-10",
-                        "new_value": "2019-10-11"
-                    }
+                    "investments[0].funding_round.announced_on": {"old_value": "2019-10-10", "new_value": "2019-10-11"}
                 }
             },
             "inserts": [],
             "updates": ["investments*"],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -428,16 +321,10 @@ class TestDiff(CaravaggioBaseTest):
         del modified_json["investments"][0]["funding_round"]["announced_on"]
 
         expected = {
-            "all": {
-                "deletes": {
-                    "investments[0].funding_round.announced_on": {
-                        "old_value": "2019-10-10"
-                    }
-                }
-            },
+            "all": {"deletes": {"investments[0].funding_round.announced_on": {"old_value": "2019-10-10"}}},
             "inserts": [],
             "updates": [],
-            "deletes": ["investments*"]
+            "deletes": ["investments*"],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -447,16 +334,10 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["ipo"]["random_object"]["some"] = "thing"
 
         expected = {
-            "all": {
-                "inserts": {
-                    "ipo.random_object.some": {
-                        "new_value": "thing"
-                    }
-                }
-            },
+            "all": {"inserts": {"ipo.random_object.some": {"new_value": "thing"}}},
             "inserts": ["ipo*"],
             "updates": [],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -466,17 +347,10 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["ipo"]["random_object"]["ab"] = "dc"
 
         expected = {
-            "all": {
-                "updates": {
-                    "ipo.random_object.ab": {
-                        "old_value": "bc",
-                        "new_value": "dc"
-                    }
-                }
-            },
+            "all": {"updates": {"ipo.random_object.ab": {"old_value": "bc", "new_value": "dc"}}},
             "inserts": [],
             "updates": ["ipo*"],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -486,16 +360,10 @@ class TestDiff(CaravaggioBaseTest):
         del modified_json["ipo"]["random_object"]["ab"]
 
         expected = {
-            "all": {
-                "deletes": {
-                    "ipo.random_object.ab": {
-                        "old_value": "bc"
-                    }
-                }
-            },
+            "all": {"deletes": {"ipo.random_object.ab": {"old_value": "bc"}}},
             "inserts": [],
             "updates": [],
-            "deletes": ["ipo*"]
+            "deletes": ["ipo*"],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -505,16 +373,10 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["ipo"]["random_list"].append({"cd": "dc"})
 
         expected = {
-            "all": {
-                "inserts": {
-                    "ipo.random_list[1]": {
-                        "new_value": {"cd": "dc"}
-                    }
-                }
-            },
+            "all": {"inserts": {"ipo.random_list[1]": {"new_value": {"cd": "dc"}}}},
             "inserts": ["ipo*"],
             "updates": [],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -524,16 +386,10 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["ipo"]["random_list"][0]["cd"] = "dc"
 
         expected = {
-            "all": {
-                "inserts": {
-                    "ipo.random_list[0].cd": {
-                        "new_value": "dc"
-                    }
-                }
-            },
+            "all": {"inserts": {"ipo.random_list[0].cd": {"new_value": "dc"}}},
             "inserts": ["ipo*"],
             "updates": [],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -543,17 +399,10 @@ class TestDiff(CaravaggioBaseTest):
         modified_json["ipo"]["random_list"][0]["ab"] = "abcd"
 
         expected = {
-            "all": {
-                "updates": {
-                    "ipo.random_list[0].ab": {
-                        "new_value": "abcd",
-                        "old_value": "bc"
-                    }
-                }
-            },
+            "all": {"updates": {"ipo.random_list[0].ab": {"new_value": "abcd", "old_value": "bc"}}},
             "inserts": [],
             "updates": ["ipo*"],
-            "deletes": []
+            "deletes": [],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -563,16 +412,10 @@ class TestDiff(CaravaggioBaseTest):
         del modified_json["ipo"]["random_list"][0]["ab"]
 
         expected = {
-            "all": {
-                "deletes": {
-                    "ipo.random_list[0].ab": {
-                        "old_value": "bc"
-                    }
-                }
-            },
+            "all": {"deletes": {"ipo.random_list[0].ab": {"old_value": "bc"}}},
             "inserts": [],
             "updates": [],
-            "deletes": ["ipo*"]
+            "deletes": ["ipo*"],
         }
 
         self._compare_diff(self.original_json, modified_json, expected)
@@ -603,12 +446,7 @@ class TestDiff(CaravaggioBaseTest):
     def test_random_modifications(self):
         modified_json = copy.deepcopy(self.original_json)
         operations = ["insert", "update", "delete"]
-        expected = {
-            "all": {},
-            "inserts": [],
-            "updates": [],
-            "deletes": []
-        }
+        expected = {"all": {}, "inserts": [], "updates": [], "deletes": []}
 
         updates = set()
         deletes = set()
@@ -622,15 +460,11 @@ class TestDiff(CaravaggioBaseTest):
             value_to_modify = modified_json[key_to_modify]
 
             if operation == "insert":
-                new_key = ''.join(random.choice(string.ascii_lowercase)
-                                  for i in range(10))
-                new_value = ''.join(
-                    random.choice(string.ascii_lowercase) for i in range(10))
+                new_key = "".join(random.choice(string.ascii_lowercase) for i in range(10))
+                new_value = "".join(random.choice(string.ascii_lowercase) for i in range(10))
                 modified_json[new_key] = new_value
 
-                self._get_inserts(expected)[new_key] = {
-                    "new_value": new_value
-                }
+                self._get_inserts(expected)[new_key] = {"new_value": new_value}
                 self._add_field_to_list(new_key, inserts)
                 expected["inserts"] = list(inserts)
 
@@ -638,28 +472,23 @@ class TestDiff(CaravaggioBaseTest):
                 if isinstance(value_to_modify, dict):
                     keys_inside = list(value_to_modify)
                     key_inside_to_modify = random.choice(keys_inside)
-                    value_inside_to_modify = value_to_modify[
-                        key_inside_to_modify]
+                    value_inside_to_modify = value_to_modify[key_inside_to_modify]
 
-                    original_value = self.original_json[key_to_modify][
-                        key_inside_to_modify]
+                    original_value = self.original_json[key_to_modify][key_inside_to_modify]
 
                     new_value = None
                     if isinstance(value_inside_to_modify, str):
-                        new_value = ''.join(
-                            random.choice(string.ascii_lowercase) for i in
-                            range(10))
+                        new_value = "".join(random.choice(string.ascii_lowercase) for i in range(10))
                     elif isinstance(value_inside_to_modify, (int, float)):
                         new_value = random.randint(0, 100000000)
 
                     if new_value is not None:
                         value_to_modify[key_inside_to_modify] = new_value
 
-                        key_modified = "%s.%s" % (key_to_modify,
-                                                  key_inside_to_modify)
+                        key_modified = "%s.%s" % (key_to_modify, key_inside_to_modify)
                         self._get_updates(expected)[key_modified] = {
                             "new_value": new_value,
-                            "old_value": original_value
+                            "old_value": original_value,
                         }
                         self._add_field_to_list(key_modified, updates)
                         expected["updates"] = list(updates)
@@ -672,9 +501,7 @@ class TestDiff(CaravaggioBaseTest):
 
                     new_value = None
                     if isinstance(value_to_modify, str):
-                        new_value = ''.join(
-                            random.choice(string.ascii_lowercase) for i in
-                            range(10))
+                        new_value = "".join(random.choice(string.ascii_lowercase) for i in range(10))
                     elif isinstance(value_to_modify, (int, float)):
                         new_value = random.randint(0, 100000000)
 
@@ -682,14 +509,13 @@ class TestDiff(CaravaggioBaseTest):
                         modified_json[key_to_modify] = new_value
                         self._get_updates(expected)[key_to_modify] = {
                             "new_value": new_value,
-                            "old_value": original_value
+                            "old_value": original_value,
                         }
                         self._add_field_to_list(key_to_modify, updates)
                         expected["updates"] = list(updates)
 
             else:
-                if key_to_modify in updates or isinstance(value_to_modify,
-                                                          dict):
+                if key_to_modify in updates or isinstance(value_to_modify, dict):
                     continue
                 try:
                     original_value = self.original_json[key_to_modify]
@@ -698,9 +524,7 @@ class TestDiff(CaravaggioBaseTest):
                     continue
                 del modified_json[key_to_modify]
 
-                self._get_deletes(expected)[key_to_modify] = {
-                    "old_value": original_value
-                }
+                self._get_deletes(expected)[key_to_modify] = {"old_value": original_value}
                 self._add_field_to_list(key_to_modify, deletes)
                 expected["deletes"] = list(deletes)
 

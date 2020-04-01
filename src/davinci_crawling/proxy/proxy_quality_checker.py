@@ -30,10 +30,9 @@ def _check_time(proxy_address, proxy_order, times_run=3):
     Returns:
         the average time of all calls defined by times_run argument
     """
+
     def get_url(url, _proxy_address, timeout=10):
-        requests.get(
-            url=url,
-            timeout=(timeout, timeout), verify=False, proxies=_proxy_address)
+        requests.get(url=url, timeout=(timeout, timeout), verify=False, proxies=_proxy_address)
 
     results = []
     for _ in range(times_run):
@@ -75,14 +74,14 @@ def assure_proxy_quality(pool):
 
 
 def periodic_checker():
-    if hasattr(settings, 'DAVINCI_CONF') and \
-            "proxy" in settings.DAVINCI_CONF["architecture-params"] \
-            and "proxies-availability-checker" in \
-            settings.DAVINCI_CONF["architecture-params"][
-                "proxy"]:
-        sleep_time = settings.DAVINCI_CONF["architecture-params"]["proxy"][
-            "proxies-availability-checker"].get("elapse-time-between-checks",
-                                                60)
+    if (
+        hasattr(settings, "DAVINCI_CONF")
+        and "proxy" in settings.DAVINCI_CONF["architecture-params"]
+        and "proxies-availability-checker" in settings.DAVINCI_CONF["architecture-params"]["proxy"]
+    ):
+        sleep_time = settings.DAVINCI_CONF["architecture-params"]["proxy"]["proxies-availability-checker"].get(
+            "elapse-time-between-checks", 60
+        )
         pool = multiprocessing.Pool(4)
         while True:
             assure_proxy_quality(pool)
@@ -90,7 +89,7 @@ def periodic_checker():
 
 
 try:
-    d = threading.Thread(name='periodic_checker', target=periodic_checker)
+    d = threading.Thread(name="periodic_checker", target=periodic_checker)
     d.setDaemon(True)
     d.start()
 except asyncio.CancelledError:

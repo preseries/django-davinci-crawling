@@ -5,10 +5,8 @@ import traceback
 import logging
 import time
 from datetime import datetime
-from davinci_crawling.management.commands.utils.utils import \
-    update_task_status, get_crawler_by_name
-from davinci_crawling.task.models import STATUS_IN_PROGRESS, STATUS_FAULTY, \
-    STATUS_FINISHED
+from davinci_crawling.management.commands.utils.utils import update_task_status, get_crawler_by_name
+from davinci_crawling.task.models import STATUS_IN_PROGRESS, STATUS_FAULTY, STATUS_FINISHED
 from persistqueue import SQLiteAckQueue
 from persistqueue.exceptions import Empty
 from threading import Thread
@@ -27,6 +25,7 @@ class CrawlConsumer(object):
     It processes the parameters in parallel using a determined quantity of
     workers.
     """
+
     consumers = []
 
     def __init__(self, qty_workers=2, times_to_run=None):
@@ -64,8 +63,7 @@ class CrawlConsumer(object):
             The result of the crawler call.
         """
         crawler = get_crawler_by_name(crawler_name)
-        _logger.debug("Calling crawl method: {0}".
-                      format(getattr(crawler, "crawl")))
+        _logger.debug("Calling crawl method: {0}".format(getattr(crawler, "crawl")))
         return crawler.crawl(task_id, crawler_param, options)
 
     def join(self):
@@ -108,14 +106,13 @@ class CrawlConsumer(object):
                 # Means that the queue is empty and we need to count many times
                 # that the occurs to the close logic, we just start counting
                 # when at least the queue received one
-                _logger.debug("No objects found on queue, waiting for 1 "
-                              "second and try again")
+                _logger.debug("No objects found on queue, waiting for 1 " "second and try again")
                 time.sleep(1)
             except Exception as e:
                 if task_id and object_queue:
-                    update_task_status(task_id, STATUS_FAULTY,
-                                       source="crawl consumer",
-                                       more_info=traceback.format_exc())
+                    update_task_status(
+                        task_id, STATUS_FAULTY, source="crawl consumer", more_info=traceback.format_exc()
+                    )
                     tasks_queue.ack_failed(object_queue)
 
                 _logger.error("Error while crawling params from queue", e)

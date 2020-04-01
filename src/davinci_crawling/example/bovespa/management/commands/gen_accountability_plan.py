@@ -5,22 +5,25 @@ import logging
 import xlsxwriter
 
 from solrq import Q, Range
-from caravaggio_rest_api.haystack.backends.utils import \
-    CaravaggioSearchPaginator
+from caravaggio_rest_api.haystack.backends.utils import CaravaggioSearchPaginator
 
 from django.core.management import BaseCommand
 
-from davinci_crawling.example.bovespa.models import \
-    BovespaAccount, \
-    DFP_BALANCE_IF, DFP_BALANCE_BPA, DFP_BALANCE_BPP, \
-    DFP_BALANCE_DRE, DFP_BALANCE_DRA,\
-    DFP_BALANCE_DFC_MD, DFP_BALANCE_DFC_MI,\
-    DFP_BALANCE_DMPL, DFP_BALANCE_DVA
+from davinci_crawling.example.bovespa.models import (
+    BovespaAccount,
+    DFP_BALANCE_IF,
+    DFP_BALANCE_BPA,
+    DFP_BALANCE_BPP,
+    DFP_BALANCE_DRE,
+    DFP_BALANCE_DRA,
+    DFP_BALANCE_DFC_MD,
+    DFP_BALANCE_DFC_MI,
+    DFP_BALANCE_DMPL,
+    DFP_BALANCE_DVA,
+)
 from davinci_crawling.example.bovespa import BOVESPA_CRAWLER
 
-_logger = logging.getLogger(
-    "davinci_crawler_{}.commands.gen_accountability_plan".
-    format(BOVESPA_CRAWLER))
+_logger = logging.getLogger("davinci_crawler_{}.commands.gen_accountability_plan".format(BOVESPA_CRAWLER))
 
 
 accounts_data_cache = {}
@@ -45,14 +48,12 @@ def load_accounts(valid_account_types):
         str(filter),
         limit=5000,
         **{"group": "true", "group.field": "number_exact", "group.limit": 1},
-        useFieldCache=True).\
-        models(BovespaAccount)
+        useFieldCache=True
+    ).models(BovespaAccount)
 
     accounts = {}
     while paginator.has_next():
-        _logger.debug(
-            "{} accounts loaded from database...".
-            format(paginator.get_loaded_docs()))
+        _logger.debug("{} accounts loaded from database...".format(paginator.get_loaded_docs()))
         paginator.next()
         for acc_number, details in paginator.get_results().items():
             accounts[acc_number] = (details[0].balance_type, details[0].name)
@@ -66,25 +67,30 @@ def export_accountability_plan():
     # Formats
 
     # Add a text format for the titles
-    bold = workbook.add_format({'bold': True})
+    bold = workbook.add_format({"bold": True})
     bold.set_font_size(20)
 
     # Add a text format for the headers
-    bold_header = workbook.add_format({'bold': True})
+    bold_header = workbook.add_format({"bold": True})
     bold_header.set_font_size(15)
 
     # Add a number format for cells with money.
-    money = workbook.add_format({'num_format': '#,##0'})
+    money = workbook.add_format({"num_format": "#,##0"})
 
     # Add a percent format for cells with percentages.
-    percent = workbook.add_format({'num_format': '0.00%'})
+    percent = workbook.add_format({"num_format": "0.00%"})
 
     valid_account_types = [
         DFP_BALANCE_IF,
-        DFP_BALANCE_BPA, DFP_BALANCE_BPP,
-        DFP_BALANCE_DRE, DFP_BALANCE_DRA,
-        DFP_BALANCE_DFC_MD, DFP_BALANCE_DFC_MI,
-        DFP_BALANCE_DMPL, DFP_BALANCE_DVA]
+        DFP_BALANCE_BPA,
+        DFP_BALANCE_BPP,
+        DFP_BALANCE_DRE,
+        DFP_BALANCE_DRA,
+        DFP_BALANCE_DFC_MD,
+        DFP_BALANCE_DFC_MI,
+        DFP_BALANCE_DMPL,
+        DFP_BALANCE_DVA,
+    ]
 
     accounts = load_accounts(valid_account_types)
 
@@ -112,8 +118,7 @@ def export_accountability_plan():
 
 
 class Command(BaseCommand):
-    help = 'Generate the list of unique accountability accounts ' \
-           'from all the financial statements'
+    help = "Generate the list of unique accountability accounts " "from all the financial statements"
 
     def add_arguments(self, parser):
         # The company to process
@@ -121,8 +126,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            _logger.debug(
-                "Exporting accountability plan data...")
+            _logger.debug("Exporting accountability plan data...")
 
             export_accountability_plan()
 

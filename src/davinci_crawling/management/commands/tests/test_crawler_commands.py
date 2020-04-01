@@ -4,10 +4,8 @@ import time
 
 from caravaggio_rest_api.tests import CaravaggioBaseTest
 from davinci_crawling.crawler import Crawler
-from davinci_crawling.management.commands.tests.test_crawl import \
-    CRAWLER_OPTIONS
-from davinci_crawling.task.models import STATUS_CREATED, ON_DEMAND_TASK,\
-    Task, STATUS_FAULTY, STATUS_MAINTENANCE
+from davinci_crawling.management.commands.tests.test_crawl import CRAWLER_OPTIONS
+from davinci_crawling.task.models import STATUS_CREATED, ON_DEMAND_TASK, Task, STATUS_FAULTY, STATUS_MAINTENANCE
 from davinci_crawling.utils import CrawlersRegistry
 
 
@@ -25,9 +23,16 @@ class TestCrawl(CaravaggioBaseTest):
     def setUpTestData(cls):
         pass
 
-    def create_task(self, kind, include_companies=None,
-                    from_date=None, to_date=None, crawling_initials=None,
-                    status=STATUS_CREATED, should_fail=False):
+    def create_task(
+        self,
+        kind,
+        include_companies=None,
+        from_date=None,
+        to_date=None,
+        crawling_initials=None,
+        status=STATUS_CREATED,
+        should_fail=False,
+    ):
         crawler_options = CRAWLER_OPTIONS.copy()
         # includes only the Vale company
         crawler_options["include_companies"] = include_companies
@@ -45,7 +50,7 @@ class TestCrawl(CaravaggioBaseTest):
             "type": ON_DEMAND_TASK,
             "status": status,
             "params": {"a": "b"},
-            "options": {"c": "d"}
+            "options": {"c": "d"},
         }
 
         return Task.create(**task)
@@ -54,10 +59,9 @@ class TestCrawl(CaravaggioBaseTest):
         """
         Test the error method.
         """
-        task = self.create_task("bovespa", ["4170"],
-                                "2011-01-01T00:00:00.000000Z",
-                                "2011-12-31T00:00:00.000000Z", ["V"],
-                                should_fail=True)
+        task = self.create_task(
+            "bovespa", ["4170"], "2011-01-01T00:00:00.000000Z", "2011-12-31T00:00:00.000000Z", ["V"], should_fail=True
+        )
 
         task_id = task.task_id
 
@@ -86,9 +90,9 @@ class TestCrawl(CaravaggioBaseTest):
         Test the maintenance_notice method.
         """
         kind = str(time.time())
-        task = self.create_task(kind, ["4170"], "2011-01-01T00:00:00.000000Z",
-                                "2011-12-31T00:00:00.000000Z", ["V"],
-                                should_fail=True)
+        task = self.create_task(
+            kind, ["4170"], "2011-01-01T00:00:00.000000Z", "2011-12-31T00:00:00.000000Z", ["V"], should_fail=True
+        )
 
         task_id = task.task_id
 

@@ -29,11 +29,9 @@ DOC_TYPES = [DOC_TYPE_ITR, DOC_TYPE_DFP]
 FILE_STATUS_NOT_PROCESSED = "not_processed"
 FILE_STATUS_PROCESSED = "processed"
 FILE_STATUS_ERROR = "error"
-FILE_STATUSES = [
-    FILE_STATUS_NOT_PROCESSED, FILE_STATUS_PROCESSED, FILE_STATUS_ERROR]
+FILE_STATUSES = [FILE_STATUS_NOT_PROCESSED, FILE_STATUS_PROCESSED, FILE_STATUS_ERROR]
 
-_logger = logging.getLogger("davinci_crawler_{}.models".
-                            format(BOVESPA_CRAWLER))
+_logger = logging.getLogger("davinci_crawler_{}.models".format(BOVESPA_CRAWLER))
 
 
 class BovespaCompany(CustomDjangoCassandraModel):
@@ -73,8 +71,8 @@ class BovespaCompany(CustomDjangoCassandraModel):
 
         if self.situation not in SITUATIONS:
             raise ValidationError(
-                "Invalid situation [{0}]. Valid situations are: {1}.".
-                format(self.situation, SITUATIONS))
+                "Invalid situation [{0}]. Valid situations are: {1}.".format(self.situation, SITUATIONS)
+            )
 
 
 class BovespaCompanyFile(CustomDjangoCassandraModel):
@@ -188,20 +186,17 @@ class BovespaCompanyFile(CustomDjangoCassandraModel):
         super().validate()
 
         if self.doc_type not in DOC_TYPES:
-            raise ValidationError(
-                "Invalid doc type [{0}]. Valid types are: {1}.".
-                format(self.doc_type, DOC_TYPES))
+            raise ValidationError("Invalid doc type [{0}]. Valid types are: {1}.".format(self.doc_type, DOC_TYPES))
 
         if self.status not in FILE_STATUSES:
             raise ValidationError(
-                "Invalid file status [{0}]. Valid statuses are: {1}.".
-                format(self.status, FILE_STATUSES))
+                "Invalid file status [{0}]. Valid statuses are: {1}.".format(self.status, FILE_STATUSES)
+            )
 
 
 # We need to set the new value for the changed_at field
 @receiver(pre_save, sender=BovespaCompanyFile)
-def pre_save_bovespa_company_file(
-        sender, instance=None, using=None, update_fields=None, **kwargs):
+def pre_save_bovespa_company_file(sender, instance=None, using=None, update_fields=None, **kwargs):
     instance.updated_at = datetime.utcnow()
 
     if instance.fiscal_date:
@@ -213,12 +208,10 @@ def pre_save_bovespa_company_file(
         instance.fiscal_date_md = date_data.tm_mday
         instance.fiscal_date_w = week_of_year(instance.fiscal_date.date())
         instance.fiscal_date_wd = date_data.tm_wday
-        instance.fiscal_date_yq = "{year}-Q{quarter}".\
-            format(year=instance.fiscal_date_y,
-                   quarter=instance.fiscal_date_q)
-        instance.fiscal_date_ym = "{year}-{month:02d}".\
-            format(year=instance.fiscal_date_y,
-                   month=instance.fiscal_date_m)
+        instance.fiscal_date_yq = "{year}-Q{quarter}".format(
+            year=instance.fiscal_date_y, quarter=instance.fiscal_date_q
+        )
+        instance.fiscal_date_ym = "{year}-{month:02d}".format(year=instance.fiscal_date_y, month=instance.fiscal_date_m)
     else:
         instance.fiscal_date_y = None
         instance.fiscal_date_yd = None
@@ -233,8 +226,7 @@ def pre_save_bovespa_company_file(
 
 DFP_FINANCIAL_INFO_INSTANT = "INSTANT"  # Individual
 DFP_FINANCIAL_INFO_DURATION = "DURATION"  # Consolidated
-FINANCIAL_INFO_TYPES = [DFP_FINANCIAL_INFO_INSTANT,
-                        DFP_FINANCIAL_INFO_DURATION]
+FINANCIAL_INFO_TYPES = [DFP_FINANCIAL_INFO_INSTANT, DFP_FINANCIAL_INFO_DURATION]
 
 DFP_BALANCE_INVALID = "INVALID"
 DFP_BALANCE_IF = "IF"  # ??
@@ -248,16 +240,16 @@ DFP_BALANCE_DMPL = "DMPL"  # Demonstraçao das Mutaçoes do Patrimônio Líquido
 DFP_BALANCE_DVA = "DVA"  # Demonstraçao Valor Adicionado
 
 BALANCE_TYPES = [
-    DFP_BALANCE_INVALID,    # 0
-    DFP_BALANCE_IF,         # 1
-    DFP_BALANCE_BPA,        # 2
-    DFP_BALANCE_BPP,        # 3
-    DFP_BALANCE_DRE,        # 4
-    DFP_BALANCE_DRA,        # 5
-    DFP_BALANCE_DFC_MD,     # 6
-    DFP_BALANCE_DFC_MI,     # 7
-    DFP_BALANCE_DMPL,       # 8
-    DFP_BALANCE_DVA         # 9
+    DFP_BALANCE_INVALID,  # 0
+    DFP_BALANCE_IF,  # 1
+    DFP_BALANCE_BPA,  # 2
+    DFP_BALANCE_BPP,  # 3
+    DFP_BALANCE_DRE,  # 4
+    DFP_BALANCE_DRA,  # 5
+    DFP_BALANCE_DFC_MD,  # 6
+    DFP_BALANCE_DFC_MI,  # 7
+    DFP_BALANCE_DMPL,  # 8
+    DFP_BALANCE_DVA,  # 9
 ]
 
 
@@ -314,20 +306,18 @@ class BovespaAccount(CustomDjangoCassandraModel):
         if self.financial_info_type not in FINANCIAL_INFO_TYPES:
             raise ValidationError(
                 "Invalid financial type [{0}] for account "
-                "[{1} {2}]. Valid types are: {3}.".
-                format(self.financial_info_type,
-                       self.number,
-                       self.name,
-                       FINANCIAL_INFO_TYPES))
+                "[{1} {2}]. Valid types are: {3}.".format(
+                    self.financial_info_type, self.number, self.name, FINANCIAL_INFO_TYPES
+                )
+            )
 
         if self.balance_type not in BALANCE_TYPES:
             raise ValidationError(
-                "Invalid balance type [{0}]. Valid types are: {1}.".
-                format(self.balance_type, BALANCE_TYPES))
+                "Invalid balance type [{0}]. Valid types are: {1}.".format(self.balance_type, BALANCE_TYPES)
+            )
 
 
 # We need to set the new value for the changed_at field
 @receiver(pre_save, sender=BovespaAccount)
-def pre_save_bovespa_account(
-        sender, instance=None, using=None, update_fields=None, **kwargs):
+def pre_save_bovespa_account(sender, instance=None, using=None, update_fields=None, **kwargs):
     instance.updated_at = datetime.utcnow()

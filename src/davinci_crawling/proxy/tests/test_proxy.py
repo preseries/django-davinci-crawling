@@ -6,17 +6,14 @@ import time
 
 from caravaggio_rest_api.tests import CaravaggioBaseTest
 from davinci_crawling.crawler import Crawler
-from davinci_crawling.net import fetch_file, fetch_page, DEFAULT_TIMEOUT, \
-    get_json
+from davinci_crawling.net import fetch_file, fetch_page, DEFAULT_TIMEOUT, get_json
 from davinci_crawling.proxy.proxy import ProxyManager
 from django.conf import settings
 
 
 _logger = logging.getLogger("davinci_crawling.testing")
 
-CHROME_OPTIONS = {
-    "chromium_bin_file": settings.CHROMIUM_BIN_FILE
-}
+CHROME_OPTIONS = {"chromium_bin_file": settings.CHROMIUM_BIN_FILE}
 
 ProxyManager.set_proxy_manager("davinci_crawling.proxy.proxy_mesh.ProxyMesh")
 
@@ -145,8 +142,7 @@ class TestProxy(CaravaggioBaseTest):
         worked = False
         for _ in range(5):
             try:
-                self.assertNotEquals(proxy_manager.get_available_proxies(),
-                                     proxy_manager.get_to_use_proxies())
+                self.assertNotEquals(proxy_manager.get_available_proxies(), proxy_manager.get_to_use_proxies())
                 worked = True
                 break
             except AssertionError:
