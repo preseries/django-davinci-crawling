@@ -48,7 +48,7 @@ def load_accounts(valid_account_types):
         str(filter),
         limit=5000,
         **{"group": "true", "group.field": "number_exact", "group.limit": 1},
-        useFieldCache=True
+        useFieldCache=True,
     ).models(BovespaAccount)
 
     accounts = {}
