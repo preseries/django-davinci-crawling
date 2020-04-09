@@ -18,5 +18,6 @@ XlsxWriter
 google-api-python-client
 google-cloud-storage
 
-git+https://github.com/intellstartup/django-cassandra-engine@bgds-1#egg=django-cassandra-engine-0
+django-cassandra-engine
+#git+https://github.com/intellstartup/django-cassandra-engine@bgds-1#egg=django-cassandra-engine-0
 git+https://github.com/intellstartup/pylimit@develop#egg=pylimit-0
