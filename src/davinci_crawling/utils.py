@@ -113,19 +113,20 @@ class TimeIt:
         return execution_times_list
 
     @staticmethod
-    def write_times_to_more_info(davinci_task, executions_times):
-        from davinci_crawling.task.models import TaskMoreInfo
+    def write_times_to_more_info(davinci_task_id, executions_times):
+        from davinci_crawling.task.models import TaskMoreInfo, Task
 
-        more_info = []
+        davinci_task = Task.objects.get(task_id=davinci_task_id)
+
+        if not davinci_task.more_info:
+            more_info = []
+        else:
+            more_info = davinci_task.more_info
 
         for execution_time in executions_times:
             more_info.append(TaskMoreInfo(**execution_time))
 
-        if not davinci_task.more_info:
-            davinci_task.more_info = more_info
-        else:
-            davinci_task.more_info.extend(more_info)
-        davinci_task.save()
+        davinci_task.update(**{"more_info": more_info})
 
     def __call__(self, fn):
         @wraps(fn)
