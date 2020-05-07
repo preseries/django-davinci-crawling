@@ -16,10 +16,12 @@ try:
     from dse.cqlengine import columns, ValidationError
     from dse.cqlengine.columns import UserDefinedType
     from dse.cqlengine.usertype import UserType
+    from dse import ConsistencyLevel
 except ImportError:
     from cassandra.cqlengine import columns, ValidationError
     from cassandra.cqlengine.columns import UserDefinedType
     from cassandra.cqlengine.usertype import UserType
+    from cassandra import ConsistencyLevel
 
 _logger = logging.getLogger("davinci_crawling.task")
 
@@ -91,6 +93,8 @@ class Task(CustomDjangoCassandraModel):
     """
 
     __table_name__ = "davinci_task"
+    _cassandra_consistency_level_read = ConsistencyLevel.ONE
+    _cassandra_consistency_level_write = ConsistencyLevel.ALL
 
     # Force that all the values will reside in the seam node of the cluster
     task_id = columns.UUID(partition_key=True, default=uuid.uuid4)
