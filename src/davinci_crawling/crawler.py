@@ -104,8 +104,9 @@ class Crawler(metaclass=ABCMeta):
         path = os.path.dirname(os.path.abspath(__file__))
         if chromium_file:
             proxy_address = cls.proxy_manager.get_proxy_address()
+            seleniumwire_options = {"verify_ssl": False, "suppress_connection_errors": False}
             if proxy_address:
-                proxy_address = {"proxy": proxy_address}
+                seleniumwire_options["proxy"] = proxy_address
 
             CHROME_OPTIONS.binary_location = chromium_file
 
@@ -117,10 +118,16 @@ class Crawler(metaclass=ABCMeta):
 
             if proxy_address:
                 driver = wire_webdriver.Chrome(
-                    chrome_options=CHROME_OPTIONS, desired_capabilities=capabilities, seleniumwire_options=proxy_address
+                    chrome_options=CHROME_OPTIONS,
+                    desired_capabilities=capabilities,
+                    seleniumwire_options=seleniumwire_options,
                 )
             else:
-                driver = wire_webdriver.Chrome(chrome_options=CHROME_OPTIONS, desired_capabilities=capabilities)
+                driver = wire_webdriver.Chrome(
+                    chrome_options=CHROME_OPTIONS,
+                    desired_capabilities=capabilities,
+                    seleniumwire_options=seleniumwire_options,
+                )
 
             _logger.info("Using CHROMIUM as Dynamic Web Driver. Driver {}".format(repr(driver)))
         else:

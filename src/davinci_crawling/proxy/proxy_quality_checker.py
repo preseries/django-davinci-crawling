@@ -32,7 +32,9 @@ def _check_time(proxy_address, proxy_order, times_run=3):
     """
 
     def get_url(url, _proxy_address, timeout=10):
-        requests.get(url=url, timeout=(timeout, timeout), verify=False, proxies=_proxy_address)
+        response = requests.get(url=url, timeout=(timeout, timeout), verify=False, proxies=_proxy_address)
+        if response.status_code >= 400:
+            raise Exception("Failed to retrieve url")
 
     results = []
     for _ in range(times_run):
