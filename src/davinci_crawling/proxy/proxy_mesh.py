@@ -16,7 +16,7 @@ PROXY_TEMPLATE = "%s:%s@%s"
 
 _logger = logging.getLogger("davinci_crawling")
 
-FILE_NAME_STORE_AUTHORIZED_IPS = "/tmp/proxy_mesh_authorized_ips.txt"
+FILE_NAME_STORE_AUTHORIZED_IPS = "%s/../tmp/proxy_mesh_authorized_ips.txt" % settings.BASE_DIR
 
 
 def get_machine_ip():
