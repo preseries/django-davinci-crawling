@@ -8,7 +8,6 @@ xmljson
 jsonpath
 gevent
 django-apscheduler
-selenium-wire
 persist-queue
 jsondiff
 
