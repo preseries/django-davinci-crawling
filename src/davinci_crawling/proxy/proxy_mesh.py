@@ -63,14 +63,22 @@ class ProxyMesh(Proxy):
         ip = result_machine_ip.json()["ip"]
 
         custom_header = {"authorization": PROXY_MESH_SETTINGS["authentication"]}
-        response = requests.post(url=PROXY_MESH_SETTINGS["add_ip_url"], data={"ip": ip}, headers=custom_header,)
+        try:
+            response = requests.post(url=PROXY_MESH_SETTINGS["add_ip_url"], data={"ip": ip}, headers=custom_header,)
+        except Exception as e:
+            _logger.error(e)
+            response = None
         tries = 10
-        while response.status_code >= 400 and tries > 0:
-            if "IP address is already authorized" in response.text:
+        while (not response or response.status_code >= 400) and tries > 0:
+            if response and "IP address is already authorized" in response.text:
                 break
 
             time.sleep(1)
-            response = requests.post(url=PROXY_MESH_SETTINGS["add_ip_url"], data={"ip": ip}, headers=custom_header,)
+            try:
+                response = requests.post(url=PROXY_MESH_SETTINGS["add_ip_url"], data={"ip": ip}, headers=custom_header,)
+            except Exception as e:
+                _logger.error(e)
+                response = None
             tries -= 1
 
         _logger.debug("Successfully authenticate to ProxyMesh")
@@ -103,17 +111,28 @@ class ProxyMesh(Proxy):
             cls._authenticate_proxy_mesh()
 
             custom_header = {"authorization": PROXY_MESH_SETTINGS["authentication"]}
-            response = get_json(
-                PROXY_MESH_SETTINGS["authorized_proxies_url"], custom_header=custom_header, use_proxy=False
-            )
-
-            tries = 10
-            while response.status_code >= 400 and tries > 0:
-                time.sleep(1)
+            try:
                 response = get_json(
                     PROXY_MESH_SETTINGS["authorized_proxies_url"], custom_header=custom_header, use_proxy=False
                 )
+            except Exception as e:
+                _logger.error(e)
+                response = None
+
+            tries = 10
+            while (not response or response.status_code >= 400) and tries > 0:
+                time.sleep(1)
+                try:
+                    response = get_json(
+                        PROXY_MESH_SETTINGS["authorized_proxies_url"], custom_header=custom_header, use_proxy=False
+                    )
+                except Exception as e:
+                    _logger.error(e)
+                    response = None
                 tries -= 1
+
+            if not response or response.status_code >= 400:
+                return []
 
             response = response.json()
             proxies = []
