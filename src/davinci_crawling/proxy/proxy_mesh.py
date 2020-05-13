@@ -3,7 +3,9 @@
 import copy
 import logging
 import random
+import time
 
+import requests
 from davinci_crawling.net import get_json
 from davinci_crawling.proxy.proxy import Proxy
 from django.conf import settings
@@ -13,6 +15,11 @@ AUTHORIZED_PROXIES_URL = "https://proxymesh.com/api/proxies/"
 PROXY_TEMPLATE = "%s:%s@%s"
 
 _logger = logging.getLogger("davinci_crawling")
+
+
+def get_machine_ip():
+    response = get_json("https://api.ipify.org?format=json", use_proxy=False)
+    return response
 
 
 def get_proxy_mesh_settings():
@@ -44,6 +51,31 @@ class ProxyMesh(Proxy):
         self.to_use_proxies = proxies
 
     @classmethod
+    def _authenticate_proxy_mesh(cls):
+        result_machine_ip = get_machine_ip()
+
+        tries = 10
+        while result_machine_ip.status_code >= 400 and tries > 0:
+            time.sleep(1)
+            result_machine_ip = get_machine_ip()
+            tries -= 1
+
+        ip = result_machine_ip.json()["ip"]
+
+        custom_header = {"authorization": PROXY_MESH_SETTINGS["authentication"]}
+        response = requests.post(url=PROXY_MESH_SETTINGS["add_ip_url"], data={"ip": ip}, headers=custom_header,)
+        tries = 10
+        while response.status_code >= 400 and tries > 0:
+            if "IP address is already authorized" in response.text:
+                break
+
+            time.sleep(1)
+            response = requests.post(url=PROXY_MESH_SETTINGS["add_ip_url"], data={"ip": ip}, headers=custom_header,)
+            tries -= 1
+
+        _logger.debug("Successfully authenticate to ProxyMesh")
+
+    @classmethod
     def get_country_from_proxy_address(cls, proxy_address):
         """
         Extract the country from the proxy_address, that are the first two
@@ -68,10 +100,21 @@ class ProxyMesh(Proxy):
 
         """
         if not cls.available_proxies and PROXY_MESH_SETTINGS:
+            cls._authenticate_proxy_mesh()
+
             custom_header = {"authorization": PROXY_MESH_SETTINGS["authentication"]}
             response = get_json(
                 PROXY_MESH_SETTINGS["authorized_proxies_url"], custom_header=custom_header, use_proxy=False
             )
+
+            tries = 10
+            while response.status_code >= 400 and tries > 0:
+                time.sleep(1)
+                response = get_json(
+                    PROXY_MESH_SETTINGS["authorized_proxies_url"], custom_header=custom_header, use_proxy=False
+                )
+                tries -= 1
+
             response = response.json()
             proxies = []
 
@@ -86,10 +129,9 @@ class ProxyMesh(Proxy):
                     if country not in only_proxies_from:
                         continue
 
-                _proxy = PROXY_TEMPLATE % (settings.PROXY_MESH_USER, settings.PROXY_MESH_PASSWORD, proxy)
                 _proxy = {
-                    "http": "http://" + _proxy,
-                    "https": "https://" + _proxy,
+                    "http": "http://" + proxy,
+                    "https": "https://" + proxy,
                     "no_proxy": "localhost,127.0.0.1",  # excludes
                 }
                 proxies.append(_proxy)
@@ -110,5 +152,5 @@ class ProxyMesh(Proxy):
         quality_proxy_quantities = min(quality_proxy_quantities, len(proxies))
 
         proxy = random.choice(proxies[0:quality_proxy_quantities])
-        _logger.debug("Using %s proxy", proxy["http"].split("@")[1])
+        _logger.debug("Using %s proxy", proxy["http"])
         return copy.deepcopy(proxy)

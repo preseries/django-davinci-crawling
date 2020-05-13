@@ -25,7 +25,6 @@ from django.test import RequestFactory
 from django.utils import timezone
 
 from selenium import webdriver
-from seleniumwire import webdriver as wire_webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from davinci_crawling.entity_diff.diff import make_diff
@@ -104,9 +103,9 @@ class Crawler(metaclass=ABCMeta):
         path = os.path.dirname(os.path.abspath(__file__))
         if chromium_file:
             proxy_address = cls.proxy_manager.get_proxy_address()
-            seleniumwire_options = {"verify_ssl": False, "suppress_connection_errors": False}
             if proxy_address:
-                seleniumwire_options["proxy"] = proxy_address
+                proxy_address = proxy_address["http"].replace("http://", "")
+                CHROME_OPTIONS.add_argument("--proxy-server=%s" % proxy_address)
 
             CHROME_OPTIONS.binary_location = chromium_file
 
@@ -116,18 +115,7 @@ class Crawler(metaclass=ABCMeta):
                 for key, value in options[Crawler.CHROME_DESIREDCAPABILITIES].items():
                     capabilities[key] = value
 
-            if proxy_address:
-                driver = wire_webdriver.Chrome(
-                    chrome_options=CHROME_OPTIONS,
-                    desired_capabilities=capabilities,
-                    seleniumwire_options=seleniumwire_options,
-                )
-            else:
-                driver = wire_webdriver.Chrome(
-                    chrome_options=CHROME_OPTIONS,
-                    desired_capabilities=capabilities,
-                    seleniumwire_options=seleniumwire_options,
-                )
+            driver = webdriver.Chrome(chrome_options=CHROME_OPTIONS, desired_capabilities=capabilities)
 
             _logger.info("Using CHROMIUM as Dynamic Web Driver. Driver {}".format(repr(driver)))
         else:

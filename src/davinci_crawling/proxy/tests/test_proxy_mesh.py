@@ -50,7 +50,7 @@ class TestProxyMesh(CaravaggioBaseTest):
         proxies = proxy_mesh.get_to_use_proxies()
         for proxy in proxies:
             proxy_http = proxy["http"]
-            proxy_http = proxy_http.split("@")[1]
+            proxy_http = proxy_http.replace("http://", "")
             proxy_country = proxy_http[0:2]
 
             for country in countries:

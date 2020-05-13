@@ -123,7 +123,7 @@ def get_json(url, timeout=None, custom_header=None, use_proxy=True):
         raise ex
 
 
-def post_json(url, json_obj, timeout=None, use_proxy=True):
+def post_json(url, json_obj, timeout=None, use_proxy=True, custom_header=None):
     """
     Send and receive json by posting to the given URL.
     The body should be provided as a map for conversion
@@ -136,13 +136,12 @@ def post_json(url, json_obj, timeout=None, use_proxy=True):
 
         proxy_address = get_proxy_address() if use_proxy else {}
 
+        header = {**APPLICATION_JSON, **USER_AGENT}
+        if custom_header:
+            header.update(custom_header)
+
         return requests.post(
-            url=url,
-            data=json_body,
-            headers={**APPLICATION_JSON, **USER_AGENT},
-            timeout=(timeout, timeout),
-            verify=False,
-            proxies=proxy_address,
+            url=url, data=json_body, headers=header, timeout=(timeout, timeout), verify=False, proxies=proxy_address,
         )
     except RequestException as ex:
         logger.exception("Unable to send the POST. Cause: %s" % ex)
