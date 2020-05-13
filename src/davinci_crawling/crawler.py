@@ -37,6 +37,7 @@ CHROME_OPTIONS.add_argument("--headless")
 CHROME_OPTIONS.add_argument("--no-sandbox")
 CHROME_OPTIONS.add_argument("--disable-gpu")
 CHROME_OPTIONS.add_argument("--disable-features=NetworkService")
+CHROME_OPTIONS.add_argument("--disable-dev-shm-usage")
 
 
 def get_configuration(crawler_name):
