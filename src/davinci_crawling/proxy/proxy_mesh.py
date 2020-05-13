@@ -56,6 +56,7 @@ class ProxyMesh(Proxy):
 
     available_proxies = None
     to_use_proxies = None
+    proxy_mesh_authenticated = False
 
     def get_to_use_proxies(self):
         if not self.to_use_proxies:
@@ -80,7 +81,7 @@ class ProxyMesh(Proxy):
 
         if not check_ip_changed(ip):
             _logger.debug("Already authenticated to ProxyMesh")
-            return
+            return True
 
         custom_header = {"authorization": PROXY_MESH_SETTINGS["authentication"]}
         try:
@@ -89,13 +90,13 @@ class ProxyMesh(Proxy):
             _logger.error(e)
             response = None
         tries = 10
-        while (not response or response.status_code >= 400) and tries > 0:
+        while (response is None or response.status_code >= 400) and tries > 0:
             if response and "IP address is already authorized" in response.text:
                 break
 
             if not check_ip_changed(ip):
                 _logger.debug("Already authenticated to ProxyMesh")
-                return
+                return True
 
             time.sleep(1)
             try:
@@ -105,8 +106,12 @@ class ProxyMesh(Proxy):
                 response = None
             tries -= 1
 
-        _logger.debug("Successfully authenticate to ProxyMesh")
-        write_changed_ip(ip)
+        if response is not None and (response.status_code < 400 or "IP address is already authorized" in response.text):
+            _logger.debug("Successfully authenticate to ProxyMesh")
+            write_changed_ip(ip)
+            return True
+
+        return False
 
     @classmethod
     def get_country_from_proxy_address(cls, proxy_address):
@@ -132,39 +137,19 @@ class ProxyMesh(Proxy):
         Returns: The list of available proxies.
 
         """
+        if not cls.proxy_mesh_authenticated and PROXY_MESH_SETTINGS:
+            cls.proxy_mesh_authenticated = cls._authenticate_proxy_mesh()
+
         if not cls.available_proxies and PROXY_MESH_SETTINGS:
-            cls._authenticate_proxy_mesh()
-
-            custom_header = {"authorization": PROXY_MESH_SETTINGS["authentication"]}
-            try:
-                response = get_json(
-                    PROXY_MESH_SETTINGS["authorized_proxies_url"], custom_header=custom_header, use_proxy=False
-                )
-            except Exception as e:
-                _logger.error(e)
-                response = None
-
-            tries = 10
-            while (not response or response.status_code >= 400) and tries > 0:
-                time.sleep(1)
-                try:
-                    response = get_json(
-                        PROXY_MESH_SETTINGS["authorized_proxies_url"], custom_header=custom_header, use_proxy=False
-                    )
-                except Exception as e:
-                    _logger.error(e)
-                    response = None
-                tries -= 1
-
-            if not response or response.status_code >= 400:
-                return []
-
-            response = response.json()
+            all_proxies = PROXY_MESH_SETTINGS.get("all-proxies")
             proxies = []
+
+            if not all_proxies:
+                raise Exception("You should define the list of all-proxies")
 
             only_proxies_from = PROXY_MESH_SETTINGS.get("only-proxies-from")
             only_proxies_from = only_proxies_from.split(",") if only_proxies_from else None
-            for proxy in response["proxies"]:
+            for proxy in all_proxies:
                 if only_proxies_from:
                     country = cls.get_country_from_proxy_address(proxy)
                     if not country:
