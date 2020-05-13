@@ -16,10 +16,26 @@ PROXY_TEMPLATE = "%s:%s@%s"
 
 _logger = logging.getLogger("davinci_crawling")
 
+FILE_NAME_STORE_AUTHORIZED_IPS = "/tmp/proxy_mesh_authorized_ips.txt"
+
 
 def get_machine_ip():
     response = get_json("https://api.ipify.org?format=json", use_proxy=False)
     return response
+
+
+def check_ip_changed(ip):
+    try:
+        with open(FILE_NAME_STORE_AUTHORIZED_IPS, "r") as f:
+            contents = f.read()
+            return contents != ip
+    except FileNotFoundError:
+        return True
+
+
+def write_changed_ip(ip):
+    with open(FILE_NAME_STORE_AUTHORIZED_IPS, "w") as f:
+        f.write(ip)
 
 
 def get_proxy_mesh_settings():
@@ -62,6 +78,10 @@ class ProxyMesh(Proxy):
 
         ip = result_machine_ip.json()["ip"]
 
+        if not check_ip_changed(ip):
+            _logger.debug("Already authenticated to ProxyMesh")
+            return
+
         custom_header = {"authorization": PROXY_MESH_SETTINGS["authentication"]}
         try:
             response = requests.post(url=PROXY_MESH_SETTINGS["add_ip_url"], data={"ip": ip}, headers=custom_header,)
@@ -73,6 +93,10 @@ class ProxyMesh(Proxy):
             if response and "IP address is already authorized" in response.text:
                 break
 
+            if not check_ip_changed(ip):
+                _logger.debug("Already authenticated to ProxyMesh")
+                return
+
             time.sleep(1)
             try:
                 response = requests.post(url=PROXY_MESH_SETTINGS["add_ip_url"], data={"ip": ip}, headers=custom_header,)
@@ -82,6 +106,7 @@ class ProxyMesh(Proxy):
             tries -= 1
 
         _logger.debug("Successfully authenticate to ProxyMesh")
+        write_changed_ip(ip)
 
     @classmethod
     def get_country_from_proxy_address(cls, proxy_address):
