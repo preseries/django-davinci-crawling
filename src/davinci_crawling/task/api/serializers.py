@@ -135,7 +135,7 @@ class TaskSearchSerializerV1(CustomHaystackSerializer, BaseCachedSerializerMixin
     type = serializers.IntegerField(default=ON_DEMAND_TASK)
     status = serializers.IntegerField(default=STATUS_CREATED)
 
-    params = fields.DictField(required=True, child=fields.CharField())
+    params = dse_fields.CassandraJSONFieldAsText(required=True)
     kind = fields.CharField(required=True)
 
     class Meta(CustomHaystackSerializer.Meta):
@@ -176,22 +176,14 @@ class TaskFacetSerializerV1(HaystackFacetSerializer):
     class Meta:
         index_classes = [Task]
         fields = [
-            "task_id",
-            "user",
             "created_at",
-            "updated_at",
             "is_deleted",
             "status",
             "kind",
-            "times_performed",
             "type",
         ]
 
-        field_options = {
-            "type": {},
-            "status": {},
-            "kind": {},
-        }
+        field_options = {}
 
 
 # Cache configuration
