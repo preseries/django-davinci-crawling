@@ -139,7 +139,7 @@ class TimeIt:
             end_time = time.time()
 
             duration_time_milliseconds = int((end_time - start_time) * 1000)
-            method_name = self.prefix + fn.__name__
+            method_name = self.prefix + "_" + fn.__name__
 
             if self.log_time:
                 _logger.debug("Method %s executed for %d milliseconds" % (method_name, duration_time_milliseconds))
