@@ -101,10 +101,11 @@ class Crawler(metaclass=ABCMeta):
 
         # Chromium folder
         chromium_file = options.get("chromium_bin_file", None)
+        use_proxy = options.pop("use_proxy", True)
         path = os.path.dirname(os.path.abspath(__file__))
         if chromium_file:
             proxy_address = cls.proxy_manager.get_proxy_address()
-            if proxy_address:
+            if use_proxy and proxy_address:
                 proxy_address = proxy_address["http"].replace("http://", "")
                 CHROME_OPTIONS.add_argument("--proxy-server=%s" % proxy_address)
 
