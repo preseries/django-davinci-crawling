@@ -137,6 +137,8 @@ class Task(CustomDjangoCassandraModel):
 
     changed_fields = columns.List(value_type=columns.Text)
 
+    logging_task = columns.Boolean(default=False)
+
     class Meta:
         get_pk_field = "task_id"
 
@@ -164,7 +166,11 @@ def pre_save_task(sender, instance=None, using=None, update_fields=None, **kwarg
     options_string = generate_key_encoded_map(instance.options, instance.options_map)
     if options_string:
         instance.options = options_string
-    instance.updated_at = timezone.now()
+
+    if instance.logging_task:
+        instance.updated_at = instance.created_at
+    else:
+        instance.updated_at = timezone.now()
 
 
 def generate_key_encoded_map(json_map, key_encoded_map):

@@ -79,6 +79,7 @@ class TaskSerializerV1(dse_serializers.CassandraModelSerializer, BaseCachedSeria
             "updated_fields",
             "deleted_fields",
             "changed_fields",
+            "logging_task",
         )
         read_only_fields = (
             "user",
@@ -95,6 +96,7 @@ class TaskSerializerV1(dse_serializers.CassandraModelSerializer, BaseCachedSeria
             "updated_fields",
             "deleted_fields",
             "changed_fields",
+            "logging_task",
         )
         extra_kwargs = {
             "task_id": {"help_text": "the task id that is the unique partition key."},
@@ -159,6 +161,7 @@ class TaskSearchSerializerV1(CustomHaystackSerializer, BaseCachedSerializerMixin
             "options_map",
             "times_performed",
             "type",
+            "logging_task",
         ]
 
 

@@ -48,6 +48,8 @@ class TaskIndex(BaseSearchIndex, indexes.Indexable):
 
     more_info = indexes.MultiValueField(model_attr="more_info")
 
+    logging_task = indexes.BooleanField(model_attr="logging_task")
+
     class Meta:
 
         text_fields = []
