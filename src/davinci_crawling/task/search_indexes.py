@@ -6,7 +6,7 @@ from datetime import datetime
 
 from haystack import indexes
 
-from caravaggio_rest_api.haystack.indexes import BaseSearchIndex
+from caravaggio_rest_api.haystack.indexes import BaseSearchIndex, TextField
 
 from .models import Task
 
@@ -39,7 +39,7 @@ class TaskIndex(BaseSearchIndex, indexes.Indexable):
 
     more_info = indexes.MultiValueField(model_attr="more_info")
 
-    differences_from_last_version = indexes.CharField(model_attr="differences_from_last_version")
+    differences_from_last_version = TextField(model_attr="differences_from_last_version")
 
     inserted_fields = indexes.MultiValueField(model_attr="inserted_fields")
 
