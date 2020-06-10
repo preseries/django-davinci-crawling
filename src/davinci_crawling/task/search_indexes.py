@@ -7,7 +7,6 @@ from datetime import datetime
 from haystack import indexes
 
 from caravaggio_rest_api.haystack.indexes import BaseSearchIndex
-from caravaggio_rest_api.haystack import indexes as custom_indexes
 
 from .models import Task
 
@@ -15,6 +14,8 @@ _logger = logging.getLogger("davinci_crawler.tasl.search_indexes")
 
 
 class TaskIndex(BaseSearchIndex, indexes.Indexable):
+
+    task_id = indexes.CharField(model_attr="task_id")
 
     user = indexes.CharField(model_attr="user")
 
@@ -36,6 +37,8 @@ class TaskIndex(BaseSearchIndex, indexes.Indexable):
 
     type = indexes.IntegerField(model_attr="type", faceted=True)
 
+    more_info = indexes.MultiValueField(model_attr="more_info")
+
     differences_from_last_version = indexes.CharField(model_attr="differences_from_last_version")
 
     inserted_fields = indexes.MultiValueField(model_attr="inserted_fields")
@@ -46,13 +49,13 @@ class TaskIndex(BaseSearchIndex, indexes.Indexable):
 
     changed_fields = indexes.MultiValueField(model_attr="changed_fields")
 
-    more_info = indexes.MultiValueField(model_attr="more_info")
-
     logging_task = indexes.BooleanField(model_attr="logging_task")
 
     class Meta:
 
         text_fields = []
+
+        exclude = ["params", "options"]
 
         # Once the index has been created it cannot be changed
         # with sync_indexes. Changes should be made by hand.
