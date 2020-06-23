@@ -34,7 +34,7 @@ class TaskSerializerV1(dse_serializers.CassandraModelSerializer, BaseCachedSeria
     fields.
     """
 
-    user = serializers.HiddenField(default=dse_fields.CurrentUserNameDefault())
+    user = serializers.CharField(required=False)
 
     params = dse_fields.CassandraJSONFieldAsText(
         required=True, help_text="the set of params used to execute the crawler" " command, this will be saved as Text."
@@ -59,6 +59,12 @@ class TaskSerializerV1(dse_serializers.CassandraModelSerializer, BaseCachedSeria
 
     changed_fields = fields.ListField(required=False, allow_null=True, child=serializers.CharField())
 
+    def create(self, validated_data):
+        request = self.context.get("request", None)
+        if request:
+            self.validated_data["user"] = str(request.user.id)
+        return super(TaskSerializerV1, self).create(validated_data)
+
     class Meta:
         model = Task
         fields = (
@@ -82,7 +88,6 @@ class TaskSerializerV1(dse_serializers.CassandraModelSerializer, BaseCachedSeria
             "logging_task",
         )
         read_only_fields = (
-            "user",
             "created_at",
             "updated_at",
             "is_deleted",
@@ -133,7 +138,7 @@ class TaskSearchSerializerV1(CustomHaystackSerializer, BaseCachedSerializerMixin
     A Fast Searcher (Solr) version of the original Business Object API View
     """
 
-    user = serializers.HiddenField(default=dse_fields.CurrentUserNameDefault())
+    user = serializers.CharField(required=False)
     type = serializers.IntegerField(default=ON_DEMAND_TASK)
     status = serializers.IntegerField(default=STATUS_CREATED)
 
