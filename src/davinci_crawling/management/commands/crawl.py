@@ -52,8 +52,11 @@ def _pool_tasks(interval, times_to_run):
         for task in all_tasks:
             try:
                 crawler_name = task.kind
-                options = json.loads(task.options)
-                options = options.copy()
+                if task.options:
+                    options = json.loads(task.options)
+                    options = options.copy()
+                else:
+                    options = {}
                 options["crawler"] = crawler_name
                 options["task_id"] = task.task_id
 

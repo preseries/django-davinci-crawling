@@ -119,7 +119,7 @@ class Task(CustomDjangoCassandraModel):
 
     options_map = KeyEncodedMap(key_type=columns.Text, value_type=columns.Text)
 
-    options = columns.Text(required=True)
+    options = columns.Text(required=False)
 
     times_performed = columns.SmallInt(default=0)
 

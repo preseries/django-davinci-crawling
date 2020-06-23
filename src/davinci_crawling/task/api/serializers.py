@@ -41,7 +41,7 @@ class TaskSerializerV1(dse_serializers.CassandraModelSerializer, BaseCachedSeria
     )
 
     options = dse_fields.CassandraJSONFieldAsText(
-        required=True,
+        required=False,
         help_text="the exactly same content as `options` but saved"
         " on a way that we can search using solr "
         "(KeyEncodedMap).",
