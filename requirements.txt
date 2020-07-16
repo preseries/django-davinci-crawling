@@ -18,5 +18,5 @@ google-api-python-client>=1.7
 google-cloud-storage>=1.10
 
 git+https://github.com/intellstartup/django-cassandra-engine.git@add-consistency-level-support#egg=django-cassandra-engine-1.6.0
-git+https://github.com/intellstartup/django-caravaggio-rest-api.git@develop#egg=django-caravaggio-rest-api-R202007
-git+https://github.com/intellstartup/pylimit.git@develop#egg=pylimit-0.1.7
+git+https://github.com/intellstartup/django-caravaggio-rest-api.git@R202007#egg=django-caravaggio-rest-api-R202007
+git+https://github.com/biplap-sarkar/pylimit.git@master#egg=pylimit-0.1.7
