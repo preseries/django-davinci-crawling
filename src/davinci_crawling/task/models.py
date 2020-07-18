@@ -93,8 +93,6 @@ class Task(CustomDjangoCassandraModel):
     """
 
     __table_name__ = "davinci_task"
-    _cassandra_consistency_level_read = ConsistencyLevel.ONE
-    _cassandra_consistency_level_write = ConsistencyLevel.ALL
 
     # Force that all the values will reside in the seam node of the cluster
     task_id = columns.UUID(partition_key=True, default=uuid.uuid4)
