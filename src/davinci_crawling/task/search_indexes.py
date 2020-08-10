@@ -37,8 +37,6 @@ class TaskIndex(BaseSearchIndex, indexes.Indexable):
 
     type = indexes.IntegerField(model_attr="type", faceted=True)
 
-    more_info = indexes.MultiValueField(model_attr="more_info")
-
     differences_from_last_version = TextField(model_attr="differences_from_last_version")
 
     inserted_fields = indexes.MultiValueField(model_attr="inserted_fields")
@@ -55,7 +53,7 @@ class TaskIndex(BaseSearchIndex, indexes.Indexable):
 
         text_fields = []
 
-        exclude = ["params", "options"]
+        exclude = ["params", "options", "more_info"]
 
         # Once the index has been created it cannot be changed
         # with sync_indexes. Changes should be made by hand.

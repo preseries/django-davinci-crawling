@@ -10,7 +10,6 @@ from abc import ABCMeta
 import abc
 import logging
 
-from caravaggio_rest_api.haystack.backends.utils import CaravaggioSearchPaginator
 from davinci_crawling.management.commands.utils.utils import update_task_status
 
 from davinci_crawling.task.models import Task, STATUS_FAULTY, STATUS_MAINTENANCE, TaskMoreInfo
