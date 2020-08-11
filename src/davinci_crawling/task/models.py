@@ -7,7 +7,7 @@ from datetime import datetime, date
 from django.utils import timezone
 import uuid
 
-from caravaggio_rest_api.dse.columns import KeyEncodedMap
+from caravaggio_rest_api.dse.columns import KeyEncodedMap, freeze_column
 from caravaggio_rest_api.dse.models import CustomDjangoCassandraModel
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
@@ -92,7 +92,7 @@ class Task(CustomDjangoCassandraModel):
         type: the type of the task, could be OnDemand(1) or Batch(2)
     """
 
-    __table_name__ = "davinci_task"
+    __table_name__ = "davinci_task_2"
 
     # Force that all the values will reside in the seam node of the cluster
     task_id = columns.UUID(partition_key=True, default=uuid.uuid4)
@@ -111,11 +111,11 @@ class Task(CustomDjangoCassandraModel):
 
     kind = columns.Text(required=True)
 
-    params_map = KeyEncodedMap(key_type=columns.Text, value_type=columns.Text)
+    params_map = freeze_column(KeyEncodedMap(key_type=columns.Text, value_type=columns.Text))
 
     params = columns.Text(required=True)
 
-    options_map = KeyEncodedMap(key_type=columns.Text, value_type=columns.Text)
+    options_map = freeze_column(KeyEncodedMap(key_type=columns.Text, value_type=columns.Text))
 
     options = columns.Text(required=False)
 
@@ -123,17 +123,17 @@ class Task(CustomDjangoCassandraModel):
 
     type = columns.SmallInt(default=ON_DEMAND_TASK)
 
-    more_info = columns.List(value_type=UserDefinedType(TaskMoreInfo))
+    more_info = freeze_column(columns.List(value_type=UserDefinedType(TaskMoreInfo)))
 
     differences_from_last_version = columns.Text()
 
-    inserted_fields = columns.List(value_type=columns.Text)
+    inserted_fields = freeze_column(columns.List(value_type=columns.Text))
 
-    updated_fields = columns.List(value_type=columns.Text)
+    updated_fields = freeze_column(columns.List(value_type=columns.Text))
 
-    deleted_fields = columns.List(value_type=columns.Text)
+    deleted_fields = freeze_column(columns.List(value_type=columns.Text))
 
-    changed_fields = columns.List(value_type=columns.Text)
+    changed_fields = freeze_column(columns.List(value_type=columns.Text))
 
     logging_task = columns.Boolean(default=False)
 
