@@ -17,11 +17,13 @@ try:
     from dse.cqlengine.columns import UserDefinedType
     from dse.cqlengine.usertype import UserType
     from dse import ConsistencyLevel
+    from dse.cqlengine.query import BatchQuery, BatchType
 except ImportError:
     from cassandra.cqlengine import columns, ValidationError
     from cassandra.cqlengine.columns import UserDefinedType
     from cassandra.cqlengine.usertype import UserType
     from cassandra import ConsistencyLevel
+    from cassandra.cqlengine.query import BatchQuery, BatchType
 
 _logger = logging.getLogger("davinci_crawling.task")
 
@@ -152,6 +154,29 @@ class Task(CustomDjangoCassandraModel):
             )
 
 
+class TaskTimeSeries(CustomDjangoCassandraModel):
+    """
+    The timeseries version of the davinci task table
+    """
+
+    __table_name__ = "davinci_task_ts"
+
+    bucket = columns.Text(partition_key=True)
+
+    ts = columns.DateTime(default=timezone.now, primary_key=True, clustering_order="ASC")
+
+    task_id = columns.UUID(required=True)
+
+    type = columns.SmallInt(default=ON_DEMAND_TASK, required=True)
+
+    kind = columns.Text(required=True)
+
+    status = columns.SmallInt(default=STATUS_CREATED, required=True)
+
+    class Meta:
+        get_pk_field = "bucket"
+
+
 # We need to set the new value for the changed_at field
 @receiver(pre_save, sender=Task)
 def pre_save_task(sender, instance=None, using=None, update_fields=None, **kwargs):
@@ -208,3 +233,44 @@ def generate_key_encoded_map(json_map, key_encoded_map):
             del json_map[key]
 
         return json.dumps(json_map)
+
+
+# We need to set the new value for the changed_at field
+@receiver(pre_save, sender=TaskTimeSeries)
+def pre_save_task_ts(sender, instance=None, using=None, update_fields=None, **kwargs):
+    instance.bucket = datetime.strftime(instance.ts, "%y%m%d%H%M")
+    instance.ts = timezone.now()
+
+
+def create_davinci_task_batch(data: dict, task_instance: Task = None, task_ts_instance: TaskTimeSeries = None) -> Task:
+    if "task_id" not in data:
+        data["task_id"] = uuid.uuid4()
+
+    if not task_instance:
+        task_instance = Task(**data)
+
+    if not task_ts_instance:
+        task_ts_instance = TaskTimeSeries(**data)
+
+    batch = BatchQuery(consistency=Task._cassandra_consistency_level_write)
+    task_instance.batch(batch).save()
+    task_ts_instance.batch(batch).save()
+    batch.execute()
+
+    return task_instance
+
+
+def update_davinci_task_batch(task: Task, data: dict) -> Task:
+    if not isinstance(task, Task):
+        task_id = task
+        task = Task.objects.get(task_id=task_id)
+    else:
+        task_id = task.task_id
+
+    task_ts = TaskTimeSeries.objects.get(task_id=task_id)
+    batch = BatchQuery(consistency=Task._cassandra_consistency_level_write)
+    task.batch(batch).update(**data)
+    task_ts.batch(batch).update(**data)
+    batch.execute()
+
+    return task

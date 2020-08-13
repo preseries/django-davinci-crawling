@@ -12,7 +12,13 @@ import logging
 
 from davinci_crawling.management.commands.utils.utils import update_task_status
 
-from davinci_crawling.task.models import Task, STATUS_FAULTY, STATUS_MAINTENANCE, TaskMoreInfo
+from davinci_crawling.task.models import (
+    Task,
+    STATUS_FAULTY,
+    STATUS_MAINTENANCE,
+    TaskMoreInfo,
+    create_davinci_task_batch,
+)
 from davinci_crawling.proxy.proxy import ProxyManager
 from django.conf import settings
 
@@ -333,7 +339,7 @@ class Crawler(metaclass=ABCMeta):
             ],
         }
 
-        Task.create(**task_data)
+        create_davinci_task_batch(task_data)
 
     @staticmethod
     def _get_fake_request():

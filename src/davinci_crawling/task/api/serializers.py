@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*
 # Copyright (c) 2019 BuildGroup Data Services Inc.
+import uuid
 
-from caravaggio_rest_api.drf_haystack.serializers import BaseCachedSerializerMixin, CustomHaystackSerializer
+from caravaggio_rest_api.drf_haystack.serializers import (
+    BaseCachedSerializerMixin,
+    CustomHaystackSerializer,
+    deserialize_instance,
+)
 from drf_haystack.serializers import HaystackFacetSerializer
 
 from rest_framework import fields, serializers
@@ -11,7 +16,7 @@ from rest_framework_cache.registry import cache_registry
 from caravaggio_rest_api.drf_haystack import serializers as dse_serializers
 from caravaggio_rest_api import fields as dse_fields
 
-from davinci_crawling.task.models import Task, ON_DEMAND_TASK, STATUS_CREATED, TaskMoreInfo
+from davinci_crawling.task.models import Task, ON_DEMAND_TASK, STATUS_CREATED, TaskMoreInfo, create_davinci_task_batch
 from davinci_crawling.task.search_indexes import TaskIndex
 
 
@@ -63,7 +68,10 @@ class TaskSerializerV1(dse_serializers.CassandraModelSerializer, BaseCachedSeria
         request = self.context.get("request", None)
         if request:
             self.validated_data["user"] = str(request.user.id)
-        return super(TaskSerializerV1, self).create(validated_data)
+        self.validated_data["task_id"] = uuid.uuid4()
+        instance = deserialize_instance(self, self.Meta.model)
+
+        return create_davinci_task_batch(self.validated_data, task_instance=instance)
 
     class Meta:
         model = Task

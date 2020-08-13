@@ -14,7 +14,7 @@ from django.core.management.base import SystemCheckError
 from django.db import connections
 
 from davinci_crawling.utils import CrawlersRegistry
-from davinci_crawling.task.models import Task, BATCH_TASK
+from davinci_crawling.task.models import BATCH_TASK, create_davinci_task_batch
 
 _logger = logging.getLogger("davinci_crawling.commands")
 
@@ -34,7 +34,7 @@ class CrawlParamsProducer(Producer):
 
         crawler_name = options.get("crawler")
         data = {"user": "batchuser", "kind": crawler_name, "params": param, "options": options, "type": BATCH_TASK}
-        Task.create(**data)
+        create_davinci_task_batch(data)
 
 
 def crawl_command_to_task(**options):
