@@ -113,11 +113,11 @@ class Task(CustomDjangoCassandraModel):
 
     kind = columns.Text(required=True)
 
-    params_map = freeze_column(KeyEncodedMap(key_type=columns.Text, value_type=columns.Text))
+    params_map = KeyEncodedMap(key_type=columns.Text, value_type=columns.Text)
 
     params = columns.Text(required=True)
 
-    options_map = freeze_column(KeyEncodedMap(key_type=columns.Text, value_type=columns.Text))
+    options_map = KeyEncodedMap(key_type=columns.Text, value_type=columns.Text)
 
     options = columns.Text(required=False)
 
