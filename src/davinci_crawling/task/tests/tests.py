@@ -6,7 +6,7 @@ import logging
 import time
 
 from caravaggio_rest_api.utils import delete_all_records
-from davinci_crawling.task.models import Task
+from davinci_crawling.task.models import Task, TaskTimeSeries
 
 from rest_framework import status
 from django.urls import reverse
@@ -151,14 +151,6 @@ class GetAllTest(CaravaggioBaseTest):
         self.assertEqual(response.data["fields"]["kind"][1]["text"], "web")
         self.assertEqual(response.data["fields"]["kind"][1]["count"], 1)
 
-        self.assertEqual(len(response.data["fields"]["status"]), 1)
-        self.assertEqual(response.data["fields"]["status"][0]["text"], "0")
-        self.assertEqual(response.data["fields"]["status"][0]["count"], 3)
-
-        self.assertEqual(len(response.data["fields"]["type"]), 1)
-        self.assertEqual(response.data["fields"]["type"][0]["text"], "1")
-        self.assertEqual(response.data["fields"]["type"][0]["count"], 3)
-
     def step6_put_not_allowed(self):
         for resource in self.post_resources:
             _logger.info("DELETE Resource: {}".format(resource["task_id"]))
@@ -181,3 +173,15 @@ class GetAllTest(CaravaggioBaseTest):
             path = "{0}{1}/".format(reverse("task-list"), resource["task_id"])
             response = self.api_client.delete(path)
             self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def step9_test_davinci_ts(self):
+        for index, resource_id in enumerate(self.persisted_resources):
+            original_resource = self.post_resources[index]
+            response = TaskTimeSeries.objects.get(task_id=resource_id)
+
+            self.assertEqual(str(response.task_id), original_resource["task_id"])
+            self.assertEqual(response.status, original_resource["status"])
+            self.assertEqual(response.type, original_resource["type"])
+            self.assertEqual(response.kind, original_resource["kind"])
+            self.assertIsNotNone(response.bucket)
+            self.assertIsNotNone(response.ts)
