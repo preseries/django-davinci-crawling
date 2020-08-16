@@ -238,8 +238,8 @@ def generate_key_encoded_map(json_map, key_encoded_map):
 # We need to set the new value for the changed_at field
 @receiver(pre_save, sender=TaskTimeSeries)
 def pre_save_task_ts(sender, instance=None, using=None, update_fields=None, **kwargs):
-    instance.bucket = datetime.strftime(instance.ts, "%y%m%d%H%M")
     instance.ts = timezone.now()
+    instance.bucket = datetime.strftime(instance.ts, "%y%m%d%H%M")
 
 
 def create_davinci_task_batch(data: dict, task_instance: Task = None, task_ts_instance: TaskTimeSeries = None) -> Task:
@@ -260,17 +260,23 @@ def create_davinci_task_batch(data: dict, task_instance: Task = None, task_ts_in
     return task_instance
 
 
-def update_davinci_task_batch(task: Task, data: dict) -> Task:
+def update_davinci_task_batch(task: [Task, str], data: dict) -> Task:
     if not isinstance(task, Task):
-        task_id = task
-        task = Task.objects.get(task_id=task_id)
-    else:
-        task_id = task.task_id
+        task = Task.objects.get(task_id=task)
 
-    task_ts = TaskTimeSeries.objects.get(task_id=task_id)
+    task_ts_data = {
+        "task_id": task.task_id,
+        "type": task.type,
+        "kind": task.kind,
+        "status": task.status,
+    }
+
+    task_ts_data.update(data)
+    task_ts = TaskTimeSeries(**task_ts_data)
+
     batch = BatchQuery(consistency=Task._cassandra_consistency_level_write)
     task.batch(batch).update(**data)
-    task_ts.batch(batch).update(**data)
+    task_ts.batch(batch).save()
     batch.execute()
 
     return task
