@@ -165,7 +165,7 @@ class TaskTimeSeries(CustomDjangoCassandraModel):
 
     ts = columns.DateTime(default=timezone.now, primary_key=True, clustering_order="ASC")
 
-    task_id = columns.UUID(required=True)
+    task_id = columns.UUID(required=True, primary_key=True)
 
     type = columns.SmallInt(default=ON_DEMAND_TASK, required=True)
 
