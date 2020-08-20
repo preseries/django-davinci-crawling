@@ -4,7 +4,11 @@
 Some utils used by the davinci_crawling commands.
 """
 from davinci_crawling.utils import CrawlersRegistry
-from davinci_crawling.task.models import Task, TaskMoreInfo, update_davinci_task_batch
+from davinci_crawling.task.models import (
+    Task,
+    TaskMoreInfo,
+    update_davinci_task_model_batch,
+)
 from django.utils import timezone
 
 cached_crawlers = {}
@@ -35,11 +39,11 @@ def update_task_status(task, status, source=None, more_info=None):
     if not task:
         raise Exception("Not found task")
 
-    data = {"status": status}
+    task.status = status
     if more_info:
-        data["more_info"] = append_more_info(task, source, more_info)
+        task.more_info = append_more_info(task, source, more_info)
 
-    task = update_davinci_task_batch(task, data)
+    task = update_davinci_task_model_batch(task)
 
     return task
 

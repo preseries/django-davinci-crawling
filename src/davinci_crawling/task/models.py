@@ -280,3 +280,23 @@ def update_davinci_task_batch(task: [Task, str], data: dict) -> Task:
     batch.execute()
 
     return task
+
+
+def update_davinci_task_model_batch(task: Task) -> Task:
+    if not isinstance(task, Task):
+        raise Exception("Should use a Task object")
+
+    task_ts_data = {
+        "task_id": task.task_id,
+        "type": task.type,
+        "kind": task.kind,
+        "status": task.status,
+    }
+    task_ts = TaskTimeSeries(**task_ts_data)
+
+    batch = BatchQuery(consistency=Task._cassandra_consistency_level_write)
+    task.batch(batch).save()
+    task_ts.batch(batch).save()
+    batch.execute()
+
+    return task
