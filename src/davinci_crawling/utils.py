@@ -126,6 +126,9 @@ class TimeIt:
         for execution_time in executions_times:
             more_info.append(TaskMoreInfo(**execution_time))
 
+        # TODO: find a better way to deal with this frozen update on collection
+        davinci_task.more_info = None
+        davinci_task.save()
         davinci_task.more_info = more_info
         davinci_task.save()
 
