@@ -10,7 +10,6 @@ import django
 
 from importlib import import_module
 
-from davinci_crawling.task.models import update_davinci_task_model_batch
 from django.utils import timezone
 from django_cassandra_engine.connection import CassandraConnection
 
@@ -128,7 +127,7 @@ class TimeIt:
             more_info.append(TaskMoreInfo(**execution_time))
 
         davinci_task.more_info = more_info
-        update_davinci_task_model_batch(davinci_task)
+        davinci_task.save()
 
     def __call__(self, fn):
         @wraps(fn)
