@@ -42,8 +42,10 @@ def update_task_status(task, status, source=None, more_info=None):
     task.status = status
     if more_info:
         # TODO: find a better way to deal with this frozen update on collection
+        tmp_more_info = task.more_info
         task.more_info = None
         task.save()
+        task.more_info = tmp_more_info
         task.more_info = append_more_info(task, source, more_info)
 
     task = update_davinci_task_model_batch(task)
