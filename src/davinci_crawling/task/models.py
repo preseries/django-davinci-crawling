@@ -2,6 +2,7 @@
 # Copyright (c) 2019 BuildGroup Data Services Inc.
 import json
 import logging
+from caravaggio_rest_api.haystack.query import CaravaggioSearchQuerySet
 from datetime import datetime, date
 
 from django.utils import timezone
@@ -300,3 +301,15 @@ def update_davinci_task_model_batch(task: Task) -> Task:
     batch.execute()
 
     return task
+
+
+def has_status_0_tasks(task_kind):
+    """
+    Check if we have tasks with status 0 for a given task.
+    Args:
+        task_kind: the kind of the task.
+
+    Returns: True if we have tasks, false otherwise.
+    """
+    first = CaravaggioSearchQuerySet().models(Task).raw_search(f"kind:{task_kind} AND status:{STATUS_CREATED}")[:1]
+    return True if first else False
