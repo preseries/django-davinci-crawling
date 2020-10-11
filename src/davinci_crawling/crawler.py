@@ -123,6 +123,10 @@ class Crawler(metaclass=ABCMeta):
                 for key, value in options[Crawler.CHROME_DESIREDCAPABILITIES].items():
                     capabilities[key] = value
 
+            # get the performance logs, used to be able to get the status code of a request
+            # reference: https://stackoverflow.com/questions/27644615/getting-chrome-performance-and-tracing-logs
+            capabilities["goog:loggingPrefs"] = {"performance": "ALL"}
+
             driver = webdriver.Chrome(chrome_options=CHROME_OPTIONS, desired_capabilities=capabilities)
 
             _logger.info("Using CHROMIUM as Dynamic Web Driver. Driver {}".format(repr(driver)))
