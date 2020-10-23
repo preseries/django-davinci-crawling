@@ -24,6 +24,8 @@ class CrawlersRegistry(object):
 
     __crawlers = {}
 
+    __available_crawlers = {}
+
     @classmethod
     def __get_installed_apps(cls):
         """
@@ -39,37 +41,55 @@ class CrawlersRegistry(object):
             return models.get_apps()
 
     @classmethod
-    def _discover_crawlers(cls):
+    def _get_crawler_class(cls, crawler_name):
+        all_crawlers = cls.get_all_crawlers()
+        if crawler_name not in cls.__crawlers:
+            from .crawler import Crawler
+
+            module_name = all_crawlers[crawler_name]
+            crawlers_module = import_module(module_name)
+
+            for name, obj in inspect.getmembers(crawlers_module, inspect.isclass):
+                crawler_types = Crawler
+                if inspect.isclass(obj) and issubclass(obj, crawler_types) and not inspect.isabstract(obj):
+                    cls.__crawlers[crawler_name] = obj
+                    break
+
+        return cls.__crawlers[crawler_name]
+
+    @classmethod
+    def _get_available_crawlers(cls):
         apps = cls.__get_installed_apps()
 
         for app in apps:
             try:
-                from .crawler import Crawler
+                module_name = cls.import_template.format(app_name=app)
+                crawler_module_exists = importlib.util.find_spec(module_name)
 
-                crawlers_module = import_module(cls.import_template.format(app_name=app))
+                if not crawler_module_exists:
+                    continue
 
-                for name, obj in inspect.getmembers(crawlers_module, inspect.isclass):
-                    crawler_types = Crawler
-                    if inspect.isclass(obj) and issubclass(obj, crawler_types) and not inspect.isabstract(obj):
-                        crawler_name = getattr(obj, "__crawler_name__")
-                        cls.__crawlers[crawler_name] = obj
+                crawlers_module = import_module(app)
+                crawler_name = getattr(crawlers_module, "CRAWLER_NAME")
+
+                if crawler_name:
+                    cls.__available_crawlers[crawler_name] = module_name
             except ModuleNotFoundError:
                 pass
 
     def get_crawler(self, name):
-        crawlers = self.get_all_crawlers()
-
-        crawler_clazz = crawlers.get(name, None)
+        crawler_clazz = self._get_crawler_class(name)
         if not crawler_clazz:
             raise LookupError("Unable to find the crawler with name {}".format(name))
 
         return crawler_clazz
 
-    def get_all_crawlers(self):
-        if not self.__crawlers:
-            self._discover_crawlers()
+    @classmethod
+    def get_all_crawlers(cls):
+        if not cls.__available_crawlers:
+            cls._get_available_crawlers()
 
-        return self.__crawlers
+        return cls.__available_crawlers
 
 
 def setup_cassandra_object_mapper(alias="cassandra"):
