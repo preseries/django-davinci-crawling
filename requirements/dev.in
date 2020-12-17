@@ -3,7 +3,6 @@ django-debug-toolbar
 django-extensions
 
 psycopg2-binary
-dse-driver
-#cassandra-driver
+cassandra-driver==3.24.0
 
 pydevd_pycharm

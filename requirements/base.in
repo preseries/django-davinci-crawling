@@ -17,5 +17,5 @@ XlsxWriter
 google-api-python-client
 google-cloud-storage
 
-git+https://github.com/buildgroupai/django-cassandra-engine@add-consistency-level-support#egg=django-cassandra-engine-0
-git+https://github.com/buildgroupai/pylimit@develop#egg=pylimit-0
+git+https://github.com/buildgroupai/django-cassandra-engine@add-consistency-level-support#egg=django-cassandra-engine
+git+https://github.com/buildgroupai/pylimit@develop#egg=pylimit
